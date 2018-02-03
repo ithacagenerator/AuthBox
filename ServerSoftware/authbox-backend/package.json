@@ -10,7 +10,6 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
-    "express-force-https": "^1.0.0",
     "homedir": "^0.6.0",
     "jsonwebtoken": "^8.1.1",
     "mongodb": "^3.0.1",
