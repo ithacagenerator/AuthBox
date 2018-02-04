@@ -141,8 +141,9 @@ var findDocuments = function(colxn, condition, options = {}) {
   
     // Get the documents collection
     return new Promise((resolve, reject) => {
-      var url = 'mongodb://localhost:27017/authbox';
-      MongoClient.connect(url, function(err, db) {
+      var url = 'mongodb://localhost:27017';
+      MongoClient.connect(url, function(err, client) {
+        const db = client.db('authbox');
         if(err){
           reject(err);
         }
@@ -170,12 +171,12 @@ var findDocuments = function(colxn, condition, options = {}) {
               else{
                 resolve(docs);
               }
-              db.close();
+              client.close();
             });
           }
           catch(error){
             reject(error);
-            db.close();
+            client.close();
           }
         }
       });
@@ -197,8 +198,9 @@ var findDocuments = function(colxn, condition, options = {}) {
   
     // update ONE document in the collection
     return new Promise((resolve, reject) => {
-      var url = 'mongodb://localhost:27017/authbox';
-      MongoClient.connect(url, function(err, db) {
+      var url = 'mongodb://localhost:27017';
+      MongoClient.connect(url, function(err, client) {
+        const db = client.db('authbox');
         if(err){
           reject(err);
         }
@@ -213,7 +215,7 @@ var findDocuments = function(colxn, condition, options = {}) {
               else{
                 resolve(result);
               }
-              db.close();
+              client.close();
             });
           }
           else{
@@ -224,7 +226,7 @@ var findDocuments = function(colxn, condition, options = {}) {
               else{
                 resolve(result);
               }
-              db.close();
+              client.close();
             });
           }
         }
@@ -236,35 +238,12 @@ var findDocuments = function(colxn, condition, options = {}) {
   
     let opts = Object.assign({}, {}, options);
   
-    // only allow deletion by specific fields
-    let errorMessage = null;
-    switch(colxn){
-      case 'Users':
-        if(Object.keys(condition).indexOf("name") < 0){
-          errorMessage = "Users can only be deleted by 'name' and none was supplied";
-        }
-        break;
-      case 'Experiments':
-        if(Object.keys(condition).indexOf("id") < 0){
-          errorMessage = "Users can only be deleted by 'id' and none was supplied";
-        }
-        break;
-      case 'Eggs':
-        if(Object.keys(condition).indexOf("serial_number") < 0){
-          errorMessage = "Eggs can only be deleted by 'serial_number' and none was supplied";
-        }
-        break;
-      default:
-        errorMessage = `Attempted to delete from unsupported collection ${colxn}`;
-        break;
-    }
-  
-  
     // delete ONE document in the collection
     return new Promise((resolve, reject) => {
       if(!errorMessage){
-        var url = 'mongodb://localhost:27017/authbox';
-        MongoClient.connect(url, function(err, db) {
+        var url = 'mongodb://localhost:27017';
+        MongoClient.connect(url, function(err, client) {
+          const db = client.db('authbox');
           if(err){
             reject(err);
           }
@@ -278,7 +257,7 @@ var findDocuments = function(colxn, condition, options = {}) {
               else{
                 resolve(result);
               }
-              db.close();
+              client.close();
             });
           }
         });
