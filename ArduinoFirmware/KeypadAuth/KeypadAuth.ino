@@ -23,7 +23,6 @@ void handleCommands(char c);
 uint16_t crc16_update(uint16_t crc, uint8_t a);
 uint16_t crc16(char * str, uint8_t len);
 uint8_t check_crc16(char * str);
-void handleCommands(char c);
 void handleAuthorizeCommand(void);
 void handleLockoutCommand(void);
 
