@@ -1,5 +1,4 @@
 var express = require('express');
-var secure = require('express-force-https');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -12,7 +11,6 @@ var index = require('./routes/index');
 var v1 = require('./routes/v1');
 
 var app = express();
-app.use(secure);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
