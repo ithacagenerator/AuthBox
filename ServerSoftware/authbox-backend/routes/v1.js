@@ -33,13 +33,13 @@ router.put('/authorize/:auth_hash/:access_code', (req, res, next) => {
   .then((result) =>{
     if(result.box_id){
       authorizedMemberName = result.member.name;
-      return updateDocument('BoxUsage', {}, {        
+      return insertDocument('BoxUsage', {
         member: authorizedMemberName,
         box_id: result.box_id,
         authorized: moment().format()
       })
-      .then((updateResult) => {
-        if(!updateResult.upsertedId){          
+      .then((insertResult) => {
+        if(!insertResult.insertedId){          
           throw new Error('no document inserted');
         }
       });
@@ -153,7 +153,7 @@ var findDocuments = function(colxn, condition, options = {}) {
           reject(err);
         }
         else {
-          console.log("Connected correctly to server");
+          // console.log("Connected correctly to server");
           try{
             var collection = db.collection(colxn);
             // Find some documents
@@ -210,7 +210,7 @@ var findDocuments = function(colxn, condition, options = {}) {
           reject(err);
         }
         else {
-          console.log("Connected correctly to server");
+          // console.log("Connected correctly to server");
           var collection = db.collection(colxn);
           if(opts.updateMany){
             collection.updateMany(condition, updateOperation, opts, function(err, result) {
@@ -239,6 +239,31 @@ var findDocuments = function(colxn, condition, options = {}) {
     });
   }
   
+  var insertDocument = function(colxn, document){
+    return new Promise((resolve, reject) => {
+      var url = 'mongodb://localhost:27017';
+      MongoClient.connect(url, function(err, client) {
+        const db = client.db('authbox');
+        if(err){
+          reject(err);
+        }
+        else {
+          // console.log("Connected correctly to server");
+          var collection = db.collection(colxn);
+          collection.insertOne(document, function(err, result) {
+            if(err){
+              reject(err);
+            }
+            else{
+              resolve(result);
+            }
+            client.close();
+          });
+        }
+      });
+    });    
+  }
+
   var deleteDocument = function(colxn, condition, options = {}){
   
     let opts = Object.assign({}, {}, options);
@@ -253,7 +278,7 @@ var findDocuments = function(colxn, condition, options = {}) {
             reject(err);
           }
           else {
-            console.log("Connected correctly to server");
+            // console.log("Connected correctly to server");
             var collection = db.collection(colxn);
             collection.deleteOne(condition, opts, function(err, result) {
               if(err){
