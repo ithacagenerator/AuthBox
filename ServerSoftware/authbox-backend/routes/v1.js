@@ -18,7 +18,7 @@ var findMemberAndBox = (auth_hash, access_code) => {
   .then((members) => {
     if(members.length === 1){      
       return {
-        member: member[0],
+        member: members[0],
         box_id: decipherAuthBoxId(members[0], auth_hash)
       }
     } else throw new Error('no such access code');
