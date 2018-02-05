@@ -55,7 +55,7 @@ router.put('/authorize/:auth_hash/:access_code', (req, res, next) => {
 });
 
 router.put('/deauthorize/:auth_hash/:access_code', (req, res, next) => {
-  findMemberAndBox(req.parames.auth_hash, req.params.access_code)
+  findMemberAndBox(req.params.auth_hash, req.params.access_code)
   .then((result) =>{
     if(result.box_id){
       return updateDocument('BoxUsage', {
