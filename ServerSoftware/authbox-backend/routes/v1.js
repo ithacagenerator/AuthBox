@@ -26,8 +26,9 @@ var findMemberAndBox = (auth_hash, access_code) => {
 
 }
 
+// cURL: curl -X PUT https://ithacagenerator.org/authbox/v1/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
 router.put('/authorize/:auth_hash/:access_code', (req, res, next) => {
-  findMemberAndBox(req.parames.auth_hash, req.params.access_code)
+  findMemberAndBox(req.params.auth_hash, req.params.access_code)
   .then((result) =>{
     if(result.box_id){
       return updateDocument('BoxUsage', {}, {        
@@ -89,6 +90,7 @@ router.put('/deauthorize/:auth_hash/:access_code', (req, res, next) => {
 
 // Boxes is a collection, each Box is required to have fields like::
 // { id: 'laser-cutter', access_code: 'secret-passphrase' }
+// cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authmap/CALCULATED-AUTH-HASH-HERE
 router.get('/authmap/:auth_hash', (req, res, next) => {
   findDocuments('AuthBoxes', {})
   .then((boxes) => {    
