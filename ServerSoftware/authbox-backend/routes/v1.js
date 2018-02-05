@@ -94,7 +94,7 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
   .then((boxes) => {    
     return boxes.find(box => {
       const box_auth_hash = pbkdf2.pbkdf2Sync(box.id, box.access_code, 1, 32, 'sha512').toString('hex');
-      return box_auth_hash === auth_hash;      
+      return box_auth_hash === req.params.auth_hash;      
     })
   })
   .then((box) => {
