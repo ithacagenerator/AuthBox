@@ -123,7 +123,7 @@ var decipherAuthBoxId = (member, auth_hash) => {
     return null;
   }
   let access_code = member.access_code;
-  let authorizeBoxes = member.authorizedBoxes;
+  let authorizedBoxes = member.authorizedBoxes;
   if(!Array.isArray(authorizedBoxes)){
     authorizedBoxes = [];
   }
