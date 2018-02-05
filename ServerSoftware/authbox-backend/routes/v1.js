@@ -93,7 +93,7 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
   findDocuments('AuthBoxes', {})
   .then((boxes) => {    
     return boxes.find(box => {
-      const box_auth_hash = pbkdf2.pbkdf2Sync(box.id, box.access_code, 1, 32, 'sha512');
+      const box_auth_hash = pbkdf2.pbkdf2Sync(box.id, box.access_code, 1, 32, 'sha512').toString('hex');
       return box_auth_hash === auth_hash;      
     })
   })
@@ -127,7 +127,7 @@ var decipherAuthBoxId = (member, auth_hash) => {
   }
 
   return authorizedBoxes.find(box_id => {
-    const box_auth_hash = pbkdf2.pbkdf2Sync(box_id, access_code, 1, 32, 'sha512');
+    const box_auth_hash = pbkdf2.pbkdf2Sync(box_id, access_code, 1, 32, 'sha512').toString('hex');
     return box_auth_hash === auth_hash;
   })
 };
