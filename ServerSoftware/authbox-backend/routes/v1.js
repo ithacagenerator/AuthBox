@@ -26,7 +26,7 @@ var findMemberAndBox = (auth_hash, access_code) => {
 
 }
 
-// cURL: curl -X PUT https://ithacagenerator.org/authbox/v1/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
+// cURL: curl -X PUT https://ithacagenerator.org/authbox/v1/authorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
 router.put('/authorize/:auth_hash/:access_code', (req, res, next) => {
   findMemberAndBox(req.params.auth_hash, req.params.access_code)
   .then((result) =>{
@@ -54,6 +54,7 @@ router.put('/authorize/:auth_hash/:access_code', (req, res, next) => {
   });
 });
 
+// cURL: curl -X PUT https://ithacagenerator.org/authbox/v1/deauthorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
 router.put('/deauthorize/:auth_hash/:access_code', (req, res, next) => {
   findMemberAndBox(req.params.auth_hash, req.params.access_code)
   .then((result) =>{
