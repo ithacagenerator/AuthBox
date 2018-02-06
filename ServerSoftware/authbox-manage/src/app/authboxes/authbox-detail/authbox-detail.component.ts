@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+import { from } from 'rxjs/observable/from';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
   selector: 'app-authbox-detail',
@@ -7,9 +11,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AuthboxDetailComponent implements OnInit {
 
-  constructor() { }
+  authbox$;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router
+  ) { }
 
   ngOnInit() {
+    this.authbox$ = this.route.paramMap
+      .switchMap((params: ParamMap) => {
+        return from([params.get('id')]);
+      });
   }
 
 }
