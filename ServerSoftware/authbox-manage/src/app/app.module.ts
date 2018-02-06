@@ -5,8 +5,14 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 
 import { ApiService } from './api.service';
-import { AuthBoxesComponent } from './auth-boxes/auth-boxes.component';
 import { MembersComponent } from './members/members.component';
+import { MemberCreateComponent } from './members/member-create/member-create.component';
+import { MemberEditComponent } from './members/member-edit/member-edit.component';
+import { MemberDetailComponent } from './members/member-detail/member-detail.component';
+import { AuthBoxesComponent } from './authboxes/authboxes/authboxes.component';
+import { AuthboxEditComponent } from './authbox--edit/authbox--edit.component';
+import { AuthboxCreateComponent } from './authboxes/authbox-create/authbox-create.component';
+import { AuthboxDetailComponent } from './authboxes/authbox-detail/authbox-detail.component';
 
 
 const appRoutes: Routes = [
@@ -27,8 +33,14 @@ const appRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
+    MembersComponent,
+    MemberCreateComponent,
+    MemberEditComponent,
+    MemberDetailComponent,
     AuthBoxesComponent,
-    MembersComponent
+    AuthboxEditComponent,
+    AuthboxCreateComponent,
+    AuthboxDetailComponent
   ],
   imports: [
     RouterModule.forRoot(
