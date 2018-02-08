@@ -29,6 +29,8 @@ console.log(path.join(__dirname, '../authbox-manage/dist'));
 app.use('/', index);
 app.use('/v1', v1);
 
+app.get('*', function(req, res, next) { res.sendFile(path.join(__dirname, '../authbox-manage/dist/index.html')); });
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
