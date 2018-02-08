@@ -13,4 +13,5 @@ export class ApiService {
   public getAuthBoxes() {
     const apiUrl = `${this.apiBase}`;
     return this._http.get(apiUrl);
+  }
 }
