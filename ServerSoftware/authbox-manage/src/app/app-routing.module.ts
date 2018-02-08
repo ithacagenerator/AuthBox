@@ -14,7 +14,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: '/dashboard', component: DashboardComponent },
+  { path: 'dashboard', component: DashboardComponent },
   { path: 'auth-boxes/create', component: AuthboxCreateComponent },
   { path: 'auth-boxes', component: AuthBoxesComponent },
   { path: 'auth-box/:id', component: AuthboxDetailComponent },
