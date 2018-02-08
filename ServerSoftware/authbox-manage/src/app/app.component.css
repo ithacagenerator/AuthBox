@@ -1,5 +1,8 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-
 nav a.active {
   color: #039be5;
+}
+
+.password-form-field {
+  width: 300px;
+  float: right;
 }

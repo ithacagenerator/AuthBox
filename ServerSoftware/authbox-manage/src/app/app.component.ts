@@ -12,4 +12,5 @@ export class AppComponent {
     { name: 'Members', route: '/members' }
   ];
 
+  password = '';
 }
