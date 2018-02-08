@@ -1,10 +1,7 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
-import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';
 
-import { ApiService } from './api.service';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
 import { MembersComponent } from './members/members/members.component';
 import { MemberCreateComponent } from './members/member-create/member-create.component';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
@@ -15,25 +12,21 @@ import { AuthboxCreateComponent } from './authboxes/authbox-create/authbox-creat
 import { AuthboxDetailComponent } from './authboxes/authbox-detail/authbox-detail.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
+const routes: Routes = [
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '/dashboard', component: DashboardComponent },
+  { path: 'auth-boxes/create', component: AuthboxCreateComponent },
+  { path: 'auth-boxes', component: AuthBoxesComponent },
+  { path: 'auth-box/:id', component: AuthboxDetailComponent },
+  { path: 'auth-box/edit/:id', component: AuthboxEditComponent },
+  { path: 'members/create', component: MemberCreateComponent },
+  { path: 'members', component: MembersComponent },
+  { path: 'member/:id', component: MemberDetailComponent },
+  { path: 'member/edit/:id', component: MemberEditComponent }
+];
+
 @NgModule({
-  declarations: [
-    AppComponent,
-    MembersComponent,
-    MemberCreateComponent,
-    MemberEditComponent,
-    MemberDetailComponent,
-    AuthBoxesComponent,
-    AuthboxEditComponent,
-    AuthboxCreateComponent,
-    AuthboxDetailComponent,
-    DashboardComponent
-  ],
-  imports: [
-    AppRoutingModule,
-    BrowserModule,
-    HttpModule
-  ],
-  providers: [ApiService],
-  bootstrap: [AppComponent]
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
 })
-export class AppModule { }
+export class AppRoutingModule { }
