@@ -6,5 +6,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
+  navItems = [
+    { name: 'Dashboard', route: '/dashboard' },
+    { name: 'Auth Boxes', route: '/auth-boxes' },
+    { name: 'Members', route: '/members' }
+  ];
+
 }

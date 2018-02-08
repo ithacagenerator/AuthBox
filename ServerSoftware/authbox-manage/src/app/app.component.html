@@ -1,7 +1,9 @@
 <nav>
-  <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-  <a routerLink="/auth-boxes" routerLinkActive="active">Auth Boxes</a>
-  <a routerLink="/members" routerLinkActive="active">Members</a>
+  <a *ngFor="let navItem of navItems"
+    mat-raised-button [routerLink]="navItem.route" 
+    routerLinkActive="active">
+    {{navItem.name}}      
+  </a>
 </nav>
 
 <router-outlet></router-outlet>

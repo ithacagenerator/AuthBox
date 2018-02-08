@@ -15,6 +15,13 @@ import { AuthboxCreateComponent } from './authboxes/authbox-create/authbox-creat
 import { AuthboxDetailComponent } from './authboxes/authbox-detail/authbox-detail.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
+import {
+  MatButtonModule,
+  MatListModule
+} from '@angular/material';
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -31,7 +38,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
   imports: [
     AppRoutingModule,
     BrowserModule,
-    HttpModule
+    HttpModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatListModule
   ],
   providers: [ApiService],
   bootstrap: [AppComponent]
