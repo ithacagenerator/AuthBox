@@ -4,6 +4,14 @@ import { Observable } from 'rxjs/Observable';
 import { from } from 'rxjs/observable/from';
 import 'rxjs/add/operator/switchMap';
 
+/*
+  This class should display:
+  1. The name of the Authbox
+  2. Which member has currently authorized it (if any)
+  3. A list of members who are currently authorized to use it
+  4. A button to add a new Authbox
+*/
+
 @Component({
   selector: 'app-authbox-detail',
   templateUrl: './authbox-detail.component.html',

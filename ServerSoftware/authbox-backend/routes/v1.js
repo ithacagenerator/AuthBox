@@ -3,12 +3,13 @@ var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
 var pbkdf2 = require('pbkdf2');
 var moment = require('moment');
+var homedir = require('homedir')();
+var secret = require(`${homedir}/authbox-secret.json`).secret;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
     res.json({status: "ok"});
 });
-
 
 // Members is a collection, each Member is an object like:
 // { name: 'Alice', access_code: '12345', authorizedBoxes: ['laser-cutter']}
@@ -26,8 +27,36 @@ var findMemberAndBox = (auth_hash, access_code) => {
 
 }
 
-// cURL: curl -X PUT https://ithacagenerator.org/authbox/v1/authorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
-router.put('/authorize/:auth_hash/:access_code', (req, res, next) => {
+
+router.post('/authboxes/create/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  insertDocument('AuthBoxes', req.body)
+  .then((insertResult) => {
+    if(!insertResult.insertedId){          
+      throw new Error('no document inserted');
+    }    
+  })
+  .then(() =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
+
+// cURL: curl -X POST https://ithacagenerator.org/authbox/v1/authorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
+// 
+// :auth_hash    is the result of mixing the user access code with the box id using a pbkdf2 hash
+// :access_code  is the access code entered by a user, uniquely identifies a user 
+//
+//               because access_codes have a unique key in the database
+//               together, auth_hash and access_code uniquely identify a box (without revealing the box id)
+router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
   let authorizedMemberName;
   findMemberAndBox(req.params.auth_hash, req.params.access_code)
   .then((result) =>{
@@ -189,10 +218,9 @@ var findDocuments = function(colxn, condition, options = {}) {
   };
   
   
-  //// BE CAREFUL, upsert: true is default behavior, use options if that is not desired
   var updateDocument = function(colxn, condition, update, options = {}){
   
-    let opts = Object.assign({}, {upsert: true}, options);
+    let opts = Object.assign({}, {upsert: false}, options);
     let updateOperation = { $set: update }; // simple default use case
     if(opts.updateType === "complex"){ // this represents intentionality
       delete opts.updateType;
