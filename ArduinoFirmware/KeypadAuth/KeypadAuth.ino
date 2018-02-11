@@ -95,7 +95,7 @@ uint8_t check_crc16(char * str){
 void handleCommands(char c){
     static char lineBuffer[64] = {0}; // allow up to 63 characters in a command (plus null terminator)
     static uint8_t idx = 0;
-    if(c == '\n'){
+    if(c == '\n' || c == '\r'){
         // newline triggers processing of the command, but only if the checksum is sound
         // remember the last four characters in the buffer are expected to be a hex value string
         if(check_crc16(lineBuffer)){
@@ -106,6 +106,12 @@ void handleCommands(char c){
             else if(0 == strcmp_P(lineBuffer, PSTR("lockout"))){
                 handleLockoutCommand();
             }
+            else {
+              Serial.print(F("Unknown Command: \"")); Serial.print(lineBuffer); Serial.print(F("\""));Serial.println();              
+            }
+        }
+        else{
+            Serial.print(F("Invalid CRC16: \"")); Serial.print(lineBuffer); Serial.print(F("\""));Serial.println();
         }
 
         idx = 0; // get ready for next line
@@ -126,8 +132,10 @@ void handleCommands(char c){
 
 void handleAuthorizeCommand(void){
     // TODO: implement logic
+    Serial.println("Got Authorize");
 }
 
 void handleLockoutCommand(void){
     // TODO: implement logic
+    Serial.println("Got Lockout");    
 }
