@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 // This will just be a modal dialogue for creating a new Authbox
 // Needs to collect fields for 'id', 'name' and 'access_code' (i.e. the secret used by the box)
@@ -9,11 +10,14 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './authbox-create.component.html',
   styleUrls: ['./authbox-create.component.css']
 })
-export class AuthboxCreateComponent implements OnInit {
+export class AuthboxCreateComponent {
 
-  constructor() { }
+  constructor(
+    public dialogRef: MatDialogRef<AuthboxCreateComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any) { }
 
-  ngOnInit() {
+  onNoClick(): void {
+    this.dialogRef.close();
   }
 
 }

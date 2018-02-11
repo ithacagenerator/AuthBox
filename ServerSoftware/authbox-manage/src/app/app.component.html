@@ -5,7 +5,7 @@
     {{navItem.name}}      
   </a>
   <mat-form-field class="password-form-field">
-      <input matInput type="text" placeholder="Enter management password" [(ngModel)]="password"/>
+      <input matInput type="password" placeholder="Enter management password" [(ngModel)]="password"/>
       <button mat-button *ngIf="password" matSuffix mat-icon-button aria-label="Clear" (click)="password=''">
         <mat-icon>close</mat-icon>
       </button>
