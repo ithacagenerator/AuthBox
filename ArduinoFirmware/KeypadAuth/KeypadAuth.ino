@@ -26,8 +26,11 @@ uint8_t check_crc16(char * str);
 void handleAuthorizeCommand(void);
 void handleLockoutCommand(void);
 
+int LOCKOUT_PIN = 13; // Relay control output
+
 void setup(){
     Serial.begin(9600);
+    pinMode(LOCKOUT_PIN, OUTPUT);
 }
 
 void loop(){
@@ -130,12 +133,12 @@ void handleCommands(char c){
     }
 }
 
-void handleAuthorizeCommand(void){
-    // TODO: implement logic
-    Serial.println("Got Authorize");
+void handleAuthorizeCommand(void){    
+    Serial.println("authorize");
+    digitalWrite(LOCKOUT_PIN, HIGH);
 }
 
-void handleLockoutCommand(void){
-    // TODO: implement logic
-    Serial.println("Got Lockout");    
+void handleLockoutCommand(void){    
+    Serial.println("lockout");    
+    digitalWrite(LOCKOUT_PIN, LOW);
 }
