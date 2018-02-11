@@ -27,12 +27,13 @@ var findMemberAndBox = (auth_hash, access_code) => {
 
 }
 
-// cURL: curl -X POST https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
+// cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "BOX-NAME", "id": "BOX-ID", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
 // 
 // :secret is the apriori secret known to administrators
 // POST body is a JSON structure representinga new authbox, 
-// which should include an id, name, and access_code field
-// date created and last modified fields will be added automatically
+//           which should include an id, name, and access_code field
+//           date created and last modified fields will be added automatically
+//
 router.post('/authboxes/create/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
     res.status(401).json({error: 'secret is incorrect'});    
