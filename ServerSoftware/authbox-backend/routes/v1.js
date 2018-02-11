@@ -27,14 +27,36 @@ var findMemberAndBox = (auth_hash, access_code) => {
 
 }
 
-
+// cURL: curl -X POST https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
+// 
+// :secret is the apriori secret known to administrators
+// POST body is a JSON structure representinga new authbox, 
+// which should include an id, name, and access_code field
+// date created and last modified fields will be added automatically
 router.post('/authboxes/create/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
     res.status(401).json({error: 'secret is incorrect'});    
     return;
   }
 
-  insertDocument('AuthBoxes', req.body)
+  let missingFields = [];
+  let obj = req.body;
+  ['name', 'id', 'access_code'].forEach(key => {
+    if(!obj[key]){
+      missingFields.push(key);
+    }
+  })
+  if(missingFields.length){
+    res.status(422).json({error: 
+      `Missing ${missingFields.length} fields: ${JSON.stringify(missingFields)}`});
+    return;    
+  }
+
+  let now = moment().format();
+  obj.created = now;
+  obj.updated = now;
+
+  insertDocument('AuthBoxes', obj)
   .then((insertResult) => {
     if(!insertResult.insertedId){          
       throw new Error('no document inserted');
