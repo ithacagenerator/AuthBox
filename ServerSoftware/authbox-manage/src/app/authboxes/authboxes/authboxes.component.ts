@@ -19,6 +19,14 @@ export class AuthBoxesComponent implements AfterViewInit {
     public dialog: MatDialog,
     public apiSrvc: ApiService
   ) {
+    this.refreshAuthBoxes();
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+  }
+
+  refreshAuthBoxes() {
     this.apiSrvc.getAuthBoxes()
     .then((authboxes) => {
       this.dataSource.data = authboxes;
@@ -26,10 +34,6 @@ export class AuthBoxesComponent implements AfterViewInit {
     .catch((err) => {
       console.error(err);
     });
-  }
-
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
   }
 
   newAuthbox() {
@@ -44,6 +48,7 @@ export class AuthBoxesComponent implements AfterViewInit {
         this.apiSrvc.createAuthBox(result)
         .then(() => {
           console.log('Success');
+          this.refreshAuthBoxes();
         })
         .catch((err) => {
           console.error(err);
