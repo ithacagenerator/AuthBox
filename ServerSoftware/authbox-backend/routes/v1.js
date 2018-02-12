@@ -27,6 +27,17 @@ var findMemberAndBox = (auth_hash, access_code) => {
 
 }
 
+router.post('/authboxes/get/:secret', (req, res, next) => {
+  findDocuments('AuthBoxes', {})
+  .then((authboxes) =>{
+    res.json(authboxes);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+})
+
 // cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "BOX-NAME", "id": "BOX-ID", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
 // 
 // :secret is the apriori secret known to administrators
