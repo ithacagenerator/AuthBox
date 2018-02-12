@@ -12,7 +12,11 @@ import { MatTableDataSource, MatSort } from '@angular/material';
 })
 export class AuthBoxesComponent implements AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
-  displayedColumns = ['position', 'name', 'weight', 'symbol'];
+  displayedColumns = [
+    'name', 'created', 'updated',
+    'lastAuthorizedAt', 'lastAuthorizedBy',
+    'lastLockedAt', 'lastLockedBy'];
+
   // dataSource = new MatTableDataSource(ELEMENT_DATA);
   dataSource = new MatTableDataSource();
   constructor(
