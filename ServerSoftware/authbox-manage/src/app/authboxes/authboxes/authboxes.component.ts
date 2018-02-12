@@ -1,4 +1,5 @@
 import { Component, AfterViewInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
 import { AuthboxCreateComponent } from '../authbox-create/authbox-create.component';
 import { AuthboxEditComponent } from '../authbox-edit/authbox-edit.component';
@@ -22,7 +23,8 @@ export class AuthBoxesComponent implements AfterViewInit {
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
-    public apiSrvc: ApiService
+    public apiSrvc: ApiService,
+    public router: Router
   ) {
     this.refreshAuthBoxes();
   }
@@ -81,7 +83,10 @@ export class AuthBoxesComponent implements AfterViewInit {
         if (!result.id) { delete result.id; }
         if (!result.access_code) { delete result.access_code; }
 
-        if (result.delete) {
+        if (result.detail) {
+          this.router.navigate([`/auth-box/${result.name}`]);
+        } else if (result.delete) {
+          delete result.delete;
           this.apiSrvc.deleteAuthBox(result)
           .then(() => {
             console.log('Success');

@@ -22,4 +22,8 @@ export class AuthboxEditComponent {
     return Object.assign({}, this.data, {delete: true});
   }
 
+  detailObj() {
+    return Object.assign({}, this.data, {detail: true});
+  }
+
 }

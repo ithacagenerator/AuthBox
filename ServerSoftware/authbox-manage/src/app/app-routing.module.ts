@@ -22,7 +22,6 @@ const routes: Routes = [
   { path: 'members/create', component: MemberCreateComponent },
   { path: 'members', component: MembersComponent },
   { path: 'member/:id', component: MemberDetailComponent },
-  { path: 'member/edit/:id', component: MemberEditComponent }
 ];
 
 @NgModule({
