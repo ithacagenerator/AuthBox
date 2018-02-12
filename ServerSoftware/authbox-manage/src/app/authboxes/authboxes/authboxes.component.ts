@@ -40,7 +40,15 @@ export class AuthBoxesComponent implements AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      console.log(result);
+      if (result) {
+        this.apiSrvc.createAuthBox(result)
+        .then(() => {
+          console.log('Success');
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+      }
     });
   }
 
