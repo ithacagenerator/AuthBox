@@ -8,6 +8,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./authbox-edit.component.css']
 })
 export class AuthboxEditComponent {
+  checked = false;
 
   constructor(
     public dialogRef: MatDialogRef<AuthboxEditComponent>,
@@ -15,6 +16,10 @@ export class AuthboxEditComponent {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  deleteObj() {
+    return Object.assign({}, this.data, {delete: true});
   }
 
 }

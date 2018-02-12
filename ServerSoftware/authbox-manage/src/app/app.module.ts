@@ -16,6 +16,8 @@ import { AuthboxEditComponent } from './authboxes/authbox-edit/authbox-edit.comp
 import { AuthboxCreateComponent } from './authboxes/authbox-create/authbox-create.component';
 import { AuthboxDetailComponent } from './authboxes/authbox-detail/authbox-detail.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { SuccessStatusSnackComponent } from './utilities/snackbars/success-snackbar/success-snackbar.component';
+import { ErrorStatusSnackComponent } from './utilities/snackbars/error-snackbar/error-snackbar.component';
 
 import {
   MatButtonModule,
@@ -24,7 +26,8 @@ import {
   MatIconModule,
   MatDialogModule,
   MatTableModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatCheckboxModule
 } from '@angular/material';
 import { MatSortModule } from '@angular/material/sort';
 
@@ -41,7 +44,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AuthboxEditComponent,
     AuthboxCreateComponent,
     AuthboxDetailComponent,
-    DashboardComponent
+    DashboardComponent,
+    SuccessStatusSnackComponent,
+    ErrorStatusSnackComponent
   ],
   imports: [
     AppRoutingModule,
@@ -56,12 +61,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatDialogModule,
     MatTableModule,
     MatSortModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatCheckboxModule
   ],
   providers: [
     ApiService,
     ManagementPasswordService
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    SuccessStatusSnackComponent,
+    ErrorStatusSnackComponent
+  ]
 })
 export class AppModule { }

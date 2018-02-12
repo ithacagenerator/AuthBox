@@ -4,7 +4,8 @@ import { AuthboxCreateComponent } from '../authbox-create/authbox-create.compone
 import { AuthboxEditComponent } from '../authbox-edit/authbox-edit.component';
 import { ApiService } from '../../api.service';
 import { MatTableDataSource, MatSort, MatSnackBar } from '@angular/material';
-
+import { SuccessStatusSnackComponent } from '../../utilities/snackbars/success-snackbar/success-snackbar.component';
+import { ErrorStatusSnackComponent } from '../../utilities/snackbars/error-snackbar/error-snackbar.component';
 @Component({
   selector: 'app-auth-boxes',
   templateUrl: './authboxes.component.html',
@@ -52,15 +53,15 @@ export class AuthBoxesComponent implements AfterViewInit {
         this.apiSrvc.createAuthBox(result)
         .then(() => {
           console.log('Success');
-          this.snackBar.open('Success! ヽ(´▽`)/', '', {
-            duration: 2000,
+          this.snackBar.openFromComponent(SuccessStatusSnackComponent, {
+            duration: 1000,
           });
           this.refreshAuthBoxes();
         })
         .catch((err) => {
           console.error(err);
-          this.snackBar.open('Error (╯°□°）╯︵ ┻━┻', '', {
-            duration: 2000,
+          this.snackBar.openFromComponent(ErrorStatusSnackComponent, {
+            duration: 1000,
           });
         });
       }
@@ -70,6 +71,7 @@ export class AuthBoxesComponent implements AfterViewInit {
   editAuthBox(authbox) {
     const dialogRef = this.dialog.open(AuthboxEditComponent, {
       width: '350px',
+      height: '75%',
       data: { name: authbox.name }
     });
 
@@ -78,14 +80,38 @@ export class AuthBoxesComponent implements AfterViewInit {
       if (result && result.name) {
         if (!result.id) { delete result.id; }
         if (!result.access_code) { delete result.access_code; }
-        this.apiSrvc.updateAuthBox(result)
-        .then(() => {
-          console.log('Success');
-          this.refreshAuthBoxes();
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+
+        if (result.delete) {
+          this.apiSrvc.deleteAuthBox(result)
+          .then(() => {
+            console.log('Success');
+            this.snackBar.openFromComponent(SuccessStatusSnackComponent, {
+              duration: 1000,
+            });
+            this.refreshAuthBoxes();
+          })
+          .catch((err) => {
+            console.error(err);
+            this.snackBar.openFromComponent(ErrorStatusSnackComponent, {
+              duration: 1000,
+            });
+          });
+        } else {
+          this.apiSrvc.updateAuthBox(result)
+          .then(() => {
+            console.log('Success');
+            this.snackBar.openFromComponent(SuccessStatusSnackComponent, {
+              duration: 1000,
+            });
+            this.refreshAuthBoxes();
+          })
+          .catch((err) => {
+            console.error(err);
+            this.snackBar.openFromComponent(ErrorStatusSnackComponent, {
+              duration: 1000,
+            });
+          });
+        }
       }
     });
   }
@@ -102,11 +128,4 @@ export class AuthBoxesComponent implements AfterViewInit {
       name: row.name,
     });
   }
-}
-
-export interface Element {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
 }

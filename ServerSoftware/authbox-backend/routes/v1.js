@@ -97,7 +97,7 @@ router.post('/authboxes/create/:secret', (req, res, next) => {
 // :secret is the apriori secret known to administrators
 // PUT body is a JSON structure representing a the udpates to make, 
 //           which should include an id (optional), name, and access_code (optional) field
-//           date created and last modified fields will be added automatically
+//           date last modified fields will be added automatically
 //
 router.put('/authbox/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
@@ -111,6 +111,11 @@ router.put('/authbox/:secret', (req, res, next) => {
       obj[key] = req.body[key];
     }
   })
+
+  if(!obj.name){
+    res.status(422).json({error: 'Name not provided.'});    
+    return;    
+  }
 
   let now = moment().format();  
   obj.updated = now;
@@ -130,6 +135,42 @@ router.put('/authbox/:secret', (req, res, next) => {
   });
 });
 
+// cURL: curl -X DELETE -H "Content-Type: application/json" -d '{"name": "BOX-NAME"}' https://ithacagenerator.org/authbox/v1/authbox/PASSWORD
+// 
+// :secret is the apriori secret known to administrators
+// DELETE body is a JSON structure representing a the udpates to make, 
+//           which should include a name
+//
+router.delete('/authbox/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  const obj = req.body;
+  if(!obj.name){
+    res.status(422).json({error: 'Name not provided.'});    
+    return;    
+  }
+
+  let now = moment().format();  
+  obj.updated = now;
+  obj.deleted = true;
+
+  updateDocument('AuthBoxes', { name: obj.name }, obj)
+  .then((deleteResult) => {
+    if(!deleteResult.deletedCount){          
+      throw new Error('no document deleted');
+    }    
+  })
+  .then(() =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
 
 // cURL: curl -X POST https://ithacagenerator.org/authbox/v1/authorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
 // 

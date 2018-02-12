@@ -31,4 +31,10 @@ export class ApiService {
     const apiUrl = `${this.apiBase}/authbox/${password}`;
     return this._http.put(apiUrl, box).toPromise<any>();
   }
+
+  public deleteAuthBox(box) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/authbox/${password}`;
+    return this._http.delete(apiUrl, box).toPromise<any>();
+  }
 }
