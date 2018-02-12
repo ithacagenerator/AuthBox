@@ -227,7 +227,7 @@ var findDocuments = function(colxn, condition, options = {}) {
           try{
             var collection = db.collection(colxn);
             // Find some documents
-            let cursor = collection.find(condition, projection);
+            let cursor = collection.find(condition, {projection});
   
             if(sort){
               console.log("Applying sort", sort);
