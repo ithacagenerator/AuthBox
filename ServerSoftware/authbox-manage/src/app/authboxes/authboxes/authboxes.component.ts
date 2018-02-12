@@ -63,7 +63,7 @@ export class AuthBoxesComponent implements AfterViewInit {
   editAuthBox(authbox) {
     const dialogRef = this.dialog.open(AuthboxEditComponent, {
       width: '250px',
-      data: { }
+      data: { name: authbox.name }
     });
 
     dialogRef.afterClosed().subscribe(result => {
