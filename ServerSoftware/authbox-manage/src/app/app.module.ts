@@ -23,7 +23,8 @@ import {
   MatFormFieldModule,
   MatIconModule,
   MatDialogModule,
-  MatTableModule
+  MatTableModule,
+  MatSnackBarModule
 } from '@angular/material';
 import { MatSortModule } from '@angular/material/sort';
 
@@ -54,7 +55,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatIconModule,
     MatDialogModule,
     MatTableModule,
-    MatSortModule
+    MatSortModule,
+    MatSnackBarModule
   ],
   providers: [
     ApiService,

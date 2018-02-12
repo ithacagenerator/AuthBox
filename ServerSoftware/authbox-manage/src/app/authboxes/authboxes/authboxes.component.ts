@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material';
 import { AuthboxCreateComponent } from '../authbox-create/authbox-create.component';
 import { AuthboxEditComponent } from '../authbox-edit/authbox-edit.component';
 import { ApiService } from '../../api.service';
-import { MatTableDataSource, MatSort } from '@angular/material';
+import { MatTableDataSource, MatSort, MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-auth-boxes',
@@ -20,6 +20,7 @@ export class AuthBoxesComponent implements AfterViewInit {
   dataSource = new MatTableDataSource();
   constructor(
     public dialog: MatDialog,
+    public snackBar: MatSnackBar,
     public apiSrvc: ApiService
   ) {
     this.refreshAuthBoxes();
@@ -41,7 +42,7 @@ export class AuthBoxesComponent implements AfterViewInit {
 
   newAuthbox() {
     const dialogRef = this.dialog.open(AuthboxCreateComponent, {
-      width: '250px',
+      width: '350px',
       data: { }
     });
 
@@ -51,10 +52,16 @@ export class AuthBoxesComponent implements AfterViewInit {
         this.apiSrvc.createAuthBox(result)
         .then(() => {
           console.log('Success');
+          this.snackBar.open('Success! ヽ(´▽`)/', '', {
+            duration: 2000,
+          });
           this.refreshAuthBoxes();
         })
         .catch((err) => {
           console.error(err);
+          this.snackBar.open('Error (╯°□°）╯︵ ┻━┻', '', {
+            duration: 2000,
+          });
         });
       }
     });
@@ -62,7 +69,7 @@ export class AuthBoxesComponent implements AfterViewInit {
 
   editAuthBox(authbox) {
     const dialogRef = this.dialog.open(AuthboxEditComponent, {
-      width: '250px',
+      width: '350px',
       data: { name: authbox.name }
     });
 
