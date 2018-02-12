@@ -33,7 +33,7 @@ router.get('/authboxes/:secret?', (req, res, next) => {
     return;
   }
     
-  findDocuments('AuthBoxes', {}, {
+  findDocuments('AuthBoxes', {deleted: {$exists: false}}, {
     projection: { _id: 0, access_code: 0 }
   })
   .then((authboxes) =>{
