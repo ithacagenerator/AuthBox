@@ -27,7 +27,12 @@ var findMemberAndBox = (auth_hash, access_code) => {
 
 }
 
-router.post('/authboxes/get/:secret', (req, res, next) => {
+router.get('/authboxes/:secret?', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+    
   findDocuments('AuthBoxes', {})
   .then((authboxes) =>{
     res.json(authboxes);
