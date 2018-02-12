@@ -45,6 +45,8 @@ router.get('/authboxes/:secret?', (req, res, next) => {
   });
 })
 
+
+
 // cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "BOX-NAME", "id": "BOX-ID", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
 // 
 // :secret is the apriori secret known to administrators
@@ -112,10 +114,19 @@ router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
         if(!insertResult.insertedId){          
           throw new Error('no document inserted');
         }
+      })
+      .then(() => {
+        return result;
       });
     } else {
       throw new Error('failed to decipher box id');
     }
+  })
+  .then((result) => { // result has result.member.name and result.box_id
+    return updateDocument('AuthBoxes', { id: result.box_id }, {
+      lastAuthorizedBy: result.member.name,
+      lastAuthorizedAt: moment().format()
+    });
   })
   .then(() =>{
     res.json({status: 'ok', member: authorizedMemberName});
@@ -147,10 +158,19 @@ router.put('/deauthorize/:auth_hash/:access_code', (req, res, next) => {
         if(updateResult.modifiedCount !== 1){
           console.error(`one document should have been modified, but actually ${updateResult.modifiedCount} were modified`);
         }
+      })
+      .then(() => {
+        return result;
       });
     } else {
       throw new Error('failed to decipher box id');
     }
+  })
+  .then((result) => { // result has result.member.name and result.box_id
+    return updateDocument('AuthBoxes', { id: result.box_id }, {
+      lastLockedBy: result.member.name,
+      lastLockedAt: moment().format()
+    });
   })
   .then(() =>{
     res.json({status: 'ok'});
