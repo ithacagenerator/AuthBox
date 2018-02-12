@@ -25,4 +25,10 @@ export class ApiService {
     const apiUrl = `${this.apiBase}/authboxes/create/${password}`;
     return this._http.post(apiUrl, box).toPromise<any>();
   }
+
+  public updateAuthBox(box) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/authbox/${box.name}/${password}`;
+    return this._http.put(apiUrl, box).toPromise<any>();
+  }
 }

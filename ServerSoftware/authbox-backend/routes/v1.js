@@ -27,6 +27,7 @@ var findMemberAndBox = (auth_hash, access_code) => {
 
 }
 
+// cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authboxes/PASSWORD
 router.get('/authboxes/:secret?', (req, res, next) => {
   if(req.params.secret !== secret){
     res.status(401).json({error: 'secret is incorrect'});    
@@ -44,7 +45,6 @@ router.get('/authboxes/:secret?', (req, res, next) => {
     res.status(422).json({error: err.message});
   });
 })
-
 
 
 // cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "BOX-NAME", "id": "BOX-ID", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
@@ -91,6 +91,45 @@ router.post('/authboxes/create/:secret', (req, res, next) => {
     res.status(422).json({error: err.message});
   });
 });
+
+// cURL: curl -X PUT -H "Content-Type: application/json" -d '{"name": "BOX-NAME", "id": "BOX-ID", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
+// 
+// :secret is the apriori secret known to administrators
+// POST body is a JSON structure representinga new authbox, 
+//           which should include an id, name, and access_code field
+//           date created and last modified fields will be added automatically
+//
+router.put('/authboxes/:name/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  let obj = { };
+  ['name', 'id', 'access_code'].forEach(key => {
+    if (req.body[key]) {
+      obj[key] = req.body[key];
+    }
+  })
+
+  let now = moment().format();  
+  obj.updated = now;
+
+  updateDocument('AuthBoxes', { name: obj.name }, obj)
+  .then((updateResult) => {
+    if(!updateResult.matchedCount){          
+      throw new Error('no document updated');
+    }    
+  })
+  .then(() =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
+
 
 // cURL: curl -X POST https://ithacagenerator.org/authbox/v1/authorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
 // 
