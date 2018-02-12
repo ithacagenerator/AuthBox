@@ -158,8 +158,8 @@ router.delete('/authbox/:secret', (req, res, next) => {
   obj.deleted = true;
 
   updateDocument('AuthBoxes', { name: obj.name }, obj)
-  .then((deleteResult) => {
-    if(!deleteResult.deletedCount){          
+  .then((updateResult) => {
+    if(!updateResult.matchedCount){        
       throw new Error('no document deleted');
     }    
   })

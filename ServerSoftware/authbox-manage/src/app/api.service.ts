@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ManagementPasswordService } from './management-password.service';
 import 'rxjs/add/operator/map';
@@ -35,6 +35,8 @@ export class ApiService {
   public deleteAuthBox(box) {
     const password = this._passwordService.getPassword();
     const apiUrl = `${this.apiBase}/authbox/${password}`;
-    return this._http.delete(apiUrl, box).toPromise<any>();
+    const req = new HttpRequest('DELETE', apiUrl);
+    const newReq = req.clone({body: box});
+    return this._http.request(newReq).toPromise<any>();
   }
 }
