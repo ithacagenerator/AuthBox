@@ -137,8 +137,8 @@ router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
   });
 });
 
-// cURL: curl -X PUT https://ithacagenerator.org/authbox/v1/deauthorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
-router.put('/deauthorize/:auth_hash/:access_code', (req, res, next) => {
+// cURL: curl -X POST https://ithacagenerator.org/authbox/v1/deauthorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
+router.post('/deauthorize/:auth_hash/:access_code', (req, res, next) => {
   findMemberAndBox(req.params.auth_hash, req.params.access_code)
   .then((result) =>{
     if(result.box_id){
