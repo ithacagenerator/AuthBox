@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ManagementPasswordService } from './management-password.service';
 
 @Component({
   selector: 'app-root',
@@ -13,4 +14,12 @@ export class AppComponent {
   ];
 
   password = '';
+
+  constructor(private passwordSrvc: ManagementPasswordService) {
+
+  }
+
+  onPasswordChange(value) {
+    this.passwordSrvc.setPassword(this.password);
+  }
 }

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { AuthboxCreateComponent } from '../authbox-create/authbox-create.component';
-
+import { AuthboxEditComponent } from '../authbox-edit/authbox-edit.component';
+import { ApiService } from '../../api.service';
+import { ManagementPasswordService } from '../../management-password.service';
 @Component({
   selector: 'app-auth-boxes',
   templateUrl: './authboxes.component.html',
@@ -13,7 +15,11 @@ export class AuthBoxesComponent implements OnInit {
   id: string;
   access_code: string;
 
-  constructor(public dialog: MatDialog) { }
+  constructor(
+    public dialog: MatDialog,
+    public apiSrvc: ApiService,
+    public passwordSrvc: ManagementPasswordService
+  ) { }
 
   ngOnInit() {
   }
@@ -21,7 +27,7 @@ export class AuthBoxesComponent implements OnInit {
   newAuthbox() {
     const dialogRef = this.dialog.open(AuthboxCreateComponent, {
       width: '250px',
-      data: { name: this.name, id: this.id, access_code: this.access_code }
+      data: { }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -29,4 +35,17 @@ export class AuthBoxesComponent implements OnInit {
       console.log(result);
     });
   }
+
+  editAuthBox(authbox) {
+    const dialogRef = this.dialog.open(AuthboxEditComponent, {
+      width: '250px',
+      data: { }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      console.log(result);
+    });
+  }
+
 }

@@ -1,3 +1,16 @@
-<p>
-  authbox-edit works!
-</p>
+<h1 mat-dialog-title>Edit AuthBox '{{ data.name }}'</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <input matInput placeholder="ID" [(ngModel)]="data.id">
+  </mat-form-field>      
+  <mat-form-field>
+    <input matInput placeholder="Name" [(ngModel)]="data.name">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput placeholder="Access Code" [(ngModel)]="data.access_code">
+  </mat-form-field>  
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Save</button>
+</div>

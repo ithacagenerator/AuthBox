@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 // This will just be a modal dialogue for editing an existing Authbox
 @Component({
@@ -6,11 +7,14 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './authbox-edit.component.html',
   styleUrls: ['./authbox-edit.component.css']
 })
-export class AuthboxEditComponent implements OnInit {
+export class AuthboxEditComponent {
 
-  constructor() { }
+  constructor(
+    public dialogRef: MatDialogRef<AuthboxEditComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any) { }
 
-  ngOnInit() {
+  onNoClick(): void {
+    this.dialogRef.close();
   }
 
 }

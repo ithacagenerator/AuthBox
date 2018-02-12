@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
 import { ApiService } from './api.service';
+import { ManagementPasswordService } from './management-password.service';
 import { MembersComponent } from './members/members/members.component';
 import { MemberCreateComponent } from './members/member-create/member-create.component';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
@@ -51,7 +52,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatIconModule,
     MatDialogModule
   ],
-  providers: [ApiService],
+  providers: [
+    ApiService,
+    ManagementPasswordService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
