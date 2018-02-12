@@ -13,9 +13,4 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
   }
-
-  testAPI() {
-    this.response$ = this._api.getAuthBoxes();
-  }
-
 }
