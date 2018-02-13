@@ -25,7 +25,7 @@
 
       <ng-container matColumnDef="authorizedBoxNames">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Authorize For </mat-header-cell>
-        <mat-cell *matCellDef="let row"> {{ row.authorizedBoxNames }} </mat-cell>
+        <mat-cell *matCellDef="let row"> {{ (row.authorizedBoxNames || []).join(', ') }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="created">
