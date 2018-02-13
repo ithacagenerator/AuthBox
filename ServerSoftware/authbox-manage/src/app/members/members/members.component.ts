@@ -17,8 +17,7 @@ import { Subscription } from 'rxjs/Subscription';
 export class MembersComponent implements AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   displayedColumns = [
-    'name', 'created', 'updated',
-    'authorizedBoxNames', 'email'];
+    'name', 'email', 'authorizedBoxNames', 'created', 'updated'];
 
   dataSource = new MatTableDataSource();
   private loginSubscription: Subscription;

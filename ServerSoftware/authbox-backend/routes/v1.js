@@ -185,7 +185,7 @@ router.get('/members/:secret?', (req, res, next) => {
   }
     
   findDocuments('Members', {deleted: {$exists: false}}, {
-    projection: { _id: 0, email: 0, access_code: 0, authorizedBoxes: 0 }
+    projection: { _id: 0, access_code: 0, authorizedBoxes: 0 }
   })
   .then((members) =>{
     res.json(members);
