@@ -14,6 +14,12 @@ export class ApiService {
     private _passwordService: ManagementPasswordService
   ) { }
 
+  public checkLoggedIn() {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/amiloggedin/${password}`;
+    return this._http.get(apiUrl).toPromise<any>();
+  }
+
   public getAuthBoxes() {
     const password = this._passwordService.getPassword();
     const apiUrl = `${this.apiBase}/authboxes/${password}`;

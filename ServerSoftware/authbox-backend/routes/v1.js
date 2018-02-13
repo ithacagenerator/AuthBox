@@ -7,8 +7,12 @@ var homedir = require('homedir')();
 var secret = require(`${homedir}/authbox-secret.json`).secret;
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-    res.json({status: "ok"});
+router.get('/amiloggedin/:secret', function(req, res, next) {
+    if(req.params.secret === secret){
+      res.json({status: "ok"});
+    } else {
+      res.status(401).json({error: "not logged in"});
+    }    
 });
 
 // Members is a collection, each Member is an object like:

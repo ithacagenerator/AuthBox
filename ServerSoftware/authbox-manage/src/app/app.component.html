@@ -4,6 +4,9 @@
     routerLinkActive="active">
     {{navItem.name}}      
   </a>
+  <a mat-button [color]="this.loggedin ? 'primary' : 'warn'">
+    {{ this.loggedin ? 'Logged In' : 'Not Logged In' }}
+  </a>
   <mat-form-field class="password-form-field">
       <input matInput 
         type="password" 
