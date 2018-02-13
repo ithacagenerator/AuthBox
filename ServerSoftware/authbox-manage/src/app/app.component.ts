@@ -19,7 +19,10 @@ export class AppComponent {
 
   }
 
-  onPasswordChange(value) {
+  onPasswordChange(clear) {
+    if (clear === true) {
+      this.password = '';
+    }
     this.passwordSrvc.setPassword(this.password);
   }
 }

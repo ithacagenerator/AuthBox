@@ -7,10 +7,10 @@
   <mat-form-field class="password-form-field">
       <input matInput 
         type="password" 
-        (keyup)="onPasswordChange($event)"
+        (keyup)="onPasswordChange($event)"        
         placeholder="Enter management password" 
         [(ngModel)]="password"/>
-      <button mat-button *ngIf="password" matSuffix mat-icon-button aria-label="Clear" (click)="password=''">
+      <button mat-button *ngIf="password" matSuffix mat-icon-button aria-label="Clear" (click)="onPasswordChange(true)">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>  
