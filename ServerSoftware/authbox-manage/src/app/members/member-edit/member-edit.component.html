@@ -1,3 +1,19 @@
-<p>
-  member-edit works!
-</p>
+<h1 mat-dialog-title>Edit Member '{{ data.name }}'</h1>
+<div mat-dialog-content class="container">
+  <mat-form-field>
+    <input matInput placeholder="Name" [(ngModel)]="data.name">
+  </mat-form-field>  
+  <mat-form-field>
+    <input matInput placeholder="Email" [(ngModel)]="data.email">
+  </mat-form-field>      
+  <mat-form-field>
+    <input matInput placeholder="Access Code" [(ngModel)]="data.access_code">
+  </mat-form-field>  
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" [disabled]="!(data.name && (data.access_code || data.email))" cdkFocusInitial>Save</button>
+  <button mat-button color="warn" [mat-dialog-close]="deleteObj()" [disabled]="!checked || !data.name">Delete</button>  
+  <button mat-button [mat-dialog-close]="detailObj()" [disabled]="!data.name">Go to Detail</button>  
+  <div class="unlock-delete"><mat-checkbox  [(ngModel)]="checked">Unlock Delete</mat-checkbox></div>
+</div>

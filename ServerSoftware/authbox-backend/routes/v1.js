@@ -255,7 +255,7 @@ router.put('/member/:secret', (req, res, next) => {
   }
 
   let obj = { };
-  ['name', 'email', 'access_code'].forEach(key => {
+  ['name', 'email', 'access_code', 'authorizedBoxNames'].forEach(key => {
     if (req.body[key]) {
       obj[key] = req.body[key];
     }

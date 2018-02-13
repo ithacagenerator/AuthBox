@@ -23,6 +23,7 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
 
   dataSource = new MatTableDataSource();
   private loginSubscription: Subscription;
+
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,

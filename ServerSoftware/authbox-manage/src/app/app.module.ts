@@ -71,7 +71,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   bootstrap: [AppComponent],
   entryComponents: [
     SuccessStatusSnackComponent,
-    ErrorStatusSnackComponent
+    ErrorStatusSnackComponent,
+    AuthboxCreateComponent,
+    AuthboxEditComponent,
+    MemberEditComponent,
+    MemberCreateComponent
   ]
 })
 export class AppModule { }

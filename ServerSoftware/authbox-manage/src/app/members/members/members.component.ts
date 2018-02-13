@@ -25,7 +25,8 @@ export class MembersComponent implements AfterViewInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
-    public apiSrvc: ApiService
+    public apiSrvc: ApiService,
+    public router: Router
   ) {
     this.refreshMembers();
     this.loginSubscription = this.apiSrvc.loginStatus$().subscribe((loggedin) => {
@@ -83,6 +84,57 @@ export class MembersComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  public editMember(member) {
+    const dialogRef = this.dialog.open(MemberEditComponent, {
+      width: '350px',
+      height: '75%',
+      data: { name: member.name, email: member.email }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      if (result && result.name) {
+        if (!result.id) { delete result.id; }
+        if (!result.access_code) { delete result.access_code; }
+
+        if (result.detail) {
+          this.router.navigate([`/member/${result.name}`]);
+        } else if (result.delete) {
+          delete result.delete;
+          this.apiSrvc.deleteMember(result)
+          .then(() => {
+            console.log('Success');
+            this.snackBar.openFromComponent(SuccessStatusSnackComponent, {
+              duration: 1000,
+            });
+            this.refreshMembers();
+          })
+          .catch((err) => {
+            console.error(err);
+            this.snackBar.openFromComponent(ErrorStatusSnackComponent, {
+              duration: 1000,
+            });
+          });
+        } else {
+          this.apiSrvc.updateMember(result)
+          .then(() => {
+            console.log('Success');
+            this.snackBar.openFromComponent(SuccessStatusSnackComponent, {
+              duration: 1000,
+            });
+            this.refreshMembers();
+          })
+          .catch((err) => {
+            console.error(err);
+            this.snackBar.openFromComponent(ErrorStatusSnackComponent, {
+              duration: 1000,
+            });
+          });
+        }
+      }
+    });
+  }
+
   public applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
@@ -91,8 +143,9 @@ export class MembersComponent implements AfterViewInit, OnDestroy {
 
   public rowSelected(row) {
     console.log(row);
-    // this.editAuthBox({
-    //   name: row.name,
-    // });
+    this.editMember({
+      name: row.name,
+      email: row.email
+    });
   }
 }

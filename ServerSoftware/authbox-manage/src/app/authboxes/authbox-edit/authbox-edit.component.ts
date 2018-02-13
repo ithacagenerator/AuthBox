@@ -5,7 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 @Component({
   selector: 'app-authbox-edit',
   templateUrl: './authbox-edit.component.html',
-  styleUrls: ['./authbox-edit.component.css']
+  styleUrls: ['./authbox-edit.component.scss']
 })
 export class AuthboxEditComponent {
   checked = false;

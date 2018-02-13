@@ -9,7 +9,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 @Component({
   selector: 'app-member-create',
   templateUrl: './member-create.component.html',
-  styleUrls: ['./member-create.component.css']
+  styleUrls: ['./member-create.component.scss']
 })
 export class MemberCreateComponent {
 

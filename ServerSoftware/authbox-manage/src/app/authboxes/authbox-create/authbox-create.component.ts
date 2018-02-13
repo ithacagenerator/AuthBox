@@ -8,7 +8,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 @Component({
   selector: 'app-authbox-create',
   templateUrl: './authbox-create.component.html',
-  styleUrls: ['./authbox-create.component.css']
+  styleUrls: ['./authbox-create.component.scss']
 })
 export class AuthboxCreateComponent {
 
