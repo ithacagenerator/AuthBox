@@ -15,23 +15,46 @@ import { Subscription } from 'rxjs/Subscription';
   styleUrls: ['./members.component.scss']
 })
 export class MembersComponent implements AfterViewInit, OnDestroy {
+  @ViewChild(MatSort) sort: MatSort;
+  displayedColumns = [
+    'name', 'created', 'updated',
+    'authorizedBoxNames', 'email'];
+
+  dataSource = new MatTableDataSource();
+  private loginSubscription: Subscription;
 
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
     public apiSrvc: ApiService
-  ) { }
+  ) {
+    this.refreshMembers();
+    this.loginSubscription = this.apiSrvc.loginStatus$().subscribe((loggedin) => {
+      if (!loggedin) {
+        this.dataSource.data = [];
+      }
+      this.refreshMembers();
+    });
+  }
 
   ngAfterViewInit() {
-
+    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy() {
-
+    if (this.loginSubscription) {
+      this.loginSubscription.unsubscribe();
+    }
   }
 
   refreshMembers() {
-
+    this.apiSrvc.getMembers()
+    .then((members) => {
+      this.dataSource.data = members;
+    })
+    .catch((err) => {
+      // console.error(err);
+    });
   }
 
   public newMember() {
@@ -59,5 +82,18 @@ export class MembersComponent implements AfterViewInit, OnDestroy {
         });
       }
     });
+  }
+
+  public applyFilter(filterValue: string) {
+    filterValue = filterValue.trim(); // Remove whitespace
+    filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
+    this.dataSource.filter = filterValue;
+  }
+
+  public rowSelected(row) {
+    console.log(row);
+    // this.editAuthBox({
+    //   name: row.name,
+    // });
   }
 }

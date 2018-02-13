@@ -177,6 +177,25 @@ router.delete('/authbox/:secret', (req, res, next) => {
 });
 
 
+// cURL: curl -X GET https://ithacagenerator.org/authbox/v1/members/PASSWORD
+router.get('/members/:secret?', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+    
+  findDocuments('Members', {deleted: {$exists: false}}, {
+    projection: { _id: 0, email: 0, access_code: 0, authorizedBoxes: 0 }
+  })
+  .then((members) =>{
+    res.json(members);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+})
+
 // cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "MEMBER-NAME", "email": "MEMBER-EMAIL", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/members/create/PASSWORD
 // 
 // :secret is the apriori secret known to administrators
