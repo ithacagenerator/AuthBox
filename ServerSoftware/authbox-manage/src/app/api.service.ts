@@ -10,6 +10,7 @@ export class ApiService {
   private apiBase = `https://ithacagenerator.org/authbox/v1`;
   private observer: any;
   private login$: Observable<boolean> = Observable.create(observer => this.observer = observer);
+  private lastLoginCheck = null;
 
   constructor(
     private _http: HttpClient,
@@ -25,11 +26,17 @@ export class ApiService {
     const apiUrl = `${this.apiBase}/amiloggedin/${password}`;
     return this._http.get(apiUrl).toPromise<any>()
     .then(() => {
-      this.observer.next(true);
+      if (this.lastLoginCheck !== true) {
+        this.lastLoginCheck = true;
+        this.observer.next(true);
+      }
       return true;
     })
     .catch((err)  => {
-      this.observer.next(false);
+      if (this.lastLoginCheck !== false) {
+        this.lastLoginCheck = false;
+        this.observer.next(false);
+      }
       throw err;
     });
   }

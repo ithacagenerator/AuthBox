@@ -31,6 +31,9 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
   ) {
     this.refreshAuthBoxes();
     this.loginSubscription = this.apiSrvc.loginStatus$().subscribe((loggedin) => {
+      if (!loggedin) {
+        this.dataSource.data = [];
+      }
       this.refreshAuthBoxes();
     });
   }
@@ -51,7 +54,7 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
       this.dataSource.data = authboxes;
     })
     .catch((err) => {
-      console.error(err);
+      // console.error(err);
     });
   }
 
