@@ -2,7 +2,28 @@ nav a.active {
   color: #039be5;
 }
 
+nav a:hover {
+  background-color: lightgrey;
+}
+
+.left-nav {
+  order: 0;
+  margin: 10px;
+}
+
+nav {
+  display: flex; 
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .password-form-field {
   width: 300px;
-  float: right;
+  order: 2;
+}
+
+.logged-in-status {
+  margin-top: 10px;
+  order: 1;
 }

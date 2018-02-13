@@ -1,22 +1,24 @@
 <nav>
-  <a *ngFor="let navItem of navItems"
-    mat-raised-button [routerLink]="navItem.route" 
-    routerLinkActive="active">
-    {{navItem.name}}      
-  </a>
-  <a mat-button [color]="this.loggedin ? 'primary' : 'warn'">
-    {{ this.loggedin ? 'Logged In' : 'Not Logged In' }}
-  </a>
+  <div class="left-nav">
+    <a *ngFor="let navItem of navItems"
+      mat-raised-button [routerLink]="navItem.route" 
+      routerLinkActive="active">
+      {{navItem.name}}      
+    </a>
+  </div>
   <mat-form-field class="password-form-field">
-      <input matInput 
-        type="password" 
-        (keyup)="onPasswordChange($event)"        
-        placeholder="Enter management password" 
-        [(ngModel)]="password"/>
-      <button mat-button *ngIf="password" matSuffix mat-icon-button aria-label="Clear" (click)="onPasswordChange(true)">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>  
+    <input matInput 
+      type="password" 
+      (keyup)="onPasswordChange($event)"        
+      placeholder="Enter management password" 
+      [(ngModel)]="password"/>
+    <button mat-button *ngIf="password" matSuffix mat-icon-button aria-label="Clear" (click)="onPasswordChange(true)">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+  <a class="logged-in-status" mat-button [color]="this.loggedin ? 'primary' : 'warn'">
+    {{ this.loggedin ? 'Logged In' : 'Not Logged In' }}
+  </a>    
 </nav>
 
 <router-outlet></router-outlet>
