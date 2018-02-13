@@ -28,14 +28,14 @@ export class ApiService {
     .then(() => {
       if (this.lastLoginCheck !== true) {
         this.lastLoginCheck = true;
-        this.observer.next(true);
+        if (this.observer) { this.observer.next(true); }
       }
       return true;
     })
     .catch((err)  => {
       if (this.lastLoginCheck !== false) {
         this.lastLoginCheck = false;
-        this.observer.next(false);
+        if (this.observer) { this.observer.next(false); }
       }
       throw err;
     });
@@ -64,6 +64,32 @@ export class ApiService {
     const apiUrl = `${this.apiBase}/authbox/${password}`;
     const req = new HttpRequest('DELETE', apiUrl);
     const newReq = req.clone({body: box});
+    return this._http.request(newReq).toPromise<any>();
+  }
+
+  public getMembers() {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/members/${password}`;
+    return this._http.get(apiUrl).toPromise<any>();
+  }
+
+  public createMember(member) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/members/create/${password}`;
+    return this._http.post(apiUrl, member).toPromise<any>();
+  }
+
+  public updateMember(member) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/member/${password}`;
+    return this._http.put(apiUrl, member).toPromise<any>();
+  }
+
+  public deleteMember(member) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/member/${password}`;
+    const req = new HttpRequest('DELETE', apiUrl);
+    const newReq = req.clone({body: member});
     return this._http.request(newReq).toPromise<any>();
   }
 }

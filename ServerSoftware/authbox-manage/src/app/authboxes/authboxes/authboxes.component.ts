@@ -58,7 +58,7 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  newAuthbox() {
+  public newAuthbox() {
     const dialogRef = this.dialog.open(AuthboxCreateComponent, {
       width: '350px',
       data: { }
@@ -85,7 +85,7 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  editAuthBox(authbox) {
+  public editAuthBox(authbox) {
     const dialogRef = this.dialog.open(AuthboxEditComponent, {
       width: '350px',
       height: '75%',
@@ -136,13 +136,13 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  applyFilter(filterValue: string) {
+  public applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
     this.dataSource.filter = filterValue;
   }
 
-  rowSelected(row) {
+  public rowSelected(row) {
     console.log(row);
     this.editAuthBox({
       name: row.name,

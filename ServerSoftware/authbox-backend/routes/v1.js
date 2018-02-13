@@ -176,6 +176,133 @@ router.delete('/authbox/:secret', (req, res, next) => {
   });
 });
 
+
+// cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "MEMBER-NAME", "email": "MEMBER-EMAIL", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/members/create/PASSWORD
+// 
+// :secret is the apriori secret known to administrators
+// POST body is a JSON structure representing a new authbox, 
+//           which should include an email, name, and access_code field
+//           date created and last modified fields will be added automatically
+//
+router.post('/members/create/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  let missingFields = [];
+  let obj = req.body;
+  ['name', 'email', 'access_code'].forEach(key => {
+    if(!obj[key]){
+      missingFields.push(key);
+    }
+  })
+  if(missingFields.length){
+    res.status(422).json({error: 
+      `Missing ${missingFields.length} fields: ${JSON.stringify(missingFields)}`});
+    return;    
+  }
+
+  let now = moment().format();
+  obj.created = now;
+  obj.updated = now;
+
+  insertDocument('Members', obj)
+  .then((insertResult) => {
+    if(!insertResult.insertedId){          
+      throw new Error('no document inserted');
+    }    
+  })
+  .then(() =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
+
+// cURL: curl -X PUT -H "Content-Type: application/json" -d '{"name": "MEMBER-NAME", "email": "MEMBER-EMAIL", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/member/PASSWORD
+// 
+// :secret is the apriori secret known to administrators
+// PUT body is a JSON structure representing a the udpates to make, 
+//           which should include an email (optional), name, and access_code (optional) field
+//           date last modified fields will be added automatically
+//
+router.put('/member/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  let obj = { };
+  ['name', 'email', 'access_code'].forEach(key => {
+    if (req.body[key]) {
+      obj[key] = req.body[key];
+    }
+  })
+
+  if(!obj.name){
+    res.status(422).json({error: 'Name not provided.'});    
+    return;    
+  }
+
+  let now = moment().format();  
+  obj.updated = now;
+
+  updateDocument('Members', { name: obj.name }, obj)
+  .then((updateResult) => {
+    if(!updateResult.matchedCount){          
+      throw new Error('no document updated');
+    }    
+  })
+  .then(() =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
+
+// cURL: curl -X DELETE -H "Content-Type: application/json" -d '{"name": "MEMBER-NAME"}' https://ithacagenerator.org/authbox/v1/member/PASSWORD
+// 
+// :secret is the apriori secret known to administrators
+// DELETE body is a JSON structure representing a the udpates to make, 
+//           which should include a name
+//
+router.delete('/member/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  const obj = req.body;
+  if(!obj.name){
+    res.status(422).json({error: 'Name not provided.'});    
+    return;    
+  }
+
+  let now = moment().format();  
+  obj.updated = now;
+  obj.deleted = true;
+
+  updateDocument('Members', { name: obj.name }, obj)
+  .then((updateResult) => {
+    if(!updateResult.matchedCount){        
+      throw new Error('no document deleted');
+    }    
+  })
+  .then(() =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
+
+
 // cURL: curl -X POST https://ithacagenerator.org/authbox/v1/authorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
 // 
 // :auth_hash    is the result of mixing the user access code with the box id using a pbkdf2 hash

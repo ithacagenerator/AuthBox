@@ -1,3 +1,16 @@
-<p>
-  member-create works!
-</p>
+<h1 mat-dialog-title>Create New Member</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <input matInput placeholder="Name" [(ngModel)]="data.name">
+  </mat-form-field>  
+  <mat-form-field>
+    <input matInput placeholder="Email" [(ngModel)]="data.email">
+  </mat-form-field>      
+  <mat-form-field>
+    <input matInput placeholder="Access Code" [(ngModel)]="data.access_code">
+  </mat-form-field>  
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" [disabled]="!(data.name && data.access_code && data.email)" cdkFocusInitial>Save</button>
+</div>
