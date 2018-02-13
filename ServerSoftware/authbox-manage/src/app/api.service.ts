@@ -7,17 +7,31 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class ApiService {
 
-  apiBase = `https://ithacagenerator.org/authbox/v1`;
+  private apiBase = `https://ithacagenerator.org/authbox/v1`;
+  private observer: any;
+  private login$: Observable<boolean> = Observable.create(observer => this.observer = observer);
 
   constructor(
     private _http: HttpClient,
     private _passwordService: ManagementPasswordService
   ) { }
 
+  loginStatus$(): Observable<boolean> {
+    return this.login$;
+  }
+
   public checkLoggedIn() {
     const password = this._passwordService.getPassword();
     const apiUrl = `${this.apiBase}/amiloggedin/${password}`;
-    return this._http.get(apiUrl).toPromise<any>();
+    return this._http.get(apiUrl).toPromise<any>()
+    .then(() => {
+      this.observer.next(true);
+      return true;
+    })
+    .catch((err)  => {
+      this.observer.next(false);
+      throw err;
+    });
   }
 
   public getAuthBoxes() {

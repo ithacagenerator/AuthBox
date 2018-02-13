@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
 import { AuthboxCreateComponent } from '../authbox-create/authbox-create.component';
@@ -7,12 +7,14 @@ import { ApiService } from '../../api.service';
 import { MatTableDataSource, MatSort, MatSnackBar } from '@angular/material';
 import { SuccessStatusSnackComponent } from '../../utilities/snackbars/success-snackbar/success-snackbar.component';
 import { ErrorStatusSnackComponent } from '../../utilities/snackbars/error-snackbar/error-snackbar.component';
+import { Subscription } from 'rxjs/Subscription';
+
 @Component({
   selector: 'app-auth-boxes',
   templateUrl: './authboxes.component.html',
   styleUrls: ['./authboxes.component.scss']
 })
-export class AuthBoxesComponent implements AfterViewInit {
+export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   displayedColumns = [
     'name', 'created', 'updated',
@@ -20,6 +22,7 @@ export class AuthBoxesComponent implements AfterViewInit {
     'lastLockedAt', 'lastLockedBy'];
 
   dataSource = new MatTableDataSource();
+  private loginSubscription: Subscription;
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
@@ -27,10 +30,19 @@ export class AuthBoxesComponent implements AfterViewInit {
     public router: Router
   ) {
     this.refreshAuthBoxes();
+    this.loginSubscription = this.apiSrvc.loginStatus$().subscribe((loggedin) => {
+      this.refreshAuthBoxes();
+    });
   }
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
+  }
+
+  ngOnDestroy() {
+    if (this.loginSubscription) {
+      this.loginSubscription.unsubscribe();
+    }
   }
 
   refreshAuthBoxes() {
