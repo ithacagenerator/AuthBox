@@ -15,6 +15,7 @@ import { AuthBoxesComponent } from './authboxes/authboxes/authboxes.component';
 import { AuthboxEditComponent } from './authboxes/authbox-edit/authbox-edit.component';
 import { AuthboxCreateComponent } from './authboxes/authbox-create/authbox-create.component';
 import { AuthboxDetailComponent } from './authboxes/authbox-detail/authbox-detail.component';
+import { AuthboxAddMemberComponent } from './authboxes/authbox-add-member/authbox-add-member.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SuccessStatusSnackComponent } from './utilities/snackbars/success-snackbar/success-snackbar.component';
 import { ErrorStatusSnackComponent } from './utilities/snackbars/error-snackbar/error-snackbar.component';
@@ -44,9 +45,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AuthboxEditComponent,
     AuthboxCreateComponent,
     AuthboxDetailComponent,
+    AuthboxAddMemberComponent,
     DashboardComponent,
     SuccessStatusSnackComponent,
-    ErrorStatusSnackComponent
+    ErrorStatusSnackComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -74,6 +76,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ErrorStatusSnackComponent,
     AuthboxCreateComponent,
     AuthboxEditComponent,
+    AuthboxAddMemberComponent,
     MemberEditComponent,
     MemberCreateComponent
   ]

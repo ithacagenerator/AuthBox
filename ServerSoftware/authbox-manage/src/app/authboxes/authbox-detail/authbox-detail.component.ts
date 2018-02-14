@@ -1,5 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { MatDialog } from '@angular/material';
+import { ApiService } from '../../api.service';
+import { MatTableDataSource, MatSort, MatSnackBar } from '@angular/material';
+import { SuccessStatusSnackComponent } from '../../utilities/snackbars/success-snackbar/success-snackbar.component';
+import { ErrorStatusSnackComponent } from '../../utilities/snackbars/error-snackbar/error-snackbar.component';
+import { AuthboxAddMemberComponent } from '../authbox-add-member/authbox-add-member.component';
+
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { from } from 'rxjs/observable/from';
@@ -26,7 +33,10 @@ export class AuthboxDetailComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    public dialog: MatDialog,
+    public snackBar: MatSnackBar,
+    public apiSrvc: ApiService,
+    public router: Router
   ) { }
 
   ngOnInit() {
@@ -45,6 +55,14 @@ export class AuthboxDetailComponent implements OnInit, OnDestroy {
   }
 
   addAuthorizedMember() {
+    const dialogRef = this.dialog.open(AuthboxAddMemberComponent, {
+      width: '350px',
+      height: '75%',
+      data: { }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+    });
   }
 }
