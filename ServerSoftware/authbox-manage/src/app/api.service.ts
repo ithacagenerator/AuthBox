@@ -92,4 +92,10 @@ export class ApiService {
     const newReq = req.clone({body: member});
     return this._http.request(newReq).toPromise<any>();
   }
+
+  public bulkAuthorizeMembers(authboxName, members) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/bulk/authorize-members/${authboxName}/${password}`;
+    return this._http.put(apiUrl, members).toPromise<any>();
+  }
 }

@@ -28,7 +28,8 @@ import {
   MatDialogModule,
   MatTableModule,
   MatSnackBarModule,
-  MatCheckboxModule
+  MatCheckboxModule,
+  MatListModule
 } from '@angular/material';
 import { MatSortModule } from '@angular/material/sort';
 
@@ -64,7 +65,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatTableModule,
     MatSortModule,
     MatSnackBarModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatListModule
   ],
   providers: [
     ApiService,

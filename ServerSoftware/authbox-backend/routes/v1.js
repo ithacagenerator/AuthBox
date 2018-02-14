@@ -196,6 +196,63 @@ router.get('/members/:secret?', (req, res, next) => {
   });
 })
 
+ 
+router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  // message body should contain an array of member names
+  if (!Array.isArray(req.body)) {
+    res.status(422).json({error: 'body must be an array of member names'});    
+    return;
+  }
+
+  // get the authbox id for the authbox name first
+  let authboxId;
+  let authboxName = req.params.authboxName;
+  findDocuments("AuthBoxes", {name: authboxName})
+  .then((authbox) => {
+    if(!authbox || !authbox.id){
+      throw new Error(`Could not find authbox named "${authboxName}"`);
+    } else {
+      authboxId = authbox.id;
+    }
+  })
+  .then(() => {
+    //then remove the authbox from all the members authorized lists
+    return updateDocument('Members', {}, // applies to all Members documents 
+      {
+        $pull: { // removes values from arrays
+          authorizedBoxNames: {$eq: authboxName}, 
+          authorizedBoxes: {$eq: authboxId}
+        }
+      },
+      {updateType: 'complex', updateMany: true}
+    );
+  })
+  .then((updateResult) => {
+    // then add the authbox to the authorized member lists
+    return updateDocument('Members', {name: {$in: req.body}}, // only authorized members
+      { 
+        $addToSet: {
+          authorizedBoxNames: authboxName, 
+          authorizedBoxes: authboxId
+        }
+      }, 
+      {updateType: 'complex', updateMany: true}
+    );    
+  })
+  .then((updateResult) =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
+
 // cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "MEMBER-NAME", "email": "MEMBER-EMAIL", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/members/create/PASSWORD
 // 
 // :secret is the apriori secret known to administrators
@@ -225,6 +282,9 @@ router.post('/members/create/:secret', (req, res, next) => {
   let now = moment().format();
   obj.created = now;
   obj.updated = now;
+
+  obj.authorizedBoxes = [];
+  obj.authorizedBoxNames = [];
 
   insertDocument('Members', obj)
   .then((insertResult) => {

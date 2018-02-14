@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 // This will just be a modal dialogue for adding a new Authbox member
@@ -11,6 +11,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./authbox-add-member.component.scss']
 })
 export class AuthboxAddMemberComponent {
+  @ViewChild('members') members;
 
   constructor(
     public dialogRef: MatDialogRef<AuthboxAddMemberComponent>,
@@ -20,5 +21,7 @@ export class AuthboxAddMemberComponent {
     this.dialogRef.close();
   }
 
-
+  selectedMembers() {
+    return this.members.selectedOptions.selected.map(item => item.value);
+  }
 }

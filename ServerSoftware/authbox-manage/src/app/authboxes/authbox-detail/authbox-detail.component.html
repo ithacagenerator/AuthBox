@@ -1,5 +1,13 @@
-<button mat-fab color="primary" (click)="addAuthorizedMember()" class="add-button">
+<button *ngIf="members"
+  mat-fab color="primary" (click)="addAuthorizedMember()" class="add-button">
   <mat-icon aria-label="Add Authrorized Member">add</mat-icon>
 </button>
-
 <h1>"{{ authboxName }}" AuthBox Detail</h1>
+<div class="member-list">
+  <h2>Current Authorized Member List</h2>
+  <mat-list>
+    <mat-list-item *ngFor="let member of authorizedMembers()"> 
+      {{ member.name }} 
+    </mat-list-item>
+  </mat-list>
+</div>

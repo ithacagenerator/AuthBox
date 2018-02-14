@@ -29,7 +29,9 @@ export class AuthboxDetailComponent implements OnInit, OnDestroy {
 
   private authbox$: Observable<any>;
   private authboxSub: Subscription;
+  private loginSubscription: Subscription;
   public authboxName;
+  public members;
 
   constructor(
     private route: ActivatedRoute,
@@ -37,7 +39,15 @@ export class AuthboxDetailComponent implements OnInit, OnDestroy {
     public snackBar: MatSnackBar,
     public apiSrvc: ApiService,
     public router: Router
-  ) { }
+  ) {
+    this.refreshMembers();
+    this.loginSubscription = this.apiSrvc.loginStatus$().subscribe((loggedin) => {
+      if (!loggedin) {
+        this.members = null;
+      }
+      this.refreshMembers();
+    });
+  }
 
   ngOnInit() {
     this.authbox$ = this.route.paramMap
@@ -52,17 +62,38 @@ export class AuthboxDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.authboxSub) { this.authboxSub.unsubscribe(); }
+    if (this.loginSubscription) { this.loginSubscription.unsubscribe(); }
+  }
+
+  authorizedMembers() {
+    if (this.members) {
+      return this.members.filter(m =>
+        m.authorizedBoxNames.indexOf(this.authboxName) >= 0);
+    }
+    return [];
+  }
+
+  refreshMembers() {
+    this.apiSrvc.getMembers()
+    .then((members) => {
+      this.members = members;
+    })
+    .catch((err) => {
+      // console.error(err);
+    });
   }
 
   addAuthorizedMember() {
     const dialogRef = this.dialog.open(AuthboxAddMemberComponent, {
       width: '350px',
       height: '75%',
-      data: { }
+      data: { members: this.members, name: this.authboxName }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      // update all the members who are authorized
+      this.apiSrvc.bulkAuthorizeMembers(this.authboxName, result);
     });
   }
 }
