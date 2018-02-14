@@ -214,6 +214,7 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   let authboxName = req.params.authboxName;
   findDocuments("AuthBoxes", {name: authboxName})
   .then((authbox) => {
+    authbox = Array.isArray(authbox) ? authbox[0] : {}; 
     if(!authbox || !authbox.id){
       throw new Error(`Could not find authbox named "${authboxName}"`);
     } else {
