@@ -93,7 +93,22 @@ export class AuthboxDetailComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
       // update all the members who are authorized
-      this.apiSrvc.bulkAuthorizeMembers(this.authboxName, result);
+      if (result) {
+        this.apiSrvc.bulkAuthorizeMembers(this.authboxName, result)
+        .then(() => {
+          console.log('Success');
+          this.snackBar.openFromComponent(SuccessStatusSnackComponent, {
+            duration: 1000,
+          });
+          this.refreshMembers();
+        })
+        .catch((err) => {
+          console.error(err);
+          this.snackBar.openFromComponent(ErrorStatusSnackComponent, {
+            duration: 1000,
+          });
+        });
+      }
     });
   }
 }
