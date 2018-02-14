@@ -226,8 +226,8 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
     return updateDocument('Members', {}, // applies to all Members documents 
       {
         $pull: { // removes values from arrays
-          authorizedBoxNames: {$eq: authboxName}, 
-          authorizedBoxes: {$eq: authboxId}
+          authorizedBoxNames: authboxName, 
+          authorizedBoxes: authboxId
         }
       },
       {updateType: 'complex', updateMany: true}
