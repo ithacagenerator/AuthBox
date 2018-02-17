@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog } from '@angular/material';
 import { ApiService } from '../../api.service';
-import { MatTableDataSource, MatSort, MatSnackBar } from '@angular/material';
+import { MatTableDataSource, MatPaginator, MatSort, MatSnackBar } from '@angular/material';
 import { SuccessStatusSnackComponent } from '../../utilities/snackbars/success-snackbar/success-snackbar.component';
 import { ErrorStatusSnackComponent } from '../../utilities/snackbars/error-snackbar/error-snackbar.component';
 import { AuthboxAddMemberComponent } from '../authbox-add-member/authbox-add-member.component';
@@ -10,6 +10,12 @@ import { AuthboxAddMemberComponent } from '../authbox-add-member/authbox-add-mem
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { from } from 'rxjs/observable/from';
+import { merge } from 'rxjs/observable/merge';
+import { of as observableOf } from 'rxjs/observable/of';
+import { catchError } from 'rxjs/operators/catchError';
+import { map } from 'rxjs/operators/map';
+import { startWith } from 'rxjs/operators/startWith';
+import { switchMap } from 'rxjs/operators/switchMap';
 import 'rxjs/add/operator/switchMap';
 
 /*
@@ -25,13 +31,22 @@ import 'rxjs/add/operator/switchMap';
   templateUrl: './authbox-detail.component.html',
   styleUrls: ['./authbox-detail.component.scss']
 })
-export class AuthboxDetailComponent implements OnInit, OnDestroy {
+export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   private authbox$: Observable<any>;
   private authboxSub: Subscription;
   private loginSubscription: Subscription;
   public authboxName;
   public members;
+
+  displayedColumns = ['member', 'authorized', 'deauthorized'];
+  dataSource = new MatTableDataSource();
+
+  resultsLength = 0;
+  isLoadingResults = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -58,6 +73,34 @@ export class AuthboxDetailComponent implements OnInit, OnDestroy {
     this.authboxSub = this.authbox$.subscribe((id) => {
       this.authboxName = id;
     });
+
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        startWith({}),
+        switchMap(() => {
+          this.isLoadingResults = true;
+          return this.apiSrvc.getAuthorizationHistory(this.authboxName,
+            this.sort.active, this.sort.direction, this.paginator.pageIndex);
+        }),
+        map((data) => {
+          // Flip flag to show that loading has finished.
+          this.isLoadingResults = false;
+          this.resultsLength = data.total_count;
+
+          return data.items;
+        }),
+        catchError(() => {
+          this.isLoadingResults = false;
+          return observableOf([]);
+        })
+      ).subscribe(data => this.dataSource.data = data);
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy() {
@@ -110,5 +153,11 @@ export class AuthboxDetailComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  applyFilter(filterValue: string) {
+    filterValue = filterValue.trim();
+    filterValue = filterValue.toLowerCase();
+    this.dataSource.filter = filterValue;
   }
 }

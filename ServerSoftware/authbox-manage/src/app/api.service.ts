@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpRequest, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ManagementPasswordService } from './management-password.service';
 import 'rxjs/add/operator/map';
@@ -97,5 +97,17 @@ export class ApiService {
     const password = this._passwordService.getPassword();
     const apiUrl = `${this.apiBase}/bulk/authorize-members/${authboxName}/${password}`;
     return this._http.put(apiUrl, members).toPromise<any>();
+  }
+
+  public getAuthorizationHistory(authboxName: string, sort: string, order: string, page: number) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/authboxes/history/${authboxName}/${password}`;
+    const options = {
+      params: new HttpParams()
+        .set('sort', sort)
+        .set('order', order)
+        .set('page', `${page}`)
+    };
+    return this._http.get(apiUrl, options).toPromise<any>();
   }
 }
