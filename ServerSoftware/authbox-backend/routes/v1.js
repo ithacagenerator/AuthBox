@@ -513,6 +513,7 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   const sort = req.query.sort || "authorized";
   const order = req.query.order || "asc";
   const page = req.query.page || 0;
+  const filter = req.query.filter || "";
   const nPerPage = 30;
 
   const authboxName = req.params.authboxName;
@@ -529,7 +530,15 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   .then((authbox) => {
     const _sort = { };
     _sort[sort] = order === 'asc' ? 1 : -1;
-    return findDocuments('BoxUsage', {box_id: authbox.id}, {
+    const _condition = {$and: [{box_id: authbox.id}]};
+    if(filter){
+      const or = {$or: []};
+      or['$or'].push({member: new RegExp(filter)});
+      or['$or'].push({authorized: new RegExp(filter)});
+      or['$or'].push({deauthorized: new RegExp(filter)});
+      _condition['$and'].push(or);
+    }
+    return findDocuments('BoxUsage', _condition, {
       projection: { _id: 0, box_id: 0 },
       sort: _sort,
       skip: page * nPerPage,

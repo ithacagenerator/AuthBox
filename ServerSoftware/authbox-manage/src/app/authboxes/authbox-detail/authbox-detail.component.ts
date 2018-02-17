@@ -82,7 +82,8 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         switchMap(() => {
           this.isLoadingResults = true;
           return this.apiSrvc.getAuthorizationHistory(this.authboxName,
-            this.sort.active, this.sort.direction, this.paginator.pageIndex);
+            this.sort.active, this.sort.direction, this.dataSource.filter,
+            this.paginator.pageIndex);
         }),
         map((data) => {
           // Flip flag to show that loading has finished.

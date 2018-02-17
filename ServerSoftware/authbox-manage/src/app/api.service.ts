@@ -99,7 +99,7 @@ export class ApiService {
     return this._http.put(apiUrl, members).toPromise<any>();
   }
 
-  public getAuthorizationHistory(authboxName: string, sort: string, order: string, page: number) {
+  public getAuthorizationHistory(authboxName: string, sort: string, order: string, filter: string, page: number) {
     const password = this._passwordService.getPassword();
     const apiUrl = `${this.apiBase}/authboxes/history/${authboxName}/${password}`;
     const options = {
@@ -107,6 +107,7 @@ export class ApiService {
         .set('sort', sort)
         .set('order', order)
         .set('page', `${page}`)
+        .set('filter', filter)
     };
     return this._http.get(apiUrl, options).toPromise<any>();
   }
