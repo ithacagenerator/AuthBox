@@ -614,7 +614,7 @@ var findDocuments = function(colxn, condition, options = {}) {
               cursor = cursor.limit(limit);
             }
             
-            cursor.count(false, {}, (err, cnt) => {
+            cursor.count(false, {}, (err, cnt) => {          
               if(err) {
                 reject(err);
                 client.close();
@@ -627,6 +627,7 @@ var findDocuments = function(colxn, condition, options = {}) {
                   }
                   else{
                     if(includeCount){
+                      console.log(`Count: ${count}`);
                       resolve({items: docs, total_count: count});
                     }
                     else{
