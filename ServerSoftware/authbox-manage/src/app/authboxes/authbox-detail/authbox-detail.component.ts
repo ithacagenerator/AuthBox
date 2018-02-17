@@ -41,16 +41,15 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private loginSubscription: Subscription;
   public authboxName;
   public members;
-  public observer;
-  public causeChange$: Observable<any> = Observable.create((o) => {
-    this.observer = o;
-  });
 
   displayedColumns = ['member', 'authorized', 'deauthorized'];
   dataSource = new MatTableDataSource();
 
   resultsLength = 0;
   isLoadingResults = true;
+
+  observer;
+  filterUpdate$ = Observable.create((obs) => this.observer = obs);
 
   constructor(
     private route: ActivatedRoute,
@@ -69,7 +68,6 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnInit() {
-
     this.authbox$ = this.route.paramMap
       .switchMap((params: ParamMap) => {
         return from([params.get('id')]);
@@ -81,7 +79,7 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-    merge(this.causeChange$, this.sort.sortChange, this.paginator.page)
+    merge(this.filterUpdate$, this.sort.sortChange, this.paginator.page)
       .pipe(
         startWith({}),
         switchMap(() => {
@@ -94,7 +92,6 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           // Flip flag to show that loading has finished.
           this.isLoadingResults = false;
           this.resultsLength = data.total_count;
-
           return data.items;
         }),
         catchError((err) => {
@@ -108,8 +105,7 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+
   }
 
   ngOnDestroy() {
@@ -168,6 +164,6 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     filterValue = filterValue.trim();
     filterValue = filterValue.toLowerCase();
     this.dataSource.filter = filterValue;
-    if (this.observer) { this.observer.next(filterValue); }
+    this.observer.next('thing');
   }
 }

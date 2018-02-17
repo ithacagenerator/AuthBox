@@ -13,14 +13,15 @@
     </mat-list>
   </div>
   <div class="access-history">
-    <div class="example-header">
-      <mat-form-field>
-        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-      </mat-form-field>
-    </div>
-    
     <div style="width: 95%">
-    
+      <h2>Access History</h2>
+      
+      <div class="example-header">
+        <mat-form-field>
+          <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+      </div>
+        
       <mat-table [dataSource]="dataSource" matSort>
             
         <ng-container matColumnDef="member">
