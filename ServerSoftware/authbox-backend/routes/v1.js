@@ -533,9 +533,9 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
     const _condition = {$and: [{box_id: authbox.id}]};
     if(filter){
       const or = {$or: []};
-      or['$or'].push({member: new RegExp(filter)});
-      or['$or'].push({authorized: new RegExp(filter)});
-      or['$or'].push({deauthorized: new RegExp(filter)});
+      or['$or'].push({member: new RegExp(filter,'i')});
+      or['$or'].push({authorized: new RegExp(filter,'i')});
+      or['$or'].push({deauthorized: new RegExp(filter,'i')});
       _condition['$and'].push(or);
     }
     return findDocuments('BoxUsage', _condition, {
