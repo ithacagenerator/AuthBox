@@ -502,6 +502,50 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
   });
 });
 
+
+// cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authboxes/history/AUTHBOX_NAME/PASSWORD?sort=SORT&order=ORDER&page=PAGE
+router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  const sort = req.query.sort || "authorized";
+  const order = req.query.order || "asc";
+  const page = req.query.page || 0;
+  const nPerPage = 30;
+
+  const authboxName = req.params.authboxName;
+  // first determine the box id that goes with the box name
+  findDocuments('AuthBoxes', {name: authboxName})
+  .then((authboxes) => {
+    if (!authboxes || (authboxes.length !== 1)) {
+      throw new Error(`Couldn't find AuthBox named ${authboxName}`)
+    }
+    else{
+      return authboxes[0];
+    }
+  })
+  .then((authbox) => {
+    const _sort = { };
+    _sort[sort] = order === 'asc' ? 1 : -1;
+    return findDocuments('BoxUsage', {box_id: authbox.id}, {
+      projection: { _id: 0, box_id: 0 },
+      sort: _sort,
+      skip: page * nPerPage,
+      limit: nPerPage, 
+      includeCount: true
+    });
+  })
+  .then((boxUsages) => {    
+    res.json(boxUsages);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });  
+});
+
 var decipherAuthBoxId = (member, auth_hash) => {
   if(!member || !auth_hash){
     return null;
@@ -522,7 +566,9 @@ var findDocuments = function(colxn, condition, options = {}) {
     let projection = options.projection || {};
     let sort = options.sort;
     let limit = options.limit;
-  
+    let skip = options.skip;
+    let includeCount = options.includeCount;
+    let count = 0;
     projection = Object.assign({}, projection, {_id: 0}); // never return id
   
     // Get the documents collection
@@ -539,25 +585,44 @@ var findDocuments = function(colxn, condition, options = {}) {
             var collection = db.collection(colxn);
             // Find some documents
             let cursor = collection.find(condition, {projection});
-  
+
             if(sort){
               console.log("Applying sort", sort);
               cursor = cursor.sort(sort);
             }
   
+            if(skip){
+              console.log("Applying skip", skip);
+              cursor = cursor.skip(skip);
+            }
+
             if(limit){
               console.log("Applying limit", limit);
               cursor = cursor.limit(limit);
             }
-  
-            cursor.toArray(function(err, docs) {
-              if(err){
+            
+            cursor.count(false, {}, (err, cnt) => {
+              if(err) {
                 reject(err);
+                client.close();
               }
               else{
-                resolve(docs);
+                count = cnt;
+                cursor.toArray(function(err, docs) {
+                  if(err){
+                    reject(err);
+                  }
+                  else{
+                    if(includeCount){
+                      resolve({items: docs, total_count: count});
+                    }
+                    else{
+                      resolve(docs);
+                    }
+                  }
+                  client.close();
+                });
               }
-              client.close();
             });
           }
           catch(error){
