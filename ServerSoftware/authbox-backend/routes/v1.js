@@ -510,6 +510,10 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
     return;
   }
 
+
+  if(req.query.sortsort === 'undefined') { delete req.query.sort };
+  if(req.query.order === 'undefined') { delete req.query.order; }
+  if(req.query.page === 'undefined') { delete req.query.page; }
   const sort = req.query.sort || "authorized";
   const order = req.query.order || "asc";
   const page = req.query.page || 0;
