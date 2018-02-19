@@ -196,6 +196,40 @@ router.get('/members/:secret?', (req, res, next) => {
   });
 })
 
+// cURL: curl -X GET https://ithacagenerator.org/authbox/v1/member/NAME/PASSWORD
+router.get('/members/:name/:secret?', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+  const name = req.params.name;
+  findDocuments('Members', {deleted: {$exists: false}, name}, {
+    projection: { _id: 0, access_code: 0 }
+  })
+  .then((members) => {
+    if (!members || (members.length !== 1)) {
+      throw new Error(`Could not find member name '${name}'`);      
+    } else { 
+      return findDocuments('AuthBoxes', {})
+      .then((allAuthBoxes) => {
+        const authboxMap = allAuthBoxes.reduce((o, v) => {
+          o[v.id] = v.name;
+          return o;
+        }, {});      
+        const member = members[0];
+        member.authorizedBoxes = member.authorizedBoxes.map(b => authboxMap[b]);
+        return member;
+      });      
+    }
+  })
+  .then((member) =>{
+    res.json(member);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+})
  
 router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
