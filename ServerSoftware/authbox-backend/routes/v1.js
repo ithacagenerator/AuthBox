@@ -599,12 +599,24 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
       _condition['$and'].push(or);
     }
     return findDocuments('BoxUsage', _condition, {
-      projection: { _id: 0, box_id: 0 },
+      projection: { _id: 0, member: 0 },
       sort: _sort,
       skip: page * nPerPage,
       limit: nPerPage, 
       includeCount: true
     });
+  })
+  .then((boxUsages) => {
+    // pull the boxes and map in the boxNames
+    return findDocuments('AuthBoxes', {})
+    .then((allAuthBoxes) => {
+      const authboxMap = allAuthBoxes.reduce((o, v) => o[v.id] = v.name, {});      
+      return boxUsages.map(bu => {
+        bu.authboxName = authboxMap[bu.box_id];
+        delete bu.box_id;
+        return bu;        
+      });
+    })
   })
   .then((boxUsages) => {    
     res.json(boxUsages);
