@@ -610,7 +610,10 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
     // pull the boxes and map in the boxNames
     return findDocuments('AuthBoxes', {})
     .then((allAuthBoxes) => {
-      const authboxMap = allAuthBoxes.reduce((o, v) => o[v.id] = v.name, {});      
+      const authboxMap = allAuthBoxes.reduce((o, v) => {
+        o[v.id] = v.name;
+        return o;
+      }, {});      
       boxUsages.items = boxUsages.items.map(bu => {
         bu.authboxName = authboxMap[bu.box_id];
         delete bu.box_id;
