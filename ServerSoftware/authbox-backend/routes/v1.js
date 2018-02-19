@@ -559,6 +559,62 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   });  
 });
 
+// cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authboxes/history/AUTHBOX_NAME/PASSWORD?sort=SORT&order=ORDER&page=PAGE
+router.get('/members/history/:memberName/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+
+  if(req.query.sort === 'undefined') { delete req.query.sort };
+  if(req.query.order === 'undefined') { delete req.query.order; }
+  if(req.query.page === 'undefined') { delete req.query.page; }
+  const sort = req.query.sort || "authorized";
+  const order = req.query.order || "asc";
+  const page = req.query.page || 0;
+  const filter = req.query.filter || "";
+  const nPerPage = 30;
+
+  const memberName = req.params.memberName;
+  // first determine the box id that goes with the box name
+  findDocuments('Members', {name: memberName})
+  .then((members) => {
+    if (!members || (members.length !== 1)) {
+      throw new Error(`Couldn't find Member named ${memberName}`)
+    }
+    else{
+      return members[0];
+    }
+  })
+  .then((member) => {
+    const _sort = { };
+    _sort[sort] = order === 'asc' ? 1 : -1;
+    const _condition = {$and: [{member: member.name}]};
+    if(filter){
+      const or = {$or: []};
+      or['$or'].push({member: new RegExp(filter,'i')});
+      or['$or'].push({authorized: new RegExp(filter,'i')});
+      or['$or'].push({deauthorized: new RegExp(filter,'i')});
+      _condition['$and'].push(or);
+    }
+    return findDocuments('BoxUsage', _condition, {
+      projection: { _id: 0, box_id: 0 },
+      sort: _sort,
+      skip: page * nPerPage,
+      limit: nPerPage, 
+      includeCount: true
+    });
+  })
+  .then((boxUsages) => {    
+    res.json(boxUsages);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });  
+});
+
 var decipherAuthBoxId = (member, auth_hash) => {
   if(!member || !auth_hash){
     return null;
