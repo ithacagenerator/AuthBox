@@ -647,7 +647,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
       _condition['$and'].push(or);
     }
     return findDocuments('BoxUsage', _condition, {
-      projection: { _id: 0, member: 0, box_id },
+      projection: { _id: 0, member: 0, box_id: 0 },
       sort: _sort,
       skip: page * nPerPage,
       limit: nPerPage, 
