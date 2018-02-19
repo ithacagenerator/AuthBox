@@ -641,7 +641,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
     const _condition = {$and: [{member: member.name}]};
     if(filter){
       const or = {$or: []};
-      or['$or'].push({authboxName: new RegExp(filter,'i')});
+      or['$or'].push({box_name: new RegExp(filter,'i')});
       or['$or'].push({authorized: new RegExp(filter,'i')});
       or['$or'].push({deauthorized: new RegExp(filter,'i')});
       _condition['$and'].push(or);
