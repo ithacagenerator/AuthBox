@@ -611,11 +611,12 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
     return findDocuments('AuthBoxes', {})
     .then((allAuthBoxes) => {
       const authboxMap = allAuthBoxes.reduce((o, v) => o[v.id] = v.name, {});      
-      return boxUsages.map(bu => {
+      boxUsages.items = boxUsages.items.map(bu => {
         bu.authboxName = authboxMap[bu.box_id];
         delete bu.box_id;
         return bu;        
       });
+      return boxUsages;
     })
   })
   .then((boxUsages) => {    
