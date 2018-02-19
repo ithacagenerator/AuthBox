@@ -497,7 +497,7 @@ router.put('/bulk/authorize-boxes/:memberName/:secret', (req, res, next) => {
       o[v.name] = v.id;
       return o;
     }, {});               
-    const authorizedBoxes = boxNames.map(b => authboxMap[b]);
+    const authorizedBoxes = authorizedBoxNames.map(b => authboxMap[b]);
     return updateDocument('Members', {name: memberName}, // applies to one member
       { authorizedBoxes, authorizedBoxNames }
     );
