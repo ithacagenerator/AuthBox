@@ -439,7 +439,7 @@ router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
     // so we can augment the box usage record
     return findDocuments('AuthBoxes', {id: result.box_id})
     .then((box) => {
-      result.authboxName = box.name;
+      result.box_name = box.name;
       return result;
     });    
   })
@@ -448,6 +448,7 @@ router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
     return insertDocument('BoxUsage', {
       member: authorizedMemberName,
       box_id: result.box_id,
+      box_name: result.box_name,
       authorized: moment().format()
     })
     .then((insertResult) => {
