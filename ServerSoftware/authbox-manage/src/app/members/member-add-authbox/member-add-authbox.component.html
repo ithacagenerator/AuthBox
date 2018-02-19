@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>Add Authorized Box</h1>
+<div mat-dialog-content>
+  <mat-selection-list #authboxes *ngIf="data && data.authboxes">
+    <mat-list-option *ngFor="let authbox of data.authboxes"
+      [value]="authbox.name"
+      [selected]="memberHasAccessto(authbox.name)">
+      {{ authbox.name  }}
+    </mat-list-option>
+  </mat-selection-list>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button
+    [mat-dialog-close]="selectedAuthboxes()"
+    cdkFocusInitial>Save</button>
+</div>

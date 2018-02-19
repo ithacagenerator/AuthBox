@@ -11,6 +11,7 @@ import { MembersComponent } from './members/members/members.component';
 import { MemberCreateComponent } from './members/member-create/member-create.component';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { MemberDetailComponent } from './members/member-detail/member-detail.component';
+import { MemberAddAuthboxComponent } from './members/member-add-authbox/member-add-authbox.component';
 import { AuthBoxesComponent } from './authboxes/authboxes/authboxes.component';
 import { AuthboxEditComponent } from './authboxes/authbox-edit/authbox-edit.component';
 import { AuthboxCreateComponent } from './authboxes/authbox-create/authbox-create.component';
@@ -51,6 +52,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DashboardComponent,
     SuccessStatusSnackComponent,
     ErrorStatusSnackComponent,
+    MemberAddAuthboxComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -81,8 +83,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AuthboxCreateComponent,
     AuthboxEditComponent,
     AuthboxAddMemberComponent,
+    MemberCreateComponent,
     MemberEditComponent,
-    MemberCreateComponent
+    MemberAddAuthboxComponent
   ]
 })
 export class AppModule { }

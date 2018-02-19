@@ -1,3 +1,50 @@
-<p>
-  member-detail works!
-</p>
+<button *ngIf="authboxes"
+  mat-fab color="primary" (click)="addAuthorizedBox()" class="add-button">
+  <mat-icon aria-label="Add Authorized Box">add</mat-icon>
+</button>
+<h1>"{{ memberName }}" Member Detail</h1>
+<div class="split-grid">
+  <div class="member-list-container">
+    <h2>Authorized Boxes</h2>
+    <mat-list class="members-list">
+      <mat-list-item *ngFor="let box of authorizedBoxes()"> 
+        {{ box }} 
+      </mat-list-item>
+    </mat-list>
+  </div>
+  <div class="access-history">
+    <div style="width: 95%">
+      <h2>Access History</h2>
+      
+      <div class="example-header">
+        <mat-form-field>
+          <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+      </div>
+        
+      <mat-table [dataSource]="dataSource" matSort>
+            
+        <ng-container matColumnDef="box_name">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> AuthBox </mat-header-cell>
+          <mat-cell *matCellDef="let row"> {{row.box_name}} </mat-cell>
+        </ng-container>
+    
+        <ng-container matColumnDef="authorized">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Authorized On </mat-header-cell>
+          <mat-cell *matCellDef="let row"> {{row.authorized}} </mat-cell>
+        </ng-container>
+    
+        <ng-container matColumnDef="deauthorized">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Locked On </mat-header-cell>
+          <mat-cell *matCellDef="let row"> {{row.deauthorized}} </mat-cell>
+        </ng-container>
+        
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;">
+        </mat-row>
+      </mat-table>
+    
+      <mat-paginator [length]="resultsLength" [pageSize]="30"></mat-paginator>
+    </div>
+  </div>
+</div>

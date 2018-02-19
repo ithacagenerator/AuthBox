@@ -111,4 +111,29 @@ export class ApiService {
     };
     return this._http.get(apiUrl, options).toPromise<any>();
   }
+
+  public bulkAuthorizeBoxes(memberName, authBoxes) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/bulk/authorize-boxes/${memberName}/${password}`;
+    return this._http.put(apiUrl, authBoxes).toPromise<any>();
+  }
+
+  public getMember(name) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/member/${name}/${password}`;
+    return this._http.get(apiUrl).toPromise<any>();
+  }
+
+  public getMemberHistory(memberName: string, sort: string, order: string, filter: string, page: number) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/members/history/${memberName}/${password}`;
+    const options = {
+      params: new HttpParams()
+        .set('sort', sort)
+        .set('order', order)
+        .set('page', `${page}`)
+        .set('filter', filter)
+    };
+    return this._http.get(apiUrl, options).toPromise<any>();
+  }
 }
