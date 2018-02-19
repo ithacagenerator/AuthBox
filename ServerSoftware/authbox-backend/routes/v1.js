@@ -438,7 +438,8 @@ router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
     // determine the boxName that goes with the box id 
     // so we can augment the box usage record
     return findDocuments('AuthBoxes', {id: result.box_id})
-    .then((box) => {
+    .then((boxes) => {
+      const box = boxes ? boxes[0] : {};
       result.box_name = box.name;
       return result;
     });    
