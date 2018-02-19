@@ -417,6 +417,99 @@ router.delete('/member/:secret', (req, res, next) => {
   });
 });
 
+router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  // message body should contain an array of member names
+  if (!Array.isArray(req.body)) {
+    res.status(422).json({error: 'body must be an array of member names'});    
+    return;
+  }
+
+  // get the authbox id for the authbox name first
+  let authboxId;
+  let authboxName = req.params.authboxName;
+  findDocuments("AuthBoxes", {name: authboxName})
+  .then((authbox) => {
+    authbox = Array.isArray(authbox) && (authbox.length === 1) ? authbox[0] : {}; 
+    if(!authbox || !authbox.id){
+      throw new Error(`Could not find authbox named "${authboxName}"`);
+    } else {
+      authboxId = authbox.id;
+    }
+  })
+  .then(() => {
+    //then remove the authbox from all the members authorized lists
+    return updateDocument('Members', {}, // applies to all Members documents 
+      {
+        $pull: { // removes values from arrays
+          authorizedBoxNames: authboxName, 
+          authorizedBoxes: authboxId
+        }
+      },
+      {updateType: 'complex', updateMany: true}
+    );
+  })
+  .then((updateResult) => {
+    // then add the authbox to the authorized member lists
+    return updateDocument('Members', {name: {$in: req.body}}, // only authorized members
+      { 
+        $addToSet: {
+          authorizedBoxNames: authboxName, 
+          authorizedBoxes: authboxId
+        }
+      }, 
+      {updateType: 'complex', updateMany: true}
+    );    
+  })
+  .then((updateResult) =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
+
+router.put('/bulk/authorize-boxes/:memberName/:secret', (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});    
+    return;
+  }
+
+  // message body should contain an array of authbox names
+  if (!Array.isArray(req.body)) {
+    res.status(422).json({error: 'body must be an array of authbox names'});    
+    return;
+  }
+
+  // get the authbox ids that go with the requested names  
+  let memberName = req.params.memberName;
+  const authorizedBoxNames = req.body;  
+  findDocuments("AuthBoxes", {
+    name: {$in: authorizedBoxNames}
+  })
+  .then((allAuthBoxes) => {
+    const authboxMap = allAuthBoxes.reduce((o, v) => { // create a reverse lookup
+      o[v.name] = v.id;
+      return o;
+    }, {});               
+    const authorizedBoxes = boxNames.map(b => authboxMap[b]);
+    return updateDocument('Members', {name: memberName}, // applies to one member
+      { authorizedBoxes, authorizedBoxNames }
+    );
+  })
+  .then((updateResult) =>{
+    res.json({status: 'ok'});
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(422).json({error: err.message});
+  });
+});
 
 // cURL: curl -X POST https://ithacagenerator.org/authbox/v1/authorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
 // 
