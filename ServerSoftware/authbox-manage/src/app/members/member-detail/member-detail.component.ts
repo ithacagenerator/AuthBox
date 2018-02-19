@@ -152,6 +152,7 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
             duration: 1000,
           });
           this.refreshAuthboxes();
+          this.refreshMember();
         })
         .catch((err) => {
           console.error(err);

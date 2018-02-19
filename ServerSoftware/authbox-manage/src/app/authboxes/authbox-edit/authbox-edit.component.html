@@ -10,7 +10,7 @@
     <input matInput placeholder="Access Code" [(ngModel)]="data.access_code">
   </mat-form-field>  
 </div>
-<div mat-dialog-actions>
+<div mat-dialog-actions class="button-section">
   <button mat-button (click)="onNoClick()">Cancel</button>
   <button mat-button [mat-dialog-close]="data" [disabled]="!(data.name && (data.access_code || data.id))" cdkFocusInitial>Save</button>
   <button mat-button color="warn" [mat-dialog-close]="deleteObj()" [disabled]="!checked || !data.name">Delete</button>  
