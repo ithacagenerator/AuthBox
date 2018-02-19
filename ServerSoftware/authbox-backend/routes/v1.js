@@ -210,16 +210,17 @@ router.get('/member/:name/:secret?', (req, res, next) => {
     if (!members || (members.length !== 1)) {
       throw new Error(`Could not find member name '${name}'`);      
     } else { 
-      return findDocuments('AuthBoxes', {})
-      .then((allAuthBoxes) => {
-        const authboxMap = allAuthBoxes.reduce((o, v) => {
-          o[v.id] = v.name;
-          return o;
-        }, {});      
-        const member = members[0];
-        member.authorizedBoxes = member.authorizedBoxes.map(b => authboxMap[b]);
-        return member;
-      });      
+      // return findDocuments('AuthBoxes', {})
+      // .then((allAuthBoxes) => {
+      //   const authboxMap = allAuthBoxes.reduce((o, v) => {
+      //     o[v.id] = v.name;
+      //     return o;
+      //   }, {});      
+      //   const member = members[0];
+      //   member.authorizedBoxes = member.authorizedBoxes.map(b => authboxMap[b]);
+      //   return member;
+      // });      
+      return members[0];
     }
   })
   .then((member) =>{
