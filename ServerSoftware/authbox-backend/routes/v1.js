@@ -204,7 +204,7 @@ router.get('/member/:name/:secret?', (req, res, next) => {
   }
   const name = req.params.name;
   findDocuments('Members', {deleted: {$exists: false}, name}, {
-    projection: { _id: 0, access_code: 0 }
+    projection: { _id: 0, access_code: 0, authorizedBoxes: 0 }
   })
   .then((members) => {
     if (!members || (members.length !== 1)) {
