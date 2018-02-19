@@ -197,7 +197,7 @@ router.get('/members/:secret?', (req, res, next) => {
 })
 
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/member/NAME/PASSWORD
-router.get('/members/:name/:secret?', (req, res, next) => {
+router.get('/member/:name/:secret?', (req, res, next) => {
   if(req.params.secret !== secret){
     res.status(401).json({error: 'secret is incorrect'});    
     return;
@@ -429,23 +429,35 @@ router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
   findMemberAndBox(req.params.auth_hash, req.params.access_code)
   .then((result) =>{
     if(result.box_id){
-      authorizedMemberName = result.member.name;
-      return insertDocument('BoxUsage', {
-        member: authorizedMemberName,
-        box_id: result.box_id,
-        authorized: moment().format()
-      })
-      .then((insertResult) => {
-        if(!insertResult.insertedId){          
-          throw new Error('no document inserted');
-        }
-      })
-      .then(() => {
-        return result;
-      });
+      return result;
     } else {
       throw new Error('failed to decipher box id');
     }
+  })
+  .then((result) => {
+    // determine the boxName that goes with the box id 
+    // so we can augment the box usage record
+    return findDocuments('AuthBoxes', {id: result.box_id})
+    .then((box) => {
+      result.authboxName = box.name;
+      return result;
+    });    
+  })
+  .then((result) => {
+    authorizedMemberName = result.member.name;
+    return insertDocument('BoxUsage', {
+      member: authorizedMemberName,
+      box_id: result.box_id,
+      authorized: moment().format()
+    })
+    .then((insertResult) => {
+      if(!insertResult.insertedId){          
+        throw new Error('no document inserted');
+      }
+    })
+    .then(() => {
+      return result;
+    });    
   })
   .then((result) => { // result has result.member.name and result.box_id
     return updateDocument('AuthBoxes', { id: result.box_id }, {
@@ -627,34 +639,18 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
     const _condition = {$and: [{member: member.name}]};
     if(filter){
       const or = {$or: []};
-      or['$or'].push({member: new RegExp(filter,'i')});
+      or['$or'].push({authboxName: new RegExp(filter,'i')});
       or['$or'].push({authorized: new RegExp(filter,'i')});
       or['$or'].push({deauthorized: new RegExp(filter,'i')});
       _condition['$and'].push(or);
     }
     return findDocuments('BoxUsage', _condition, {
-      projection: { _id: 0, member: 0 },
+      projection: { _id: 0, member: 0, box_id },
       sort: _sort,
       skip: page * nPerPage,
       limit: nPerPage, 
       includeCount: true
-    });
-  })
-  .then((boxUsages) => {
-    // pull the boxes and map in the boxNames
-    return findDocuments('AuthBoxes', {})
-    .then((allAuthBoxes) => {
-      const authboxMap = allAuthBoxes.reduce((o, v) => {
-        o[v.id] = v.name;
-        return o;
-      }, {});      
-      boxUsages.items = boxUsages.items.map(bu => {
-        bu.authboxName = authboxMap[bu.box_id];
-        delete bu.box_id;
-        return bu;        
-      });
-      return boxUsages;
-    })
+    });  
   })
   .then((boxUsages) => {    
     res.json(boxUsages);
