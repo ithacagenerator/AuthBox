@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "moment": "^2.20.1",
     "mongodb": "^3.0.2",
+    "promise-do-whilst": "^1.0.1",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "serialport": "^6.0.5"
