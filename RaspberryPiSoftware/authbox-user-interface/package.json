@@ -1,0 +1,17 @@
+{
+  "name": "authbox-user-interface",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^3.0.2",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
+    "serialport": "^6.0.5"
+  }
+}
