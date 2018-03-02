@@ -12,6 +12,7 @@ const promiseDoWhilst = require('promise-do-whilst');
 let access_code_buffer = '';
 let last_access_code_change = moment();
 let is_currently_authorized = false;
+let should_dauthorize = false;
 
 // register input handler to accept a single
 // character of input from the user interface
@@ -37,8 +38,8 @@ serial.setInputHandler(function(chr) {
     if(chr === '#'){
       last_access_code_change = moment(); // extend authorization timeout
     }
-    else if(chr === '*'){
-      // TODO: deauthorize
+    else if(chr === '*'){      
+      should_dauthorize = true;    // this will trigger a deauthorize event
     }
   }
 });
@@ -56,11 +57,14 @@ const checkForIdleKeypadEntry = function() {
 
     resolve({
       code: access_code_buffer,
-      authorized: is_currently_authorized
+      authorized: is_currently_authorized,
+      deauthorize: should_dauthorize
     });
   });
 };
 
+// if the user is authorized, their *-masked passcode should be displayed on line 1
+// otherwise the phrase ENTER CODE should be displaed on line 1
 const updateLcd = function(user) {
   if(!user.authorized){
     if(user.code){
@@ -82,22 +86,22 @@ const validateCode = function(user) {
 };
 
 const checkAuthorizedIfReady = function(user) {
-  return new Promise(function(resolve, rejetc) { resolve(user); }) // just to make it a promise result
+  return new Promise(function(resolve, reject) { resolve(user); }) // just to make it a promise result
   .then(function(user) {
-    if(user.code.endsWith('#')){
-      if(user.authorized){
+    if(user.code.endsWith('#')){ // this will be the case for a deauthorizing user
+      if(user.authorized && user.deauthorize){
+        should_dauthorize = false; // this should be a 'once' event, so clear the flag
         // if you hit 'enter' and you are authorized
-        // it will trigger a de-authorization event
-        is_currently_authorized = false;
-        return Object.assign({}, user, { event: 'deauthorize' });
-      } else {
+        // it will trigger a de-authorization event         
+        return Object.assign({}, user, { event: 'deauthorize' }); // i.e. log off
+      } else if(!user.authorized) {
         // not currently authorized so check if we should authorize
         return db.isAuthorized(access_code_buffer)
         .then(function(isAuthorized) {
           is_currently_authorized = isAuthorized;
           return isAuthorized ?
-            Object.assign({}, user, { event: 'authorize' }) :
-            Object.assign({}, user, { event: 'unauthorized' });
+            Object.assign({}, user, { event: 'authorize' }) :   // i.e. right password
+            Object.assign({}, user, { event: 'unauthorized' }); // i.e. wrong password
         });
       }
     } else {
@@ -106,23 +110,38 @@ const checkAuthorizedIfReady = function(user) {
   });
 };
 
+// TODO: this should probably be in a utility.js file rather than inline
+const delayPromise = function(millis) {
+  return function(){ // return a function 
+    return new Promise(function(resolve, reject){ // that returns a promise
+      setTimeout(function() { 
+        resolve(); 
+      }, millis); // that resolves after millis time
+    });
+  };
+};
+
 const handleAuthorizationResult = function(auth) {
   return new Promise(function(resolve, reject) {
     switch(auth.event){
     case 'authorize':    // was not authorized, now power up
       return serial.authorize()                  // power up the authbox
       .then(api.authorize.bind(null, auth.code)) // register it with the server
-      .then(lcd.authorize);                      // turn the lcd green
+      .then(lcd.authorize)                       // turn the lcd green
+      .then(() => false);                        // don't clear access code
     case 'deauthorize':  // was authorized, now shutting down
       return serial.deauthorize()                // power down the authbox
       .then(api.deauthorize)                     // register it with the server
-      .then(lcd.deauthorize);                    // turn the lcd red
+      .then(lcd.deauthorize)                     // turn the lcd red
+      .then(() => true);                         // do clear access code
     case 'unauthorized': // user tried to authorize but code not found
-      return lcd.unauthorized();
+      return lcd.unauthorized()                  // turn to incorrect login color
+      .then(delayPromise(2000))                         // then wait 2 seconds
+      .then(() => false);                        // do clear access code      
     }
   })
-  .then(function() {
-    if(auth.event){
+  .then(function(should_clear_access_code) {    
+    if(should_clear_access_code){ 
       access_code_buffer = '';
     }
     return auth;
