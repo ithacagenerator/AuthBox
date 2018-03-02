@@ -1,11 +1,13 @@
+/* jshint esversion:6 */
+/* jshint node: true */
 module.exports = (function(){
   console.log('Initialized Local Database');
 
-  const isAuthorized = (code) => {
+  function isAuthorized(code) {
     // TODO: implement
   }
 
-  const saveAccessCodes = (codes) => {
+  function saveAccessCodes(codes) {
     // TODO: implement    
   }
 

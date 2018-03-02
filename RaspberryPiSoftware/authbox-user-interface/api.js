@@ -1,9 +1,11 @@
+/* jshint esversion:6 */
+/* jshint node: true */
 module.exports = (function(){
   console.log('Initialized API');
 
   let access_code = ''; 
 
-  const fetchAccessCodes = () => {
+  function fetchAccessCodes() {
     // TODO: implement API call
     // Mock for now
     return new Promise((resolve, reject) => {
@@ -11,12 +13,12 @@ module.exports = (function(){
     });
   }
 
-  const authorize = (access) => {
+  function authorize(access) {
     // TODO: implement API call
     access_code = access;
   }
 
-  const deauthorize = () => {
+  function deauthorize() {
     // TODO: implement API call
   }
 

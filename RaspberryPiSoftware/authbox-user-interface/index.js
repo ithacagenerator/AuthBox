@@ -81,7 +81,7 @@ const updateLcd = function(user) {
 };
 
 const validateCode = function(user) {
-  checkAuthorizedIfReady(user)
+  return checkAuthorizedIfReady(user)
   .then(handleAuthorizationResult);
 };
 
