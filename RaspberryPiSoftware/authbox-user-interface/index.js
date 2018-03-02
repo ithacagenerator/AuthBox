@@ -2,6 +2,7 @@
 /* jshint node: true */
 "use strict";
 
+const util = require('./util');
 const api = require('./api');
 const lcd = require('./lcd');
 const serial = require('./serial');
@@ -19,38 +20,41 @@ let should_dauthorize = false;
 // which provides the user's access code
 // e.g. keypad, rfid reader, etc
 serial.setInputHandler(function(chr) {
+  chr = chr ? chr.toString().trim() : '';
+  // console.log(`Got ${chr}`);
   // if the access code ends with '#' reject further
   // input until it has been processed
   // if the chr is '*' it is the 'backspace' key
-  // otherwise append it to the buffered access code
+  // otherwise append it to the buffered access code  
   if(!access_code_buffer.endsWith('#')){
     if(chr === '*') { // backspace key
       access_code_buffer = access_code_buffer.slice(0, -1);
       last_access_code_change = moment();
     } else {          // anything else
-      access_code_buffer = `${access_code_buffer}${chr}`;
+      access_code_buffer = `${access_code_buffer}${chr.trim()}`;
       last_access_code_change = moment();
     }
   }
-  else { // otherwise the only two inputs we'll pay attention to are # and *
-         // if we get # in this state it should just extend your authorization
+  else { // otherwise the only two input we'll pay special attention to is '*'
          // if we get * in this state it should coerce and deauthorization
-    if(chr === '#'){
-      last_access_code_change = moment(); // extend authorization timeout
-    }
-    else if(chr === '*'){      
+         // any keypress will reset the last_access_code_change to now
+    last_access_code_change = moment(); // extend authorization timeout    
+    if(chr === '*'){      
       should_dauthorize = true;    // this will trigger a deauthorize event
     }
   }
+  // console.log(access_code_buffer);
 });
 
 const checkForIdleKeypadEntry = function() {
   // clear the data entered if it's been idle for too long
   return new Promise(function(resolve, reject) {
     if(access_code_buffer.length > 0){
-      const automatically_clear_duration_ms = 10 * 1000;
+      const automatically_clear_duration_ms = 10 * 60 * 1000; // TODO: API server should tell Pi what to do
+                                                              //      use 10 minutes for now
       const idle_time_ms = moment().diff(last_access_code_change, 'ms');
       if(idle_time_ms >= automatically_clear_duration_ms){
+        console.log("Automatic clear duration expired");
         access_code_buffer = '';
       }
     }
@@ -104,21 +108,13 @@ const checkAuthorizedIfReady = function(user) {
             Object.assign({}, user, { event: 'unauthorized' }); // i.e. wrong password
         });
       }
+      else { // the user is already authorized and is not being deauthorized
+        return util.resolvedPromise(user); 
+      }
     } else {
-      return {}; // no event generated
+      return util.resolvedPromise(user); // code is not ready
     }
   });
-};
-
-// TODO: this should probably be in a utility.js file rather than inline
-const delayPromise = function(millis) {
-  return function(){ // return a function 
-    return new Promise(function(resolve, reject){ // that returns a promise
-      setTimeout(function() { 
-        resolve(); 
-      }, millis); // that resolves after millis time
-    });
-  };
 };
 
 const handleAuthorizationResult = function(auth) {
@@ -128,16 +124,18 @@ const handleAuthorizationResult = function(auth) {
       return serial.authorize()                  // power up the authbox
       .then(api.authorize.bind(null, auth.code)) // register it with the server
       .then(lcd.authorize)                       // turn the lcd green
-      .then(() => false);                        // don't clear access code
+      .then(resolve(false));                     // don't clear access code
     case 'deauthorize':  // was authorized, now shutting down
       return serial.deauthorize()                // power down the authbox
       .then(api.deauthorize)                     // register it with the server
       .then(lcd.deauthorize)                     // turn the lcd red
-      .then(() => true);                         // do clear access code
-    case 'unauthorized': // user tried to authorize but code not found
+      .then(resolve(true));                      // do clear access code
+    case 'unauthorized': // user tried to authorize but code not found      
       return lcd.unauthorized()                  // turn to incorrect login color
-      .then(delayPromise(2000))                         // then wait 2 seconds
-      .then(() => false);                        // do clear access code      
+      .then(util.delayPromise(2000))             // then wait 2 seconds
+      .then(resolve(true));                     // do clear access code      
+    default:             // no event
+      return resolve(false);                     // do not clear access code
     }
   })
   .then(function(should_clear_access_code) {    
@@ -169,7 +167,11 @@ serial.begin(); // kick off the serial connection(s)
 promiseDoWhilst( function () {
   return checkForIdleKeypadEntry()
   .then(updateLcd)
-  .then(validateCode);
+  .then(validateCode)
+  .then(util.delayPromise(100))
+  .catch((error) => {
+    console.error(error.message, error.stack);
+  });
 }, function() {
   return true; // while true
 });

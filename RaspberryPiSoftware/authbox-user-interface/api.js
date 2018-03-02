@@ -1,5 +1,8 @@
 /* jshint esversion:6 */
 /* jshint node: true */
+
+const util = require('./util');
+
 module.exports = (function(){
   console.log('Initialized API');
 
@@ -8,9 +11,7 @@ module.exports = (function(){
   function fetchAccessCodes() {
     // TODO: implement API call
     // Mock for now
-    return new Promise((resolve, reject) => {
-      resolve(['open sesame']);
-    });
+    return util.resolvedPromise(['open sesame']);
   }
 
   function authorize(access) {

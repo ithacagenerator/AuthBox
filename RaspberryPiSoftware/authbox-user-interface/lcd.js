@@ -1,5 +1,8 @@
 /* jshint esversion:6 */
 /* jshint node: true */
+
+const util = require('./util');
+
 module.exports = (function(){
   console.log('Initialized LCD');
   let lines = [ 
@@ -23,24 +26,23 @@ module.exports = (function(){
     lines[lineNumber] = centerJustify(text.slice(0,16), 16);
     // TODO: put it on the display
     // Mock for now
-    return new Promise(function(resolve, reject) {
-      resolve();
-    });
+    return util.resolvedPromise();
   }
 
   function authorize() {
-    lines[lineNumber] = centerJustify('AUTHORIZED', 16);
+    lines[0] = centerJustify('AUTHORIZED', 16);
     // TODO: put it on the display
   }
 
   function deauthorize() {
-    lines[lineNumber] = centerJustify('ENTER CODE', 16);
+    lines[0] = centerJustify('ENTER CODE', 16);
     // TODO: put it on the display
   }
 
   function unauthorized() {
-    lines[lineNumber] = centerJustify('NOT AUTHORIZED', 16);
+    lines[0] = centerJustify('NOT AUTHORIZED', 16);
     // TODO: put it on the display
+    return util.resolvedPromise();
   }
 
   return {
