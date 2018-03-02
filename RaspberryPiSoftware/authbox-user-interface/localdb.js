@@ -8,7 +8,8 @@ module.exports = (function(){
 
   function isAuthorized(code) {
     // TODO: implement
-    return util.resolvedPromise();
+    const validCodes = ['1234'];
+    return util.resolvedPromise(validCodes.indexOf(code) >= 0);
   }
 
   function saveAccessCodes(codes) {

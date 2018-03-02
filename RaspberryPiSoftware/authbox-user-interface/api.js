@@ -11,7 +11,7 @@ module.exports = (function(){
   function fetchAccessCodes() {
     // TODO: implement API call
     // Mock for now
-    return util.resolvedPromise(['open sesame']);
+    return util.resolvedPromise(['1234']);
   }
 
   function authorize(access) {

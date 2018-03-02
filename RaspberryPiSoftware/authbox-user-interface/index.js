@@ -21,7 +21,7 @@ let should_dauthorize = false;
 // e.g. keypad, rfid reader, etc
 serial.setInputHandler(function(chr) {
   chr = chr ? chr.toString().trim() : '';
-  // console.log(`Got ${chr}`);
+  console.log(`Got ${chr}`);
   // if the access code ends with '#' reject further
   // input until it has been processed
   // if the chr is '*' it is the 'backspace' key
@@ -34,10 +34,9 @@ serial.setInputHandler(function(chr) {
       access_code_buffer = `${access_code_buffer}${chr.trim()}`;
       last_access_code_change = moment();
     }
-  }
-  else { // otherwise the only two input we'll pay special attention to is '*'
-         // if we get * in this state it should coerce and deauthorization
-         // any keypress will reset the last_access_code_change to now
+  } else { // otherwise the only two input we'll pay special attention to is '*'
+           // if we get * in this state it should coerce and deauthorization
+           // any keypress will reset the last_access_code_change to now
     last_access_code_change = moment(); // extend authorization timeout    
     if(chr === '*'){      
       should_dauthorize = true;    // this will trigger a deauthorize event
@@ -51,7 +50,7 @@ const checkForIdleKeypadEntry = function() {
   return new Promise(function(resolve, reject) {
     if(access_code_buffer.length > 0){
       const automatically_clear_duration_ms = 10 * 60 * 1000; // TODO: API server should tell Pi what to do
-                                                              //      use 10 minutes for now
+                                                              //       just use 10 minutes for now
       const idle_time_ms = moment().diff(last_access_code_change, 'ms');
       if(idle_time_ms >= automatically_clear_duration_ms){
         console.log("Automatic clear duration expired");
@@ -100,15 +99,14 @@ const checkAuthorizedIfReady = function(user) {
         return Object.assign({}, user, { event: 'deauthorize' }); // i.e. log off
       } else if(!user.authorized) {
         // not currently authorized so check if we should authorize
-        return db.isAuthorized(access_code_buffer)
+        return db.isAuthorized(user.code.slice(0, -1)) // remove the trailing '#' for checking
         .then(function(isAuthorized) {
           is_currently_authorized = isAuthorized;
           return isAuthorized ?
             Object.assign({}, user, { event: 'authorize' }) :   // i.e. right password
             Object.assign({}, user, { event: 'unauthorized' }); // i.e. wrong password
         });
-      }
-      else { // the user is already authorized and is not being deauthorized
+      } else { // the user is already authorized and is not being deauthorized
         return util.resolvedPromise(user); 
       }
     } else {
@@ -126,6 +124,7 @@ const handleAuthorizationResult = function(auth) {
       .then(lcd.authorize)                       // turn the lcd green
       .then(resolve(false));                     // don't clear access code
     case 'deauthorize':  // was authorized, now shutting down
+      is_currently_authorized = false;
       return serial.deauthorize()                // power down the authbox
       .then(api.deauthorize)                     // register it with the server
       .then(lcd.deauthorize)                     // turn the lcd red
