@@ -21,7 +21,7 @@ let should_dauthorize = false;
 // e.g. keypad, rfid reader, etc
 serial.setInputHandler(function(chr) {
   chr = chr ? chr.toString().trim() : '';
-  console.log(`Got ${chr}`);
+  // console.log(`Got ${chr}`);
   // if the access code ends with '#' reject further
   // input until it has been processed
   // if the chr is '*' it is the 'backspace' key
