@@ -639,10 +639,10 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
     };
   })
   .then((members_and_box) => {    
-    // send back an array of valid authorization codes for the requested box
+    // send back an array of valid authorization codes for the requested box    
     res.json({
-      codes: members.map(m => m.access_code),
-      idle_timeout_ms: box.idle_timeout_ms || 0
+      codes: members_and_box.members.map(m => m.access_code),
+      idle_timeout_ms: members_and_box.box.idle_timeout_ms || 0
     });
   })
   .catch((err) => {
