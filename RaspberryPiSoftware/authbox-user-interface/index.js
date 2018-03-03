@@ -10,6 +10,7 @@ const db = require('./localdb');
 const moment = require('moment');
 const promiseDoWhilst = require('promise-do-whilst');
 
+let configuration = {};
 let access_code_buffer = '';
 let last_access_code_change = moment();
 let is_currently_authorized = false;
@@ -49,12 +50,13 @@ const checkForIdleKeypadEntry = function() {
   // clear the data entered if it's been idle for too long
   return new Promise(function(resolve, reject) {
     if(access_code_buffer.length > 0){
-      const automatically_clear_duration_ms = 10 * 60 * 1000; // TODO: API server should tell Pi what to do
-                                                              //       just use 10 minutes for now
-      const idle_time_ms = moment().diff(last_access_code_change, 'ms');
-      if(idle_time_ms >= automatically_clear_duration_ms){
-        console.log("Automatic clear duration expired");
-        access_code_buffer = '';
+      const automatically_clear_duration_ms = configuration.idle_timeout_ms;
+      if(util.isNumeric(automatically_clear_duration_ms) && (automatically_clear_duration_ms > 0)){
+        const idle_time_ms = moment().diff(last_access_code_change, 'ms');
+        if(idle_time_ms >= automatically_clear_duration_ms){
+          console.log("Automatic clear duration expired");
+          access_code_buffer = '';
+        }
       }
     }
 
@@ -145,12 +147,11 @@ const handleAuthorizationResult = function(auth) {
   });
 };
 
-// interval task to synchronize the local database access codes with the
-// no need for this to be in the same thread of control as anything else
-setInterval(function() {
-  api.fetchAccessCodes()
-  .then(function(codes) {
-    return db.saveAccessCodes(codes);
+function synchronizeConfigWithServer() {
+  return api.fetchConfiguration()
+  .then(function(config) {
+    configuration = config;
+    return db.saveConfiguration(config);
   })
   .then(function() {
     console.log(`Database Synchronized @ ${moment().format()}`);
@@ -158,9 +159,19 @@ setInterval(function() {
   .catch(function(err) {
     console.err(err);
   });
-}, 10 * 60 * 1000 ); // every 10 minutes
+}
 
-serial.begin(); // kick off the serial connection(s)
+db.getConfiguration()
+.then(function(config){
+  configuration = config;
+
+  // interval task to synchronize the local database access codes with the
+  // no need for this to be in the same thread of control as anything else  
+  synchronizeConfigWithServer();                             // synchronize immediately
+  setInterval(synchronizeConfigWithServer, 10 * 60 * 1000 ); // then every 10 minutes after that
+  
+  serial.begin(); // kick off the serial connection(s)  
+});
 
 // an asynchronous non-blocking 'forever' loop
 promiseDoWhilst( function () {

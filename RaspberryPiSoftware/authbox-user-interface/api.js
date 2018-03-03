@@ -8,7 +8,7 @@ module.exports = (function(){
 
   let access_code = ''; 
 
-  function fetchAccessCodes() {
+  function fetchConfiguration() {
     // TODO: implement API call
     // Mock for now
     return util.resolvedPromise(['1234']);
@@ -24,7 +24,7 @@ module.exports = (function(){
   }
 
   return {
-    fetchAccessCodes,
+    fetchConfiguration,
     authorize,
     deauthorize
   };

@@ -35,5 +35,8 @@ module.exports = {
       crc = crc16_update(crc, str[ii]);      
     }
     return crc.toString(16).toUpperCase();
+  },
+  isNumeric: function(n){
+    return !isNaN(parseFloat(n)) && isFinite(n);
   }
 };
