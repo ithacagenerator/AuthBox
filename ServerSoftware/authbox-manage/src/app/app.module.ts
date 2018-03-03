@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
+import { UtilService } from './util.service';
 import { ApiService } from './api.service';
 import { ManagementPasswordService } from './management-password.service';
 import { MembersComponent } from './members/members/members.component';
@@ -74,7 +75,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   providers: [
     ApiService,
-    ManagementPasswordService
+    ManagementPasswordService,
+    UtilService
   ],
   bootstrap: [AppComponent],
   entryComponents: [

@@ -1,3 +1,5 @@
+/* jshint esversion:6 */
+
 var express = require('express');
 var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
@@ -25,11 +27,10 @@ var findMemberAndBox = (auth_hash, access_code) => {
       return {
         member: members[0],
         box_id: decipherAuthBoxId(members[0], auth_hash)
-      }
+      };
     } else throw new Error('no such access code');
-  })
-
-}
+  });
+};
 
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authboxes/PASSWORD
 router.get('/authboxes/:secret?', (req, res, next) => {
@@ -48,14 +49,14 @@ router.get('/authboxes/:secret?', (req, res, next) => {
     console.error(err);
     res.status(422).json({error: err.message});
   });
-})
+});
 
 
 // cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "BOX-NAME", "id": "BOX-ID", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
 // 
 // :secret is the apriori secret known to administrators
 // POST body is a JSON structure representing a new authbox, 
-//           which should include an id, name, and access_code field
+//           which should include an id, name, access_code, and (optional) idle_timeout_ms field
 //           date created and last modified fields will be added automatically
 //
 router.post('/authboxes/create/:secret', (req, res, next) => {
@@ -70,7 +71,7 @@ router.post('/authboxes/create/:secret', (req, res, next) => {
     if(!obj[key]){
       missingFields.push(key);
     }
-  })
+  });
   if(missingFields.length){
     res.status(422).json({error: 
       `Missing ${missingFields.length} fields: ${JSON.stringify(missingFields)}`});
@@ -100,7 +101,7 @@ router.post('/authboxes/create/:secret', (req, res, next) => {
 // 
 // :secret is the apriori secret known to administrators
 // PUT body is a JSON structure representing a the udpates to make, 
-//           which should include an id (optional), name, and access_code (optional) field
+//           which should include an id (optional), name, access_code (optional), and idle_timeout_ms (optional) field
 //           date last modified fields will be added automatically
 //
 router.put('/authbox/:secret', (req, res, next) => {
@@ -110,11 +111,11 @@ router.put('/authbox/:secret', (req, res, next) => {
   }
 
   let obj = { };
-  ['name', 'id', 'access_code'].forEach(key => {
+  ['name', 'id', 'access_code', 'idle_timeout_ms'].forEach(key => {
     if (req.body[key]) {
       obj[key] = req.body[key];
     }
-  })
+  });
 
   if(!obj.name){
     res.status(422).json({error: 'Name not provided.'});    
@@ -194,7 +195,7 @@ router.get('/members/:secret?', (req, res, next) => {
     console.error(err);
     res.status(422).json({error: err.message});
   });
-})
+});
 
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/member/NAME/PASSWORD
 router.get('/member/:name/:secret?', (req, res, next) => {
@@ -230,7 +231,7 @@ router.get('/member/:name/:secret?', (req, res, next) => {
     console.error(err);
     res.status(422).json({error: err.message});
   });
-})
+});
  
 router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
@@ -308,7 +309,7 @@ router.post('/members/create/:secret', (req, res, next) => {
     if(!obj[key]){
       missingFields.push(key);
     }
-  })
+  });
   if(missingFields.length){
     res.status(422).json({error: 
       `Missing ${missingFields.length} fields: ${JSON.stringify(missingFields)}`});
@@ -355,7 +356,7 @@ router.put('/member/:secret', (req, res, next) => {
     if (req.body[key]) {
       obj[key] = req.body[key];
     }
-  })
+  });
 
   if(!obj.name){
     res.status(422).json({error: 'Name not provided.'});    
@@ -623,7 +624,7 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
     return boxes.find(box => {
       const box_auth_hash = pbkdf2.pbkdf2Sync(box.id, box.access_code, 1, 32, 'sha512').toString('hex');
       return box_auth_hash === req.params.auth_hash;      
-    })
+    });
   })
   .then((box) => {
     if(!box) {
@@ -653,7 +654,7 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   }
 
 
-  if(req.query.sort === 'undefined') { delete req.query.sort };
+  if(req.query.sort === 'undefined') { delete req.query.sort; }
   if(req.query.order === 'undefined') { delete req.query.order; }
   if(req.query.page === 'undefined') { delete req.query.page; }
   const sort = req.query.sort || "authorized";
@@ -667,7 +668,7 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   findDocuments('AuthBoxes', {name: authboxName})
   .then((authboxes) => {
     if (!authboxes || (authboxes.length !== 1)) {
-      throw new Error(`Couldn't find AuthBox named ${authboxName}`)
+      throw new Error(`Couldn't find AuthBox named ${authboxName}`);
     }
     else{
       return authboxes[0];
@@ -679,10 +680,10 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
     const _condition = {$and: [{box_id: authbox.id}]};
     if(filter){
       const or = {$or: []};
-      or['$or'].push({member: new RegExp(filter,'i')});
-      or['$or'].push({authorized: new RegExp(filter,'i')});
-      or['$or'].push({deauthorized: new RegExp(filter,'i')});
-      _condition['$and'].push(or);
+      or.$or.push({member: new RegExp(filter,'i')});
+      or.$or.push({authorized: new RegExp(filter,'i')});
+      or.$or.push({deauthorized: new RegExp(filter,'i')});
+      _condition.$and.push(or);
     }
     return findDocuments('BoxUsage', _condition, {
       projection: { _id: 0, box_id: 0 },
@@ -709,7 +710,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
   }
 
 
-  if(req.query.sort === 'undefined') { delete req.query.sort };
+  if(req.query.sort === 'undefined') { delete req.query.sort; }
   if(req.query.order === 'undefined') { delete req.query.order; }
   if(req.query.page === 'undefined') { delete req.query.page; }
   const sort = req.query.sort || "authorized";
@@ -723,7 +724,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
   findDocuments('Members', {name: memberName})
   .then((members) => {
     if (!members || (members.length !== 1)) {
-      throw new Error(`Couldn't find Member named ${memberName}`)
+      throw new Error(`Couldn't find Member named ${memberName}`);
     }
     else{
       return members[0];
@@ -735,10 +736,10 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
     const _condition = {$and: [{member: member.name}]};
     if(filter){
       const or = {$or: []};
-      or['$or'].push({box_name: new RegExp(filter,'i')});
-      or['$or'].push({authorized: new RegExp(filter,'i')});
-      or['$or'].push({deauthorized: new RegExp(filter,'i')});
-      _condition['$and'].push(or);
+      or.$or.push({box_name: new RegExp(filter,'i')});
+      or.$or.push({authorized: new RegExp(filter,'i')});
+      or.$or.push({deauthorized: new RegExp(filter,'i')});
+      _condition.$and.push(or);
     }
     return findDocuments('BoxUsage', _condition, {
       projection: { _id: 0, member: 0, box_id: 0 },
@@ -770,134 +771,163 @@ var decipherAuthBoxId = (member, auth_hash) => {
   return authorizedBoxes.find(box_id => {
     const box_auth_hash = pbkdf2.pbkdf2Sync(box_id, access_code, 1, 32, 'sha512').toString('hex');
     return box_auth_hash === auth_hash;
-  })
+  });
 };
 
 var findDocuments = function(colxn, condition, options = {}) {
-    let projection = options.projection || {};
-    let sort = options.sort;
-    let limit = options.limit;
-    let skip = options.skip;
-    let includeCount = options.includeCount;
-    let count = 0;
-    projection = Object.assign({}, projection, {_id: 0}); // never return id
-  
-    // Get the documents collection
-    return new Promise((resolve, reject) => {
-      var url = 'mongodb://localhost:27017';
-      MongoClient.connect(url, function(err, client) {
-        const db = client.db('authbox');
-        if(err){
-          reject(err);
-        }
-        else {
-          // console.log("Connected correctly to server");
-          try{
-            var collection = db.collection(colxn);
-            // Find some documents
-            let cursor = collection.find(condition, {projection});
+  let projection = options.projection || {};
+  let sort = options.sort;
+  let limit = options.limit;
+  let skip = options.skip;
+  let includeCount = options.includeCount;
+  let count = 0;
+  projection = Object.assign({}, projection, {_id: 0}); // never return id
 
-            if(sort){
-              console.log("Applying sort", sort);
-              cursor = cursor.sort(sort);
-            }
-  
-            if(skip){
-              console.log("Applying skip", skip);
-              cursor = cursor.skip(skip);
-            }
+  // Get the documents collection
+  return new Promise((resolve, reject) => {
+    var url = 'mongodb://localhost:27017';
+    MongoClient.connect(url, function(err, client) {
+      const db = client.db('authbox');
+      if(err){
+        reject(err);
+      }
+      else {
+        // console.log("Connected correctly to server");
+        try{
+          var collection = db.collection(colxn);
+          // Find some documents
+          let cursor = collection.find(condition, {projection});
 
-            if(limit){
-              console.log("Applying limit", limit);
-              cursor = cursor.limit(limit);
+          if(sort){
+            console.log("Applying sort", sort);
+            cursor = cursor.sort(sort);
+          }
+
+          if(skip){
+            console.log("Applying skip", skip);
+            cursor = cursor.skip(skip);
+          }
+
+          if(limit){
+            console.log("Applying limit", limit);
+            cursor = cursor.limit(limit);
+          }
+          
+          cursor.count(false, {}, (err, cnt) => {          
+            if(err) {
+              reject(err);
+              client.close();
             }
-            
-            cursor.count(false, {}, (err, cnt) => {          
-              if(err) {
-                reject(err);
-                client.close();
-              }
-              else{
-                count = cnt;
-                cursor.toArray(function(err, docs) {
-                  if(err){
-                    reject(err);
+            else{
+              count = cnt;
+              cursor.toArray(function(err, docs) {
+                if(err){
+                  reject(err);
+                }
+                else{
+                  if(includeCount){
+                    console.log(`Count: ${count}`);
+                    resolve({items: docs, total_count: count});
                   }
                   else{
-                    if(includeCount){
-                      console.log(`Count: ${count}`);
-                      resolve({items: docs, total_count: count});
-                    }
-                    else{
-                      resolve(docs);
-                    }
+                    resolve(docs);
                   }
-                  client.close();
-                });
-              }
-            });
-          }
-          catch(error){
-            reject(error);
-            client.close();
-          }
+                }
+                client.close();
+              });
+            }
+          });
         }
-      });
+        catch(error){
+          reject(error);
+          client.close();
+        }
+      }
     });
-  };
-  
-  
-  var updateDocument = function(colxn, condition, update, options = {}){
-  
-    let opts = Object.assign({}, {upsert: false}, options);
-    let updateOperation = { $set: update }; // simple default use case
-    if(opts.updateType === "complex"){ // this represents intentionality
-      delete opts.updateType;
-      // if updateType is marked complex defer to caller for a complete
-      // update operator specification, rather than a simple $set operation
-      updateOperation = update;
-    }
-  
-    // update ONE document in the collection
-    return new Promise((resolve, reject) => {
-      var url = 'mongodb://localhost:27017';
-      MongoClient.connect(url, function(err, client) {
-        const db = client.db('authbox');
-        if(err){
-          reject(err);
+  });
+};
+   
+var updateDocument = function(colxn, condition, update, options = {}){
+
+  let opts = Object.assign({}, {upsert: false}, options);
+  let updateOperation = { $set: update }; // simple default use case
+  if(opts.updateType === "complex"){ // this represents intentionality
+    delete opts.updateType;
+    // if updateType is marked complex defer to caller for a complete
+    // update operator specification, rather than a simple $set operation
+    updateOperation = update;
+  }
+
+  // update ONE document in the collection
+  return new Promise((resolve, reject) => {
+    var url = 'mongodb://localhost:27017';
+    MongoClient.connect(url, function(err, client) {
+      const db = client.db('authbox');
+      if(err){
+        reject(err);
+      }
+      else {
+        // console.log("Connected correctly to server");
+        var collection = db.collection(colxn);
+        if(opts.updateMany){
+          collection.updateMany(condition, updateOperation, opts, function(err, result) {
+            if(err){
+              reject(err);
+            }
+            else{
+              resolve(result);
+            }
+            client.close();
+          });
         }
-        else {
-          // console.log("Connected correctly to server");
-          var collection = db.collection(colxn);
-          if(opts.updateMany){
-            collection.updateMany(condition, updateOperation, opts, function(err, result) {
-              if(err){
-                reject(err);
-              }
-              else{
-                resolve(result);
-              }
-              client.close();
-            });
+        else{
+          collection.updateOne(condition, updateOperation, opts, function(err, result) {
+            if(err){
+              reject(err);
+            }
+            else{
+              resolve(result);
+            }
+            client.close();
+          });
+        }
+      }
+    });
+  });
+};
+
+var insertDocument = function(colxn, document){
+  return new Promise((resolve, reject) => {
+    var url = 'mongodb://localhost:27017';
+    MongoClient.connect(url, function(err, client) {
+      const db = client.db('authbox');
+      if(err){
+        reject(err);
+      }
+      else {
+        // console.log("Connected correctly to server");
+        var collection = db.collection(colxn);
+        collection.insertOne(document, function(err, result) {
+          if(err){
+            reject(err);
           }
           else{
-            collection.updateOne(condition, updateOperation, opts, function(err, result) {
-              if(err){
-                reject(err);
-              }
-              else{
-                resolve(result);
-              }
-              client.close();
-            });
+            resolve(result);
           }
-        }
-      });
+          client.close();
+        });
+      }
     });
-  }
-  
-  var insertDocument = function(colxn, document){
-    return new Promise((resolve, reject) => {
+  });    
+};
+
+var deleteDocument = function(colxn, condition, options = {}){
+
+  let opts = Object.assign({}, {}, options);
+
+  // delete ONE document in the collection
+  return new Promise((resolve, reject) => {
+    if(!errorMessage){
       var url = 'mongodb://localhost:27017';
       MongoClient.connect(url, function(err, client) {
         const db = client.db('authbox');
@@ -907,7 +937,7 @@ var findDocuments = function(colxn, condition, options = {}) {
         else {
           // console.log("Connected correctly to server");
           var collection = db.collection(colxn);
-          collection.insertOne(document, function(err, result) {
+          collection.deleteOne(condition, opts, function(err, result) {
             if(err){
               reject(err);
             }
@@ -918,42 +948,12 @@ var findDocuments = function(colxn, condition, options = {}) {
           });
         }
       });
-    });    
-  }
-
-  var deleteDocument = function(colxn, condition, options = {}){
-  
-    let opts = Object.assign({}, {}, options);
-  
-    // delete ONE document in the collection
-    return new Promise((resolve, reject) => {
-      if(!errorMessage){
-        var url = 'mongodb://localhost:27017';
-        MongoClient.connect(url, function(err, client) {
-          const db = client.db('authbox');
-          if(err){
-            reject(err);
-          }
-          else {
-            // console.log("Connected correctly to server");
-            var collection = db.collection(colxn);
-            collection.deleteOne(condition, opts, function(err, result) {
-              if(err){
-                reject(err);
-              }
-              else{
-                resolve(result);
-              }
-              client.close();
-            });
-          }
-        });
-      }
-      else {
-        reject(new Error(errorMessage));
-      }
-    });
-  }
+    }
+    else {
+      reject(new Error(errorMessage));
+    }
+  });
+};
   
 
 module.exports = router;

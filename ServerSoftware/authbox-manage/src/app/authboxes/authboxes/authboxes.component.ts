@@ -68,6 +68,7 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
       if (result) {
+        if (!result.idle_timeout_ms) { result.idle_timeout_ms = 0; }
         this.apiSrvc.createAuthBox(result)
         .then(() => {
           console.log('Success');
@@ -90,7 +91,7 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(AuthboxEditComponent, {
       width: '350px',
       height: '75%',
-      data: { name: authbox.name }
+      data: { name: authbox.name, idle_timeout_ms: authbox.idle_timeout_ms }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -98,7 +99,7 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
       if (result && result.name) {
         if (!result.id) { delete result.id; }
         if (!result.access_code) { delete result.access_code; }
-
+        if (!result.idle_timeout_ms) { result.idle_timeout_ms = 0; }
         if (result.detail) {
           this.router.navigate([`/auth-box/${result.name}`]);
         } else if (result.delete) {

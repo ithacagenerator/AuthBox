@@ -9,6 +9,9 @@
   <mat-form-field>
     <input matInput placeholder="Access Code" [(ngModel)]="data.access_code">
   </mat-form-field>  
+  <mat-form-field>
+    <input matInput type="number" placeholder="(Optional) Idle Timeout (ms)" [(ngModel)]="data.idle_timeout_ms">
+  </mat-form-field>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>
