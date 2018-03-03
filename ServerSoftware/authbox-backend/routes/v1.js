@@ -633,11 +633,17 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
     return box;
   })  
   .then((box) => {
-    return findDocuments('Members', { authorizedBoxes: { $elemMatch: { $eq: box.id } } });
+    return {
+      members: findDocuments('Members', { authorizedBoxes: { $elemMatch: { $eq: box.id } } }),
+      box
+    };
   })
-  .then((members) => {    
+  .then((members_and_box) => {    
     // send back an array of valid authorization codes for the requested box
-    res.json(members.map(m => m.access_code));
+    res.json({
+      codes: members.map(m => m.access_code),
+      idle_timeout_ms: box.idle_timeout_ms || 0
+    });
   })
   .catch((err) => {
     console.error(err);
