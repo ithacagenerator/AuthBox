@@ -14,6 +14,8 @@
     "promise-do-whilst": "^1.0.1",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
-    "serialport": "^6.0.5"
+    "serialport": "^6.0.5",
+    "pbkdf2": "^3.0.14",
+    "homedir": "^0.6.0"
   }
 }
