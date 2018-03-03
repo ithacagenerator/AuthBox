@@ -11,7 +11,10 @@ module.exports = (function(){
   function fetchConfiguration() {
     // TODO: implement API call
     // Mock for now
-    return util.resolvedPromise(['1234']);
+    return util.resolvedPromise({
+      idle_timeout_ms: 600000,
+      codes: ['1234']
+    });
   }
 
   function authorize(access) {
