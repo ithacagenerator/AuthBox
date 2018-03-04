@@ -19,6 +19,9 @@ let last_access_code_change = moment();
 let is_currently_authorized = false;
 let should_dauthorize = false;
 let last_key_captured = '';
+let current_blinking_color = 'green';
+let next_toggle_moment = moment();
+
 // register input handler to accept a single
 // character of input from the user interface
 // which provides the user's access code
@@ -56,12 +59,27 @@ const checkForIdleKeypadEntry = function() {
     if(access_code_buffer.length > 0){
       const automatically_clear_duration_ms = configuration.idle_timeout_ms;
       if(util.isNumeric(automatically_clear_duration_ms) && (automatically_clear_duration_ms > 0)){
-        const idle_time_ms = moment().diff(last_access_code_change, 'ms');
+        const now = moment();
+        const idle_time_ms = now.diff(last_access_code_change, 'ms');
+        const time_until_idle_timeout = automatically_clear_duration_ms - idle_time_ms;
         if(idle_time_ms >= automatically_clear_duration_ms){
           console.log("Automatic clear duration expired");
           should_dauthorize = true;
           access_code_buffer = '';
-        }
+        } else if(is_currently_authorized &&   // currently authorized
+          (time_until_idle_timeout > 0) &&     // time not already expired
+          (time_until_idle_timeout < 60000)) { // within one minute of timeout
+          if(now.isSameOrAfter(next_toggle_moment)){
+            if(current_blinking_color === 'green'){
+              current_blinking_color = 'yellow';
+              lcd.setBacklightColor(current_blinking_color);            
+            } else {
+              current_blinking_color = 'green';
+              lcd.setBacklightColor(current_blinking_color);
+            }
+            next_toggle_moment = now.add(500, 'ms'); // 0.5 seconds from now
+          }
+        } 
       }
     }
 
