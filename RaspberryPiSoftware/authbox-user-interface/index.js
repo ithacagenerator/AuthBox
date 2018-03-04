@@ -58,6 +58,7 @@ const checkForIdleKeypadEntry = function() {
         const idle_time_ms = moment().diff(last_access_code_change, 'ms');
         if(idle_time_ms >= automatically_clear_duration_ms){
           console.log("Automatic clear duration expired");
+          should_dauthorize = true;
           access_code_buffer = '';
         }
       }
@@ -71,7 +72,7 @@ const checkForIdleKeypadEntry = function() {
   });
 };
 
-// if the user is authorized, their *-masked passcode should be displayed on line 1
+// if the user is authorized, their '*'-masked passcode should be displayed on line 1
 // otherwise the phrase ENTER CODE should be displaed on line 1
 const updateLcd = function(user) {
   if(!user.authorized){
@@ -130,6 +131,7 @@ const handleAuthorizationResult = function(auth) {
       .then(resolve(false));                     // don't clear access code
     case 'deauthorize':  // was authorized, now shutting down
       is_currently_authorized = false;
+      access_code_buffer = '';
       return serial.deauthorize()                // power down the authbox
       .then(api.deauthorize)                     // register it with the server
       .then(lcd.deauthorize)                     // turn the lcd red
@@ -137,7 +139,7 @@ const handleAuthorizationResult = function(auth) {
     case 'unauthorized': // user tried to authorize but code not found      
       return lcd.unauthorized()                  // turn to incorrect login color
       .then(util.delayPromise(2000))             // then wait 2 seconds
-      .then(resolve(true));                     // do clear access code      
+      .then(resolve(true));                      // do clear access code      
     default:             // no event
       return resolve(false);                     // do not clear access code
     }
@@ -160,10 +162,12 @@ function synchronizeConfigWithServer() {
     console.log(`Database Synchronized @ ${moment().format()}`);
   })
   .catch(function(err) {
-    console.err(err);
+    console.error(err.message, err.stack);
   });
 }
 
+// fetch the configuration from the database
+// then synchronize with the server immediately and periodically
 db.getConfiguration()
 .then(function(config){
   configuration = config;

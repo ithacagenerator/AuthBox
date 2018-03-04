@@ -44,8 +44,12 @@ module.exports = (function(){
   function saveConfiguration(config) {        
     return initial_load
     .then(function(){
-      in_memory_configuration = config;
-      return updateDocument("Configurations", {}, config);
+      if(config){
+        in_memory_configuration = config;
+        return updateDocument("Configurations", {}, config);
+      } else {
+        console.log(`Warn: local database not updated, because !config`);
+      }
     });   
   }
 

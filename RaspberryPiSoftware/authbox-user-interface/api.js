@@ -2,28 +2,53 @@
 /* jshint node: true */
 
 const util = require('./util');
+const pbkdf2 = require('pbkdf2');
+const request = require('request-promise-native');
+const api_base = 'https://ithacagenerator.org/authbox/v1';
+const path = require('path');
+const homedir = require('homedir')();
+const identity = require(path.join(homedir, 'identity.json'));
+const auth_hash = pbkdf2.pbkdf2Sync(identity.id, identity.access_code, 1, 32, 'sha512').toString('hex');
 
 module.exports = (function(){
   console.log('Initialized API');
 
-  let access_code = ''; 
+  let currently_authrorized_access_code = 'not-authorized';
 
-  function fetchConfiguration() {
-    // TODO: implement API call
-    // Mock for now
-    return util.resolvedPromise({
-      idle_timeout_ms: 600000,
-      codes: ['1234']
+  function fetchConfiguration() {    
+    return request.get(`${api_base}/authmap/${auth_hash}`)
+    .then(function(response){
+      return JSON.parse(response);
+    })
+    .catch(function(err){
+      console.error(err.message, err.stack);
+      return null;
     });
   }
 
-  function authorize(access) {
-    // TODO: implement API call
-    access_code = access;
+  function authorize(access_code) {
+    currently_authrorized_access_code = access_code;
+    return request.post(`${api_base}/authorize/${auth_hash}/${access_code}`)
+    .then(function(response){
+      return JSON.parse(response);
+    })
+    .catch(function(err){
+      console.error(err.message, err.stack);
+      return null;
+    });        
   }
 
   function deauthorize() {
-    // TODO: implement API call
+    const access_code = currently_authrorized_access_code;
+    currently_authrorized_access_code = 'not-authorized';
+    return request.post(`${api_base}/deauthorize/${auth_hash}/${access_code}`)
+    .then(function(response){
+      return JSON.parse(response);
+    })
+    .catch(function(err){
+      console.error(err.message, err.stack);
+      return null;
+    });        
   }
 
   return {
