@@ -9,6 +9,9 @@ const serial = require('./serial');
 const db = require('./localdb');
 const moment = require('moment');
 const promiseDoWhilst = require('promise-do-whilst');
+const path = require('path');
+const homedir = require('homedir')();
+const identity = require(path.join(homedir, 'identity.json'));
 
 let configuration = {};
 let access_code_buffer = '';

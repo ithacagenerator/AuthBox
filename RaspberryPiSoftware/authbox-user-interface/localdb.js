@@ -2,33 +2,51 @@
 /* jshint node: true */
 
 const util = require('./util');
-const path = require('path');
-const identity = require(path.join(require('homedir')(), 'identity.json'));
+const MongoClient = require('mongodb').MongoClient;
 
 module.exports = (function(){
   console.log('Initialized Local Database');
 
   let in_memory_configuration = {};
-  const initial_load = new Promise(function(resolve, reject){
-    // TODO: implement database fetch
-    in_memory_configuration = {
-      idle_timeout_ms: 600000,
-      codes: ['1234']
-    };
+  // for initial testing without database
+  // const initial_load = new Promise(function(resolve, reject){
+  //   // TODO: implement database fetch
+  //   in_memory_configuration = {
+  //     idle_timeout_ms: 600000,
+  //     codes: ['1234']
+  //   };
 
-    resolve(in_memory_configuration);
-  })
-  .then((config) => in_memory_configuration = config);
+  //   resolve(in_memory_configuration);
+  // })
+  // .then((config) => in_memory_configuration = config);
+
+  // production implementation with database
+  const initial_load = findDocuments('Configurations', {})
+    .then(function(configs){
+      if(configs && configs.length){
+        in_memory_configuration = configs[0];
+      } else {
+        in_memory_configuration = {
+          idle_timeout_ms: 600000,
+          codes: []
+        };
+      }
+    })
+    .catch(function(err){
+      console.error(err.message, err.stack);
+    });
 
   function isAuthorized(code) {    
     const validCodes = in_memory_configuration.codes || [];
     return util.resolvedPromise(validCodes.indexOf(code) >= 0);
   }
 
-  function saveConfiguration(config) {
-    // TODO: implement database save
-    in_memory_configuration = config;
-    return util.resolvedPromise();
+  function saveConfiguration(config) {        
+    return initial_load
+    .then(function(){
+      in_memory_configuration = config;
+      return updateDocument("Configurations", {}, config);
+    });   
   }
 
   function getConfiguration(){       
@@ -38,7 +56,7 @@ module.exports = (function(){
     });
   }
 
-  var findDocuments = function(colxn, condition, options = {}) {
+  function findDocuments(colxn, condition, options = {}) {
     let projection = options.projection || {};
     let sort = options.sort;
     let limit = options.limit;
@@ -109,9 +127,9 @@ module.exports = (function(){
         }
       });
     });
-  };
+  }
      
-  var updateDocument = function(colxn, condition, update, options = {}){
+  function updateDocument(colxn, condition, update, options = {}){
   
     let opts = Object.assign({}, {upsert: true}, options); // NOTE: upsert: true
     let updateOperation = { $set: update }; // simple default use case
@@ -158,9 +176,9 @@ module.exports = (function(){
         }
       });
     });
-  };
+  }
   
-  var deleteDocument = function(colxn, condition, options = {}){
+  function deleteDocument(colxn, condition, options = {}){
   
     let opts = Object.assign({}, {}, options);
   
@@ -192,7 +210,7 @@ module.exports = (function(){
         reject(new Error(errorMessage));
       }
     });
-  };
+  }
 
   return {
     isAuthorized,
