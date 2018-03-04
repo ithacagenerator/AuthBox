@@ -7,6 +7,7 @@ const lcd = new LCDPLATE(1, 0x20); // 1 => /dev/i2c-1, 0x20 => i2c address 0x20
 
 module.exports = (function(){
   console.log('Initialized LCD');
+  let lastRendered = '';
   let lines = [ 
     '                ',
     '                ' 
@@ -53,8 +54,11 @@ module.exports = (function(){
     return new Promise(function(resolve, reject){
       try{
         const two_lines_combined = `${lines[0].slice(0,16)}\n${lines[1].slice(0,16)}`;
-        lcd.clear();
-        lcd.message(two_lines_combined);
+        if(lastRendered != two_lines_combined){
+          lcd.clear();
+          lcd.message(two_lines_combined);
+          lastRendered = two_lines_combined;
+        }        
         resolve();        
       } catch (err) {
         reject(err);
