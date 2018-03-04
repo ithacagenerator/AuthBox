@@ -21,6 +21,7 @@ let should_dauthorize = false;
 let last_key_captured = '';
 let current_blinking_color = 'green';
 let next_toggle_moment = moment();
+let next_countdown_moment = moment();
 
 // register input handler to accept a single
 // character of input from the user interface
@@ -66,20 +67,26 @@ const checkForIdleKeypadEntry = function() {
           console.log("Automatic clear duration expired");
           should_dauthorize = true;
           access_code_buffer = '';
-        } else if(is_currently_authorized &&   // currently authorized
-          (time_until_idle_timeout > 0) &&     // time not already expired
-          (time_until_idle_timeout < 60000)) { // within one minute of timeout
-          if(now.isSameOrAfter(next_toggle_moment)){
-            if(current_blinking_color === 'green'){
-              current_blinking_color = 'yellow';
-              lcd.setBacklightColor(current_blinking_color);            
-            } else {
-              current_blinking_color = 'green';
-              lcd.setBacklightColor(current_blinking_color);
+        } else if(is_currently_authorized){ // currently authorized
+          if((time_until_idle_timeout > 0) &&     // time not already expired
+            (time_until_idle_timeout < 60000)) {  // within one minute of timeout
+            if(now.isSameOrAfter(next_toggle_moment)){
+              if(current_blinking_color === 'green'){
+                current_blinking_color = 'yellow';
+                lcd.setBacklightColor(current_blinking_color);            
+              } else {
+                current_blinking_color = 'green';
+                lcd.setBacklightColor(current_blinking_color);
+              }
+              next_toggle_moment = moment(now).add(500, 'ms'); // 0.5 seconds from now
             }
-            next_toggle_moment = now.add(500, 'ms'); // 0.5 seconds from now
           }
-        } 
+          
+          if(now.isSameOrAfter(next_countdown_moment)){
+            lcd.centerText((time_until_idle_timeout/1000).toFixed(0), 1);
+            next_countdown_moment = moment(now).add(1000, 'ms');
+          }
+        }
       }
     }
 
