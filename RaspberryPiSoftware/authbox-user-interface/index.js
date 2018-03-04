@@ -18,13 +18,14 @@ let access_code_buffer = '';
 let last_access_code_change = moment();
 let is_currently_authorized = false;
 let should_dauthorize = false;
-
+let last_key_captured = '';
 // register input handler to accept a single
 // character of input from the user interface
 // which provides the user's access code
 // e.g. keypad, rfid reader, etc
 serial.setInputHandler(function(chr) {
   chr = chr ? chr.toString().trim() : '';
+  last_key_captured = chr;
   // console.log(`Got ${chr}`);
   // if the access code ends with '#' reject further
   // input until it has been processed
@@ -85,7 +86,9 @@ const updateLcd = function(user) {
 
       const idle_time_ms = moment().diff(last_access_code_change, 'ms');
       let maskedCode = ''; // only expose the last character entered for 0.5 seconds
-      if((idle_time_ms < 500) && !user.code.endsWith('#')){ // don't expose last character on enter
+      if((idle_time_ms < 500) &&
+        !user.code.endsWith('#') &&  // don't expose last character on enter
+        !last_key_captured === '*'){ // don't expose last character on backspace
         maskedCode = `${code.slice(0,-1).replace(/./g,'*')}${code.slice(-1)}`;
       } else {
         maskedCode = `${code.replace(/./g,'*')}`;
