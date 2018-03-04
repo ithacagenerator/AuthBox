@@ -88,7 +88,7 @@ const updateLcd = function(user) {
       let maskedCode = ''; // only expose the last character entered for 0.5 seconds
       if((idle_time_ms < 500) &&
         !user.code.endsWith('#') &&  // don't expose last character on enter
-        !last_key_captured === '*'){ // don't expose last character on backspace
+        (last_key_captured !== '*')){ // don't expose last character on backspace
         maskedCode = `${code.slice(0,-1).replace(/./g,'*')}${code.slice(-1)}`;
       } else {
         maskedCode = `${code.replace(/./g,'*')}`;
