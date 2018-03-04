@@ -81,7 +81,7 @@ const updateLcd = function(user) {
       return lcd.centerText(maskedCode, 1)
       .then(() => user);
     } else {
-      return lcd.centerText(`ENTER CODE`, 1)
+      return lcd.centerText(`ENTER CODE:`, 0)
       .then(() => user);
     }
   } else {

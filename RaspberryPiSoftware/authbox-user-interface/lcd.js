@@ -2,8 +2,18 @@
 /* jshint node: true */
 
 const util = require('./util');
-const LCDPLATE = require('adafruit-i2c-lcd').plate;
-const lcd = new LCDPLATE(1, 0x20); // 1 => /dev/i2c-1, 0x20 => i2c address 0x20
+let LCDPLATE, lcd = { // stub out some functions for development without a pi
+  backlight: function() { },
+  colors: { }, 
+  clear: function(){ }, 
+  message: function(text) { }
+};
+try {
+  LCDPLATE = require('adafruit-i2c-lcd').plate;
+  lcd = new LCDPLATE(1, 0x20); // 1 => /dev/i2c-1, 0x20 => i2c address 0x20
+} catch (err) {
+  console.error(err);
+}
 
 module.exports = (function(){
   console.log('Initialized LCD');
@@ -19,7 +29,7 @@ module.exports = (function(){
   function centerJustify(str, length, char = ' ') {
     let i = 0;	  
 	  let toggle = true;
-    while ( i + this.length < length ) {
+    while ( i + str.length < length ) {
       i++;
 	    if(toggle) str = str + char;
 	    else str = char + str;
@@ -67,7 +77,9 @@ module.exports = (function(){
   }
 
   function centerText(text, lineNumber) {
-    lines[lineNumber] = centerJustify(text.slice(0,16), 16);
+    if(line_number >= 0 && line_number < 2){
+      lines[lineNumber] = centerJustify(text.slice(0,16), 16);
+    }
     return render();
   }
 
@@ -77,7 +89,7 @@ module.exports = (function(){
   }
 
   function deauthorize() {
-    lines[0] = centerJustify('ENTER CODE', 16);    
+    lines[0] = centerJustify('ENTER CODE:', 16);    
     return setBacklightColor('red').then(render);
   }
 
