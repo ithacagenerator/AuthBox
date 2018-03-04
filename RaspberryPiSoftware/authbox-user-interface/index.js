@@ -77,7 +77,20 @@ const checkForIdleKeypadEntry = function() {
 const updateLcd = function(user) {
   if(!user.authorized){
     if(user.code){
-      const maskedCode = `${user.code.slice(0,-1).replace(/./g,'*')}${user.code.slice(-1)}`;
+      let code = user.code;
+
+      if(code.endsWith('#')){ // don't display the enter key
+        code = code.slice(0,-1);
+      }
+
+      const idle_time_ms = moment().diff(last_access_code_change, 'ms');
+      let maskedCode = ''; // only expose the last character entered for 0.5 seconds
+      if(idle_time_ms < 500){
+        maskedCode = `${code.slice(0,-1).replace(/./g,'*')}${code.slice(-1)}`;
+      } else {
+        maskedCode = `${code.replace(/./g,'*')}`;
+      }
+
       return lcd.centerText(maskedCode, 1)
       .then(() => user);
     } else {
