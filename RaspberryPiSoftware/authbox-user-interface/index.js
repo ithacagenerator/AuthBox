@@ -83,7 +83,9 @@ const checkForIdleKeypadEntry = function() {
           }
           
           if(now.isSameOrAfter(next_countdown_moment)){
-            lcd.centerText((time_until_idle_timeout/1000).toFixed(0), 1);
+            const seconds_until_timeout = (time_until_idle_timeout/1000).toFixed(0);
+            const message = `FOR ${seconds_until_timeout} SECONDS`;
+            lcd.centerText(message, 1);
             next_countdown_moment = moment(now).add(1000, 'ms');
           }
         }
