@@ -86,16 +86,19 @@ module.exports = (function(){
 
   function authorize() {
     lines[0] = centerJustify('AUTHORIZED', 16);
+    lines[1] = centerJustify('', 16);
     return setBacklightColor('green').then(render);
   }
 
   function deauthorize() {
     lines[0] = centerJustify('ENTER CODE:', 16);    
+    lines[1] = centerJustify('', 16);
     return setBacklightColor('red').then(render);
   }
 
   function unauthorized() {
     lines[0] = centerJustify('NOT AUTHORIZED', 16);    
+    lines[1] = centerJustify('', 16);
     return setBacklightColor('yellow').then(render);
   }
 
