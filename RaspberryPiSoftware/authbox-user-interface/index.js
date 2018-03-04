@@ -126,7 +126,7 @@ const handleAuthorizationResult = function(auth) {
     switch(auth.event){
     case 'authorize':    // was not authorized, now power up
       return serial.authorize()                  // power up the authbox
-      .then(api.authorize.bind(null, auth.code)) // register it with the server
+      .then(api.authorize.bind(null, auth.code.slice(0,-1))) // register it with the server
       .then(lcd.authorize)                       // turn the lcd green
       .then(resolve(false));                     // don't clear access code
     case 'deauthorize':  // was authorized, now shutting down
