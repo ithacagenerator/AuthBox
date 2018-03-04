@@ -29,8 +29,7 @@ module.exports = (function(){
   function centerJustify(str, length, char = ' ') {
     let i = 0;	  
 	  let toggle = true;
-    while ( i + str.length < length ) {
-      i++;
+    while (str.length < length ) {      
 	    if(toggle) str = str + char;
 	    else str = char + str;
       toggle = !toggle;
