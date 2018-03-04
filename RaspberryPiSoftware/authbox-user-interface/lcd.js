@@ -77,8 +77,10 @@ module.exports = (function(){
   }
 
   function centerText(text, lineNumber) {
-    if(line_number >= 0 && line_number < 2){
+    if(lineNumber >= 0 && lineNumber < 2){
       lines[lineNumber] = centerJustify(text.slice(0,16), 16);
+    } else {
+      console.error(`centerText called with invalid lineNumber ${lineNumber}`);
     }
     return render();
   }
