@@ -148,6 +148,7 @@ export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
     console.log(row);
     this.editAuthBox({
       name: row.name,
+      idle_timeout_ms: row.idle_timeout_ms
     });
   }
 }
