@@ -85,7 +85,7 @@ const updateLcd = function(user) {
 
       const idle_time_ms = moment().diff(last_access_code_change, 'ms');
       let maskedCode = ''; // only expose the last character entered for 0.5 seconds
-      if(idle_time_ms < 500){
+      if((idle_time_ms < 500) && !user.code.endsWith('#')){ // don't expose last character on enter
         maskedCode = `${code.slice(0,-1).replace(/./g,'*')}${code.slice(-1)}`;
       } else {
         maskedCode = `${code.replace(/./g,'*')}`;
