@@ -10,12 +10,10 @@ module.exports = (function(){
   let in_memory_configuration = {};
   // for initial testing without database
   // const initial_load = new Promise(function(resolve, reject){
-  //   // TODO: implement database fetch
   //   in_memory_configuration = {
   //     idle_timeout_ms: 600000,
   //     codes: ['1234']
   //   };
-
   //   resolve(in_memory_configuration);
   // })
   // .then((config) => in_memory_configuration = config);
@@ -72,12 +70,11 @@ module.exports = (function(){
     // Get the documents collection
     return new Promise((resolve, reject) => {
       var url = 'mongodb://localhost:27017';
-      MongoClient.connect(url, function(err, client) {
-        const db = client.db('authbox');
+      MongoClient.connect(url, function(err, client) {        
         if(err){
           reject(err);
-        }
-        else {
+        } else {
+          const db = client.db('authbox');
           // console.log("Connected correctly to server");
           try{
             var collection = db.collection(colxn);
@@ -103,19 +100,16 @@ module.exports = (function(){
               if(err) {
                 reject(err);
                 client.close();
-              }
-              else{
+              } else{
                 count = cnt;
                 cursor.toArray(function(err, docs) {
                   if(err){
                     reject(err);
-                  }
-                  else{
+                  } else {
                     if(includeCount){
                       console.log(`Count: ${count}`);
                       resolve({items: docs, total_count: count});
-                    }
-                    else{
+                    } else {
                       resolve(docs);
                     }
                   }
@@ -123,8 +117,7 @@ module.exports = (function(){
                 });
               }
             });
-          }
-          catch(error){
+          } catch(error) {
             reject(error);
             client.close();
           }
@@ -147,31 +140,27 @@ module.exports = (function(){
     // update ONE document in the collection
     return new Promise((resolve, reject) => {
       var url = 'mongodb://localhost:27017';
-      MongoClient.connect(url, function(err, client) {
-        const db = client.db('authbox');
+      MongoClient.connect(url, function(err, client) {        
         if(err){
           reject(err);
-        }
-        else {
+        } else {
+          const db = client.db('authbox');
           // console.log("Connected correctly to server");
           var collection = db.collection(colxn);
           if(opts.updateMany){
             collection.updateMany(condition, updateOperation, opts, function(err, result) {
               if(err){
                 reject(err);
-              }
-              else{
+              } else {
                 resolve(result);
               }
               client.close();
             });
-          }
-          else{
+          } else {
             collection.updateOne(condition, updateOperation, opts, function(err, result) {
               if(err){
                 reject(err);
-              }
-              else{
+              } else {
                 resolve(result);
               }
               client.close();
@@ -190,27 +179,24 @@ module.exports = (function(){
     return new Promise((resolve, reject) => {
       if(!errorMessage){
         var url = 'mongodb://localhost:27017';
-        MongoClient.connect(url, function(err, client) {
-          const db = client.db('authbox');
+        MongoClient.connect(url, function(err, client) {          
           if(err){
             reject(err);
-          }
-          else {
+          } else {
+            const db = client.db('authbox');
             // console.log("Connected correctly to server");
             var collection = db.collection(colxn);
             collection.deleteOne(condition, opts, function(err, result) {
               if(err){
                 reject(err);
-              }
-              else{
+              } else {
                 resolve(result);
               }
               client.close();
             });
           }
         });
-      }
-      else {
+      } else {
         reject(new Error(errorMessage));
       }
     });
