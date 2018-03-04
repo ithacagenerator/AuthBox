@@ -29,7 +29,7 @@ module.exports = (function(){
   function authorize(access_code) {
     const user_auth_hash = pbkdf2.pbkdf2Sync(identity.id, access_code, 1, 32, 'sha512').toString('hex');
     currently_authrorized_access_code = access_code;
-    return request.post(`${api_base}/authorize/${auth_hash}/${user_access_code}`)
+    return request.post(`${api_base}/authorize/${user_auth_hash}/${access_code}`)
     .then(function(response){
       return JSON.parse(response);
     })
