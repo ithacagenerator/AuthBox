@@ -2,13 +2,18 @@
 /* jshint node: true */
 
 const util = require('./util');
+const LCDPLATE = require('adafruit-i2c-lcd').plate;
+const lcd = new LCDPLATE(1, 0x20); // 1 => /dev/i2c-1, 0x20 => i2c address 0x20
 
 module.exports = (function(){
   console.log('Initialized LCD');
   let lines = [ 
     '                ',
     '                ' 
-  ];
+  ];  
+
+  // initialize the backlight color to RED
+  setBacklightColor('red');
 
   function centerJustify(str, length, char = ' ') {
     let i = 0;	  
@@ -22,33 +27,66 @@ module.exports = (function(){
     return str;
   }
 
+  function setBacklightColor(str){
+    return new Promise(function(resolve, reject){
+      let rejected = false;
+      switch(str.toUpperCase()){
+        case 'OFF': lcd.backlight(lcd.colors.OFF); break;
+        case 'ON': lcd.backlight(lcd.colors.ON); break;
+        case 'RED': lcd.backlight(lcd.colors.RED); break;
+        case 'GREEN': lcd.backlight(lcd.colors.GREEN); break;
+        case 'BLUE': lcd.backlight(lcd.colors.BLUE); break;
+        case 'YELLOW': lcd.backlight(lcd.colors.YELLOW); break;
+        case 'TEAL': lcd.backlight(lcd.colors.TEAL); break;
+        case 'VIOLET': lcd.backlight(lcd.colors.VIOLET); break;
+        case 'WHITE': lcd.backlight(lcd.colors.WHITE); break;
+        default: rejected = true; reject(); break;
+      }
+
+      if(!rejected){
+        resolve();
+      }
+    });
+  }
+
+  function render(){
+    return new Promise(function(resolve, reject){
+      try{
+        const two_lines_combined = `${lines[0].slice(0,16)}\n${lines[1].slice(0,16)}`;
+        lcd.clear();
+        lcd.message(two_lines_combined);
+        resolve();        
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   function centerText(text, lineNumber) {
     lines[lineNumber] = centerJustify(text.slice(0,16), 16);
-    // TODO: put it on the display
-    // Mock for now
-    return util.resolvedPromise();
+    return render();
   }
 
   function authorize() {
     lines[0] = centerJustify('AUTHORIZED', 16);
-    // TODO: put it on the display
+    return setBacklightColor('green').then(render);
   }
 
   function deauthorize() {
-    lines[0] = centerJustify('ENTER CODE', 16);
-    // TODO: put it on the display
+    lines[0] = centerJustify('ENTER CODE', 16);    
+    return setBacklightColor('red').then(render);
   }
 
   function unauthorized() {
-    lines[0] = centerJustify('NOT AUTHORIZED', 16);
-    // TODO: put it on the display
-    return util.resolvedPromise();
+    lines[0] = centerJustify('NOT AUTHORIZED', 16);    
+    return setBacklightColor('yellow').then(render);
   }
 
   return {
     centerText,
     authorize,
     deauthorize,
-    unauthorized
+    unauthorized,
+    setBacklightColor
   };
 })();

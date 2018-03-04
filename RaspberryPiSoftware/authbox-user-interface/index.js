@@ -139,6 +139,7 @@ const handleAuthorizationResult = function(auth) {
     case 'unauthorized': // user tried to authorize but code not found      
       return lcd.unauthorized()                  // turn to incorrect login color
       .then(util.delayPromise(2000))             // then wait 2 seconds
+      .then(lcd.deauthorize)                     // then turn the backlight red
       .then(resolve(true));                      // do clear access code      
     default:             // no event
       return resolve(false);                     // do not clear access code
