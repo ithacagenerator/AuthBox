@@ -138,6 +138,7 @@ const handleAuthorizationResult = function(auth) {
   return new Promise(function(resolve, reject) {
     switch(auth.event){
     case 'authorize':    // was not authorized, now power up
+      is_currently_authorized = true;
       return serial.authorize()                  // power up the authbox
       .then(api.authorize.bind(null, auth.code.slice(0,-1))) // register it with the server
       .then(lcd.authorize)                       // turn the lcd green
@@ -150,6 +151,8 @@ const handleAuthorizationResult = function(auth) {
       .then(lcd.deauthorize)                     // turn the lcd red
       .then(resolve(true));                      // do clear access code
     case 'unauthorized': // user tried to authorize but code not found      
+      is_currently_authorized = false;
+      access_code_buffer = '';    
       return lcd.unauthorized()                  // turn to incorrect login color
       .then(util.delayPromise(2000))             // then wait 2 seconds
       .then(lcd.deauthorize)                     // then turn the backlight red
