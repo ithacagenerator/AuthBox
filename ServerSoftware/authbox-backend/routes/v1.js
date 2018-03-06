@@ -487,6 +487,7 @@ router.delete('/member/:secret', (req, res, next) => {
   let now = moment().format();  
   obj.updated = now;
   obj.deleted = true;
+  obj.access_codes = []; // wipe out the user's access codes
 
   updateDocument('Members', { name: obj.name }, obj)
   .then((updateResult) => {
