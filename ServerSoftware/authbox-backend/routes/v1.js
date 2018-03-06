@@ -301,7 +301,7 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
 //           date created and last modified fields will be added automatically
 //
 router.post('/members/create/:secret', (req, res, next) => {
-  waitUntil(0, Infinity, function condition(){
+  waitUntil(100, Infinity, function condition(){
     return !members_modification_in_progress;
   }, function done(){
     members_modification_in_progress = true;  
@@ -376,7 +376,7 @@ router.post('/members/create/:secret', (req, res, next) => {
 //           date last modified fields will be added automatically
 //
 router.put('/member/:secret', (req, res, next) => {
-  waitUntil(0, Infinity, function condition(){
+  waitUntil(100, Infinity, function condition(){
     return !members_modification_in_progress;
   }, function done(){
     members_modification_in_progress = true;
