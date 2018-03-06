@@ -24,9 +24,10 @@ router.get('/amiloggedin/:secret', function(req, res, next) {
 // { name: 'Alice', access_code: '12345', authorizedBoxes: ['laser-cutter']}
 var findMemberAndBox = (auth_hash, access_code) => {
   // first see if there's a user in the database that matches the user_code
-  return findDocuments('Members', {access_code})
+  return findDocuments('Members', {'access_code.code': access_code})
   .then((members) => {
     if(members.length === 1){      
+      members[0].access_code = access_code; // collapse to the code that was used
       return {
         member: members[0],
         box_id: decipherAuthBoxId(members[0], auth_hash)
@@ -43,7 +44,7 @@ router.get('/authboxes/:secret?', (req, res, next) => {
   }
     
   findDocuments('AuthBoxes', {deleted: {$exists: false}}, {
-    projection: { _id: 0, id: 0, access_code: 0 }
+    projection: { _id: 0, id: 0, access_codes: 0 }
   })
   .then((authboxes) =>{
     res.json(authboxes);
@@ -189,7 +190,7 @@ router.get('/members/:secret?', (req, res, next) => {
   }
     
   findDocuments('Members', {deleted: {$exists: false}}, {
-    projection: { _id: 0, access_code: 0, authorizedBoxes: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0 }
   })
   .then((members) =>{
     res.json(members);
@@ -208,7 +209,7 @@ router.get('/member/:name/:secret?', (req, res, next) => {
   }
   const name = req.params.name;
   findDocuments('Members', {deleted: {$exists: false}, name}, {
-    projection: { _id: 0, access_code: 0, authorizedBoxes: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0 }
   })
   .then((members) => {
     if (!members || (members.length !== 1)) {
@@ -725,7 +726,10 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
   .then((members_and_box) => {    
     // send back an array of valid authorization codes for the requested box    
     res.json({
-      codes: members_and_box.members.map(m => m.access_code),
+      codes: members_and_box.members
+        .map(m => m.access_codes)                                   // an array of arrays of objects {code: '', method: ''}
+        .reduce((t, v) =>                                           // reduce it to a flat array
+          Array.isArray(v) ? t.concat(v.map(c => c.code)) : t, []), // of just the codes, methods don't matter
       idle_timeout_ms: members_and_box.box.idle_timeout_ms || 0
     });
   })
