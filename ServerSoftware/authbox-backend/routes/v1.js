@@ -342,7 +342,7 @@ router.post('/members/create/:secret', (req, res, next) => {
     delete obj.access_code;
 
     // make sure the proposed access code is unique across members
-    return findDocuments('Members', { access_codes: {code: access_code}})
+    return findDocuments('Members', { access_codes: {code:  obj.access_codes[0].code}})
     .then((members) => {
       if(members.length > 0){
         throw new Error('proposed access code is not unique');
