@@ -7,6 +7,9 @@ var pbkdf2 = require('pbkdf2');
 var moment = require('moment');
 var homedir = require('homedir')();
 var secret = require(`${homedir}/authbox-secret.json`).secret;
+var waitUntil = require('wait-until');
+
+var members_modification_in_progress = false;
 
 /* GET home page. */
 router.get('/amiloggedin/:secret', function(req, res, next) {
@@ -21,9 +24,10 @@ router.get('/amiloggedin/:secret', function(req, res, next) {
 // { name: 'Alice', access_code: '12345', authorizedBoxes: ['laser-cutter']}
 var findMemberAndBox = (auth_hash, access_code) => {
   // first see if there's a user in the database that matches the user_code
-  return findDocuments('Members', {access_code})
+  return findDocuments('Members', {'access_code.code': access_code})
   .then((members) => {
     if(members.length === 1){      
+      members[0].access_code = access_code; // collapse to the code that was used
       return {
         member: members[0],
         box_id: decipherAuthBoxId(members[0], auth_hash)
@@ -40,7 +44,7 @@ router.get('/authboxes/:secret?', (req, res, next) => {
   }
     
   findDocuments('AuthBoxes', {deleted: {$exists: false}}, {
-    projection: { _id: 0, id: 0, access_code: 0 }
+    projection: { _id: 0, id: 0, access_codes: 0 }
   })
   .then((authboxes) =>{
     res.json(authboxes);
@@ -186,7 +190,7 @@ router.get('/members/:secret?', (req, res, next) => {
   }
     
   findDocuments('Members', {deleted: {$exists: false}}, {
-    projection: { _id: 0, access_code: 0, authorizedBoxes: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0 }
   })
   .then((members) =>{
     res.json(members);
@@ -205,7 +209,7 @@ router.get('/member/:name/:secret?', (req, res, next) => {
   }
   const name = req.params.name;
   findDocuments('Members', {deleted: {$exists: false}, name}, {
-    projection: { _id: 0, access_code: 0, authorizedBoxes: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0 }
   })
   .then((members) => {
     if (!members || (members.length !== 1)) {
@@ -298,43 +302,70 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
 //           date created and last modified fields will be added automatically
 //
 router.post('/members/create/:secret', (req, res, next) => {
-  if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
-    return;
-  }
+  waitUntil(100, Infinity, function condition(){
+    return !members_modification_in_progress;
+  }, function done(){
+    members_modification_in_progress = true;  
 
-  let missingFields = [];
-  let obj = req.body;
-  ['name', 'email', 'access_code'].forEach(key => {
-    if(!obj[key]){
-      missingFields.push(key);
+    if(req.params.secret !== secret){
+      res.status(401).json({error: 'secret is incorrect'});    
+      members_modification_in_progress = false;
+      return;
     }
-  });
-  if(missingFields.length){
-    res.status(422).json({error: 
-      `Missing ${missingFields.length} fields: ${JSON.stringify(missingFields)}`});
-    return;    
-  }
+  
+    let missingFields = [];
+    let obj = req.body;
+    ['name', 'email', 'access_code', 'access_method'].forEach(key => {
+      if(!obj[key]){
+        missingFields.push(key);
+      }
+    });
+    if(missingFields.length){
+      res.status(422).json({error: 
+        `Missing ${missingFields.length} fields: ${JSON.stringify(missingFields)}`});
+      members_modification_in_progress = false;
+      return;    
+    }
+  
+    let now = moment().format();
+    obj.created = now;
+    obj.updated = now;
+  
+    obj.authorizedBoxes = [];
+    obj.authorizedBoxNames = [];
+  
+    obj.access_codes = [{
+      method: obj.access_method,
+      code: obj.access_code
+    }];
+  
+    delete obj.access_method;
+    delete obj.access_code;
 
-  let now = moment().format();
-  obj.created = now;
-  obj.updated = now;
-
-  obj.authorizedBoxes = [];
-  obj.authorizedBoxNames = [];
-
-  insertDocument('Members', obj)
-  .then((insertResult) => {
-    if(!insertResult.insertedId){          
-      throw new Error('no document inserted');
-    }    
-  })
-  .then(() =>{
-    res.json({status: 'ok'});
-  })
-  .catch((err) => {
-    console.error(err);
-    res.status(422).json({error: err.message});
+    // make sure the proposed access code is unique across members
+    return findDocuments('Members', { 'access_codes.code':  obj.access_codes[0].code})
+    .then((members) => {
+      if(members.length > 0){
+        throw new Error('proposed access code is not unique');
+      }
+    })    
+    .then(() => {
+      return insertDocument('Members', obj);
+    })    
+    .then((insertResult) => {
+      if(!insertResult.insertedId){          
+        throw new Error('no document inserted');
+      }    
+    })
+    .then(() =>{
+      members_modification_in_progress = false;
+      res.json({status: 'ok'});
+    })
+    .catch((err) => {
+      console.error(err);
+      members_modification_in_progress = false;
+      res.status(422).json({error: err.message});
+    });    
   });
 });
 
@@ -346,38 +377,92 @@ router.post('/members/create/:secret', (req, res, next) => {
 //           date last modified fields will be added automatically
 //
 router.put('/member/:secret', (req, res, next) => {
-  if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
-    return;
-  }
-
-  let obj = { };
-  ['name', 'email', 'access_code', 'authorizedBoxNames'].forEach(key => {
-    if (req.body[key]) {
-      obj[key] = req.body[key];
+  waitUntil(100, Infinity, function condition(){
+    return !members_modification_in_progress;
+  }, function done(){
+    members_modification_in_progress = true;
+    if(req.params.secret !== secret){
+      res.status(401).json({error: 'secret is incorrect'});    
+      members_modification_in_progress = false;
+      return;
     }
-  });
-
-  if(!obj.name){
-    res.status(422).json({error: 'Name not provided.'});    
-    return;    
-  }
-
-  let now = moment().format();  
-  obj.updated = now;
-
-  updateDocument('Members', { name: obj.name }, obj)
-  .then((updateResult) => {
-    if(!updateResult.matchedCount){          
-      throw new Error('no document updated');
-    }    
-  })
-  .then(() =>{
-    res.json({status: 'ok'});
-  })
-  .catch((err) => {
-    console.error(err);
-    res.status(422).json({error: err.message});
+  
+    let obj = { };
+    ['name', 'email', 'authorizedBoxNames'].forEach(key => {
+      if (req.body[key]) {
+        obj[key] = req.body[key];
+      }
+    });
+  
+    if(!obj.name){
+      res.status(422).json({error: 'Name not provided.'});    
+      members_modification_in_progress = false;
+      return;    
+    }
+  
+    let now = moment().format();  
+    obj.updated = now;
+  
+    updateDocument('Members', { name: obj.name }, obj)
+    .then((updateResult) => {
+      if(!updateResult.matchedCount){          
+        throw new Error('no document updated');
+      }    
+    })
+    .then(() => {
+      // if an access code and access method was provided
+      // need to read the member object and update their 
+      // access codes array to include this object
+      let access_code = req.body.access_code;
+      let access_method = req.body.access_method;
+      if(access_code && access_method){
+        // make sure the proposed access code is unique across members
+        return findDocuments('Members', { 'access_codes.code': access_code})
+        .then((members) => {
+          if(members.length > 0){
+            throw new Error('proposed access code is not unique');
+          }
+        })
+        .then(() => {
+          // fetch the existing member object by name
+          return findDocuments('Members', {name: obj.name});
+        })
+        .then((members) => {
+          if(members && members.length){
+            return members[0].access_codes; 
+          } else {
+            throw new Error(`Could not find member name '${obj.name}'`);
+          }
+        })
+        .then((access_codes) => {
+          if(!access_codes) { access_codes = []; }
+          const existing_code = access_codes.find(c => c.method === access_method);
+          if(existing_code){
+            existing_code.code = access_code;
+          } else {
+            access_codes.push({
+              method: access_method,
+              code: access_code
+            });
+          }
+          return updateDocument('Members', {name: obj.name}, {access_codes});
+        })
+        .then((updateResult) => {
+          if(!updateResult.matchedCount){          
+            throw new Error('no document updated [access codes update]');
+          }    
+        });
+      }
+    })
+    .then(() =>{
+      members_modification_in_progress = false;
+      res.json({status: 'ok'});
+    })
+    .catch((err) => {
+      members_modification_in_progress = false;
+      console.error(err);
+      res.status(422).json({error: err.message});
+    });    
   });
 });
 
@@ -402,6 +487,7 @@ router.delete('/member/:secret', (req, res, next) => {
   let now = moment().format();  
   obj.updated = now;
   obj.deleted = true;
+  obj.access_codes = []; // wipe out the user's access codes
 
   updateDocument('Members', { name: obj.name }, obj)
   .then((updateResult) => {
@@ -641,7 +727,11 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
   .then((members_and_box) => {    
     // send back an array of valid authorization codes for the requested box    
     res.json({
-      codes: members_and_box.members.map(m => m.access_code),
+      codes: members_and_box.members
+        .map(m => m.access_codes)                                   // an array of arrays of objects {code: '', method: ''}
+        .reduce((t, v) =>                                           // reduce it to a flat array
+           t.concat(Array.isArray(v) ? v.map(c => c.code) : []),    // of just the codes, methods don't matter
+        []),
       idle_timeout_ms: members_and_box.box.idle_timeout_ms || 0
     });
   })

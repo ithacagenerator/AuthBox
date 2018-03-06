@@ -32,7 +32,8 @@ import {
   MatSnackBarModule,
   MatCheckboxModule,
   MatListModule,
-  MatPaginatorModule
+  MatPaginatorModule,
+  MatSelectModule
 } from '@angular/material';
 import { MatSortModule } from '@angular/material/sort';
 
@@ -71,7 +72,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatSnackBarModule,
     MatCheckboxModule,
     MatListModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatSelectModule
   ],
   providers: [
     ApiService,

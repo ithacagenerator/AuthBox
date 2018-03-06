@@ -17,6 +17,16 @@ export class ApiService {
     private _passwordService: ManagementPasswordService
   ) { }
 
+  getAuthMethods() {
+    return new Promise((resolve, reject) => {
+      resolve([
+        '',
+        'Key Pad',
+        'RFID Tag'
+      ]);
+    });
+  }
+
   loginStatus$(): Observable<boolean> {
     return this.login$;
   }
