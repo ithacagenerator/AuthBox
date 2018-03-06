@@ -5,12 +5,20 @@
   </mat-form-field>  
   <mat-form-field>
     <input matInput placeholder="Email" [(ngModel)]="data.email">
-  </mat-form-field>      
+  </mat-form-field>  
+  <mat-form-field>
+    <mat-select placeholder="Access Method" [(ngModel)]="data.access_method">
+      <mat-option *ngFor="let access_method of access_methods" 
+        [value]="access_method">
+        {{ access_method }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
   <mat-form-field>
     <input matInput placeholder="Access Code" [(ngModel)]="data.access_code">
   </mat-form-field>  
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-button [mat-dialog-close]="data" [disabled]="!(data.name && data.access_code && data.email)" cdkFocusInitial>Save</button>
+  <button mat-button [mat-dialog-close]="data" [disabled]="!(data.name && data.access_code && data.access_method && data.email)" cdkFocusInitial>Save</button>
 </div>

@@ -18,6 +18,7 @@
     "morgan": "~1.9.0",
     "pbkdf2": "^3.0.14",
     "pug": "2.0.0-beta11",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "wait-until": "0.0.2"
   }
 }
