@@ -425,7 +425,7 @@ router.put('/member/:secret', (req, res, next) => {
         })
         .then(() => {
           // fetch the existing member object by name
-          return findDocuments('Members', {name: obj.name})
+          return findDocuments('Members', {name: obj.name});
         })
         .then((members) => {
           if(members && members.length){
@@ -729,7 +729,8 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
       codes: members_and_box.members
         .map(m => m.access_codes)                                   // an array of arrays of objects {code: '', method: ''}
         .reduce((t, v) =>                                           // reduce it to a flat array
-          Array.isArray(v) ? t.concat(v.map(c => c.code)) : t, []), // of just the codes, methods don't matter
+           t.concat(Array.isArray(v) ? v.map(c => c.code) : []),    // of just the codes, methods don't matter
+        []),
       idle_timeout_ms: members_and_box.box.idle_timeout_ms || 0
     });
   })
