@@ -29,16 +29,50 @@ uint16_t crc16(char * str, uint8_t len);
 uint8_t check_crc16(char * str);
 void handleAuthorizeCommand(void);
 void handleLockoutCommand(void);
+void handleBuzzerOnCommand(void);
+void handleBuzzerOffCommand(void);
+void enableCounter(void);
+void disableCounter(void);
 
 int LOCKOUT_PIN = 13; // Relay control output
+int BUZZER_HIGH_PIN = 10;
+int BUZZER_LOW_PIN = 9;
+boolean buzzer_enabled = false;
+boolean buzzer_on = false;
+uint32_t previousBuzzerMillis = 0;
+const int32_t buzzerInterval = 500; // sets the buzzer beeping frequency
 
 void setup(){
-  Serial.begin(115200);
+  Serial.begin(9600);
   attachInterrupt(0, ISRreceiveData0, FALLING );  //data0/tx is connected to pin 2, which results in INT 0
   attachInterrupt(1, ISRreceiveData1, FALLING );  //data1/rx is connected to pin 3, which results in INT 1
+  
+  pinMode(BUZZER_HIGH_PIN, OUTPUT);
+  pinMode(BUZZER_LOW_PIN, OUTPUT);
+  digitalWrite(BUZZER_HIGH_PIN, 0); 
+  digitalWrite(BUZZER_LOW_PIN, 0);
 }
 
 void loop(){
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousBuzzerMillis >= buzzerInterval) {
+    previousBuzzerMillis = currentMillis;
+
+    if(buzzer_enabled){
+      if(buzzer_on){
+        buzzer_on = false;
+        disableCounter();
+      }
+      else{
+        buzzer_on = true;
+        enableCounter();        
+      }
+    }
+    else {
+      disableCounter();
+    }
+  }
+  
   //read card number bit
   if(isData0Low||isData1Low){
     if(1 == recvBitCount){//even bit
@@ -183,7 +217,8 @@ uint8_t check_crc16(char * str){
 // valid commands are:
 //   authorize40A2\n
 //   lockoutDF6B\n
-//
+//   sirenF012
+//   quiet6C9D
 void handleCommands(char c){
     static char lineBuffer[64] = {0}; // allow up to 63 characters in a command (plus null terminator)
     static uint8_t idx = 0;
@@ -198,6 +233,12 @@ void handleCommands(char c){
             else if(0 == strcmp_P(lineBuffer, PSTR("lockout"))){
                 handleLockoutCommand();
             }
+            else if(0 == strcmp_P(lineBuffer, PSTR("siren"))){
+                handleBuzzerOnCommand();
+            }
+            else if(0 == strcmp_P(lineBuffer, PSTR("quiet"))){
+                handleBuzzerOffCommand(); 
+            }            
             else {
               Serial.print(F("Unknown Command: \"")); Serial.print(lineBuffer); Serial.print(F("\""));Serial.println();              
             }
@@ -231,3 +272,43 @@ void handleLockoutCommand(void){
     Serial.println("lockout");    
     digitalWrite(LOCKOUT_PIN, LOW);
 }
+
+void handleBuzzerOnCommand(void){
+  Serial.println("siren");     
+  // set for Phase + Frequency Correct PWM Mode
+  // WGM3:0 = 1000
+  // IRC1 = TOP   -- determines output frequency = CLK / ( 2 * Prescale * TOP)
+  //                 CLK = 16000000 Hz
+  //                 Prescale = 1, 8, 64, 256, or 1024
+  //                 pick TOP so that output frequency ~ 4000
+  // a perfect match is PRESCALER = 8, TOP = 250 ... 16MHz / (2 * 8 * 250) = 1000kHz / 250 = 4kHz
+  //
+  // COM1A1:0 = 10 set/clear
+  // COM1B1:0 = 11 clear/set
+  // Set ORC1A = ORCR1B to 1/2 IRCR = 125
+
+  OCR1A  = 125;
+  OCR1B  = 125;
+  ICR1   = 250;
+  TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(COM1B0); 
+  TCCR1B = _BV(WGM13);    
+  buzzer_enabled = true;  
+}
+
+void handleBuzzerOffCommand(void){
+  Serial.println("quiet");  
+  TCCR1A = 0x00;
+  TCCR1B = 0x00;
+  TCCR1C = 0x00;    
+  buzzer_enabled = false;
+}
+
+void enableCounter(){
+  TCCR1B |= _BV(CS11);
+}
+
+void disableCounter(){
+  TCCR1B &= ~_BV(CS11);
+}
+
+
