@@ -19,12 +19,22 @@ module.exports = (function() {
 
   function authorize() {    
     // broadcast to all attached arduinos
-    return Promise.all(discoveredArduinos.map(p => sendCommandExpectResponse(p, 'authorize', 'authorize', -1)));    
+    return Promise.all(discoveredArduinos.map(p => sendCommandExpectResponse(p, 'authorize', 'authorize', 100)));    
   }
 
   function deauthorize() {
     // broadcast to all attached arduinos
-    return Promise.all(discoveredArduinos.map(p => sendCommandExpectResponse(p, 'lockout', 'lockout', -1))); 
+    return Promise.all(discoveredArduinos.map(p => sendCommandExpectResponse(p, 'lockout', 'lockout', 100))); 
+  }
+
+  function buzzeron(){
+    // broadcast to all attached arduinos
+    return Promise.all(discoveredArduinos.map(p => sendCommandExpectResponse(p, 'siren', 'siren', 100)));    
+  }
+
+  function buzzeroff(){
+    // broadcast to all attached arduinos
+    return Promise.all(discoveredArduinos.map(p => sendCommandExpectResponse(p, 'quiet', 'quiet', 100))); 
   }
 
   function listPorts(manufacturerRegex){    
@@ -140,6 +150,8 @@ module.exports = (function() {
     setInputHandler,
     authorize,
     deauthorize,
+    buzzeron, 
+    buzzeroff,
     begin
   };
 })();

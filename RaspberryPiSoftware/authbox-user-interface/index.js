@@ -72,10 +72,12 @@ const checkForIdleKeypadEntry = function() {
             if(now.isSameOrAfter(next_toggle_moment)){
               if(current_blinking_color === 'green'){
                 current_blinking_color = 'yellow';
-                lcd.setBacklightColor(current_blinking_color);            
+                lcd.setBacklightColor(current_blinking_color);
+                serial.buzzeron();              
               } else {
                 current_blinking_color = 'green';
                 lcd.setBacklightColor(current_blinking_color);
+                serial.buzzeroff();
               }
               next_toggle_moment = moment(now).add(500, 'ms'); // 0.5 seconds from now
             }
@@ -178,6 +180,7 @@ const handleAuthorizationResult = function(auth) {
       return serial.deauthorize()                // power down the authbox
       .then(api.deauthorize)                     // register it with the server
       .then(lcd.deauthorize)                     // turn the lcd red
+      .then(serial.buzzeroff)                    // silence the buzzer if its on
       .then(resolve(true));                      // do clear access code
     case 'unauthorized': // user tried to authorize but code not found      
       is_currently_authorized = false;
