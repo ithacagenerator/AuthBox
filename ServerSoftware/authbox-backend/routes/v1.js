@@ -749,7 +749,8 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
     res.status(401).json({error: 'secret is incorrect'});    
     return;
   }
-
+  
+  const csv = req.query.csv === 'true';
 
   if(req.query.sort === 'undefined') { delete req.query.sort; }
   if(req.query.order === 'undefined') { delete req.query.order; }
@@ -791,7 +792,20 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
     });
   })
   .then((boxUsages) => {    
-    res.json(boxUsages);
+    if(csv){
+      return new Promise((resolve, reject) => {
+        stringify(boxUsages.items, {header: true}, function(err, output){
+          if(err){
+            reject(err);
+          } else {
+            res.type('text/csv').send(output);
+            resolve();
+          }
+        });          
+      });
+    } else {    
+      res.json(boxUsages);
+    }
   })
   .catch((err) => {
     console.error(err);
