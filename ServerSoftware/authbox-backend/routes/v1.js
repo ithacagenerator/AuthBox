@@ -8,7 +8,7 @@ var moment = require('moment');
 var homedir = require('homedir')();
 var secret = require(`${homedir}/authbox-secret.json`).secret;
 var waitUntil = require('wait-until');
-var stringify = require('csv-stringify');
+var stringify = require('csv-stringify/');
 
 var members_modification_in_progress = false;
 
@@ -806,8 +806,8 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
     return;
   }
 
-  const csv = req.query.csv;
-
+  const csv = req.query.csv === 'true';
+  
   if(req.query.sort === 'undefined') { delete req.query.sort; }
   if(req.query.order === 'undefined') { delete req.query.order; }
   if(req.query.page === 'undefined') { delete req.query.page; }
@@ -849,9 +849,17 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
   })
   .then((boxUsages) => {
     if(csv){
-      res.type('text/csv').send(stringify(boxUsages.items, {header: true}));
-    }
-    else{
+      return new Promise((resolve, reject) => {
+        stringify(boxUsages.items, {header: true}, function(err, output){
+          if(err){
+            reject(err);
+          } else {
+            res.type('text/csv').send(output);
+            resolve();
+          }
+        });          
+      });
+    } else {
       res.json(boxUsages);
     }
   })
