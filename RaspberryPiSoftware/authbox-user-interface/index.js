@@ -204,7 +204,7 @@ const handleAuthorizationResult = function(auth) {
 function synchronizeConfigWithServer() {
   return api.fetchConfiguration()
   .then(function(config) {
-    configuration = config;
+    configuration = config || {};
     return db.saveConfiguration(config);
   })
   .then(function() {
