@@ -102,6 +102,7 @@ void loop(){
       for(uint8_t ii = 0; ii < len; ii++){
         Serial.println(tmp[ii]);
       }
+      Serial.println('#'); // append the 'enter' key
     }
     resetData();
   }
