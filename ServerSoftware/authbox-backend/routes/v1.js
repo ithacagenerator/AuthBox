@@ -751,6 +751,7 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   }
   
   const csv = req.query.csv === 'true';
+  const all = req.query.all === 'true';
 
   if(req.query.sort === 'undefined') { delete req.query.sort; }
   if(req.query.order === 'undefined') { delete req.query.order; }
@@ -783,13 +784,18 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
       or.$or.push({deauthorized: new RegExp(filter,'i')});
       _condition.$and.push(or);
     }
-    return findDocuments('BoxUsage', _condition, {
+
+    const options = {
       projection: { _id: 0, box_id: 0 },
       sort: _sort,
-      skip: page * nPerPage,
-      limit: nPerPage, 
-      includeCount: true
-    });
+      includeCount: true      
+    }
+    if(!all){
+      options.skip = page * nPerPage;
+      options.limit = nPerPage;
+    }
+
+    return findDocuments('BoxUsage', _condition, options);
   })
   .then((boxUsages) => {    
     if(csv){
@@ -821,6 +827,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
   }
 
   const csv = req.query.csv === 'true';
+  const all = req.query.all === 'true';
   
   if(req.query.sort === 'undefined') { delete req.query.sort; }
   if(req.query.order === 'undefined') { delete req.query.order; }
@@ -853,13 +860,18 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
       or.$or.push({deauthorized: new RegExp(filter,'i')});
       _condition.$and.push(or);
     }
-    return findDocuments('BoxUsage', _condition, {
+
+    const options = {
       projection: { _id: 0, member: 0, box_id: 0 },
       sort: _sort,
-      skip: page * nPerPage,
-      limit: nPerPage, 
-      includeCount: true
-    });  
+      includeCount: true   
+    }
+    if(!all){
+      options.skip = page * nPerPage;
+      options.limit = nPerPage;
+    }
+
+    return findDocuments('BoxUsage', _condition, options);  
   })
   .then((boxUsages) => {
     if(csv){
