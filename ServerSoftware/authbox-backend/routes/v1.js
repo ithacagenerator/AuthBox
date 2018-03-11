@@ -8,6 +8,7 @@ var moment = require('moment');
 var homedir = require('homedir')();
 var secret = require(`${homedir}/authbox-secret.json`).secret;
 var waitUntil = require('wait-until');
+var stringify = require('csv-stringify');
 
 var members_modification_in_progress = false;
 
@@ -805,6 +806,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
     return;
   }
 
+  const csv = req.query.csv;
 
   if(req.query.sort === 'undefined') { delete req.query.sort; }
   if(req.query.order === 'undefined') { delete req.query.order; }
@@ -845,8 +847,13 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
       includeCount: true
     });  
   })
-  .then((boxUsages) => {    
-    res.json(boxUsages);
+  .then((boxUsages) => {
+    if(csv){
+      res.type('text/csv').send(stringify(boxUsages.items, {header: true}));
+    }
+    else{
+      res.json(boxUsages);
+    }
   })
   .catch((err) => {
     console.error(err);
