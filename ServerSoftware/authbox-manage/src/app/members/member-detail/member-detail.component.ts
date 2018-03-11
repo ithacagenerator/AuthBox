@@ -18,6 +18,8 @@ import { startWith } from 'rxjs/operators/startWith';
 import { switchMap } from 'rxjs/operators/switchMap';
 import 'rxjs/add/operator/switchMap';
 
+import { saveAs } from 'file-saver/FileSaver';
+
 @Component({
   selector: 'app-member-detail',
   templateUrl: './member-detail.component.html',
@@ -169,5 +171,18 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     filterValue = filterValue.toLowerCase();
     this.dataSource.filter = filterValue;
     this.observer.next('thing');
+  }
+
+  downloadCsv() {
+    return this.apiSrvc.getMemberHistory(this.memberName,
+      this.sort.active, this.sort.direction, this.dataSource.filter)
+    .then((res) => {
+      console.dir(res);
+      const filename = 'member-history.csv';
+      saveAs(res, filename);
+    })
+    .catch((err) => {
+      console.error(err.message, err.stack);
+    });
   }
 }

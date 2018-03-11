@@ -109,16 +109,21 @@ export class ApiService {
     return this._http.put(apiUrl, members).toPromise<any>();
   }
 
-  public getAuthorizationHistory(authboxName: string, sort: string, order: string, filter: string, page: number) {
+  public getAuthorizationHistory(authboxName: string, sort: string, order: string, filter: string, page?: number) {
+    const all = page === undefined;
     const password = this._passwordService.getPassword();
     const apiUrl = `${this.apiBase}/authboxes/history/${authboxName}/${password}`;
-    const options = {
+    const options: any = {
       params: new HttpParams()
         .set('sort', sort)
         .set('order', order)
         .set('page', `${page}`)
         .set('filter', filter)
     };
+    if (all) {
+      options.params = options.params.set('all', 'true').set('csv', 'true');
+      options.responseType = 'blob';
+    }
     return this._http.get(apiUrl, options).toPromise<any>();
   }
 
@@ -134,16 +139,21 @@ export class ApiService {
     return this._http.get(apiUrl).toPromise<any>();
   }
 
-  public getMemberHistory(memberName: string, sort: string, order: string, filter: string, page: number) {
+  public getMemberHistory(memberName: string, sort: string, order: string, filter: string, page?: number) {
+    const all = page === undefined;
     const password = this._passwordService.getPassword();
     const apiUrl = `${this.apiBase}/members/history/${memberName}/${password}`;
-    const options = {
+    const options: any = {
       params: new HttpParams()
         .set('sort', sort)
         .set('order', order)
         .set('page', `${page}`)
         .set('filter', filter)
     };
+    if (all) {
+      options.params = options.params.set('all', 'true').set('csv', 'true');
+      options.responseType = 'blob';
+    }
     return this._http.get(apiUrl, options).toPromise<any>();
   }
 }

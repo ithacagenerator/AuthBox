@@ -14,7 +14,11 @@
   </div>
   <div class="access-history">
     <div style="width: 95%">
-      <h2>Access History</h2>
+      <h2>Access History
+        <span class="download-csv">
+          <button (click)="downloadCsv()">csv</button>
+        </span>        
+      </h2>
       
       <div class="example-header">
         <mat-form-field>
