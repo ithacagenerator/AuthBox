@@ -195,6 +195,7 @@ const handleAuthorizationResult = function(auth) {
   .then(function(should_clear_access_code) {    
     if(should_clear_access_code){ 
       access_code_buffer = '';
+      lcd.centerText('               ', 1);
     }
     return auth;
   });
