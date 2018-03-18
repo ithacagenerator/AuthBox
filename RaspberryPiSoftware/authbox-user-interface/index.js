@@ -38,19 +38,18 @@ serial.setInputHandler(function(chr) {
   if(!access_code_buffer.endsWith('#')){
     if(chr === '*') { // backspace key
       access_code_buffer = access_code_buffer.slice(0, -1);
-      last_access_code_change = moment();
     } else {          // anything else
-      access_code_buffer = `${access_code_buffer}${chr.trim()}`;
-      last_access_code_change = moment();
+      access_code_buffer = `${access_code_buffer}${chr.trim()}`;      
     }
   } else { // otherwise the only two input we'll pay special attention to is '*'
            // if we get * in this state it should coerce and deauthorization
-           // any keypress will reset the last_access_code_change to now
-    last_access_code_change = moment(); // extend authorization timeout    
+           // any keypress will reset the last_access_code_change to now    
     if(chr === '*'){      
       should_dauthorize = true;    // this will trigger a deauthorize event
     }
   }
+  last_access_code_change = moment(); // extend authorization timeout   
+  serial.buzzeroff(); // silence the buzzer  
   // console.log(access_code_buffer);
 });
 
