@@ -43,6 +43,7 @@ uint32_t previousBuzzerMillis = 0;
 const int32_t buzzerInterval = 500; // sets the buzzer beeping frequency
 
 void setup(){
+  pinMode(LOCKOUT_PIN, OUTPUT);
   Serial.begin(9600);
   attachInterrupt(0, ISRreceiveData0, FALLING );  //data0/tx is connected to pin 2, which results in INT 0
   attachInterrupt(1, ISRreceiveData1, FALLING );  //data1/rx is connected to pin 3, which results in INT 1
@@ -288,12 +289,14 @@ void handleBuzzerOnCommand(void){
   // COM1B1:0 = 11 clear/set
   // Set ORC1A = ORCR1B to 1/2 IRCR = 125
 
-  OCR1A  = 125;
-  OCR1B  = 125;
-  ICR1   = 250;
-  TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(COM1B0); 
-  TCCR1B = _BV(WGM13);    
-  buzzer_enabled = true;  
+  if(!buzzer_enabled){
+    OCR1A  = 125;
+    OCR1B  = 125;
+    ICR1   = 250;
+    TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(COM1B0); 
+    TCCR1B = _BV(WGM13);  
+    buzzer_enabled = true;  
+  }
 }
 
 void handleBuzzerOffCommand(void){

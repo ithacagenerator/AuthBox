@@ -76,8 +76,7 @@ const checkForIdleKeypadEntry = function() {
                 serial.buzzeron();              
               } else {
                 current_blinking_color = 'green';
-                lcd.setBacklightColor(current_blinking_color);
-                serial.buzzeroff();
+                lcd.setBacklightColor(current_blinking_color);                
               }
               next_toggle_moment = moment(now).add(500, 'ms'); // 0.5 seconds from now
             }
