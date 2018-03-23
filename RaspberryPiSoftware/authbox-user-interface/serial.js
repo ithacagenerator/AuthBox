@@ -114,7 +114,7 @@ module.exports = (function() {
         return;
       }      
       
-      if (port.waitingForResponseData){
+      if (port.waitingForResponseData && ['0','1','2','3','4','5','6','7','8','9','#'].indexOf(data) < 0){
         port.response = port.response ? `${port.response}${data}` : `${data}`;
       } else {
         if(inputHandler){
