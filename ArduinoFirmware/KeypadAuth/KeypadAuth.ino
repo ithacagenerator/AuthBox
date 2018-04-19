@@ -198,12 +198,14 @@ void handleBuzzerOnCommand(void){
   // COM1B1:0 = 11 clear/set
   // Set ORC1A = ORCR1B to 1/2 IRCR = 125
 
-  OCR1A  = 125;
-  OCR1B  = 125;
-  ICR1   = 250;
-  TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(COM1B0); 
-  TCCR1B = _BV(WGM13);    
-  buzzer_enabled = true;  
+  if(!buzzer_enabled){
+    OCR1A  = 125;
+    OCR1B  = 125;
+    ICR1   = 250;
+    TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(COM1B0); 
+    TCCR1B = _BV(WGM13);    
+    buzzer_enabled = true;  
+  }
 }
 
 void handleBuzzerOffCommand(void){
