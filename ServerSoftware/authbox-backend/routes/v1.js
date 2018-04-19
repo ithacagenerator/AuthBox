@@ -25,7 +25,7 @@ router.get('/amiloggedin/:secret', function(req, res, next) {
 // { name: 'Alice', access_code: '12345', authorizedBoxes: ['laser-cutter']}
 var findMemberAndBox = (auth_hash, access_code) => {
   // first see if there's a user in the database that matches the user_code
-  return findDocuments('Members', {'access_code.code': access_code})
+  return findDocuments('Members', {'access_codes.code': access_code})
   .then((members) => {
     if(members.length === 1){      
       members[0].access_code = access_code; // collapse to the code that was used
