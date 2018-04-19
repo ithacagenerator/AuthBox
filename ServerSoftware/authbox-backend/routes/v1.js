@@ -789,7 +789,7 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
       projection: { _id: 0, box_id: 0 },
       sort: _sort,
       includeCount: true      
-    }
+    };
     if(!all){
       options.skip = page * nPerPage;
       options.limit = nPerPage;
@@ -865,7 +865,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
       projection: { _id: 0, member: 0, box_id: 0 },
       sort: _sort,
       includeCount: true   
-    }
+    };
     if(!all){
       options.skip = page * nPerPage;
       options.limit = nPerPage;
