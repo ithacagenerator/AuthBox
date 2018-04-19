@@ -64,7 +64,8 @@ const checkForIdleKeypadEntry = function() {
         const time_until_idle_timeout = automatically_clear_duration_ms - idle_time_ms;
         if(idle_time_ms >= automatically_clear_duration_ms){
           console.log("Automatic clear duration expired");
-          should_dauthorize = true;          
+          should_dauthorize = true;
+          access_code_buffer = ""; // wipe the access code    
         } else if(is_currently_authorized){ // currently authorized
           if((time_until_idle_timeout > 0) &&     // time not already expired
             (time_until_idle_timeout < 60000)) {  // within one minute of timeout
