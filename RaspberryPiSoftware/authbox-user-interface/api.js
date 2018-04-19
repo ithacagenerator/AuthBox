@@ -27,7 +27,7 @@ module.exports = (function(){
   }
 
   function authorize(access_code) {
-    const user_auth_hash = pbkdf2.pbkdf2Sync(identity.id, identity.access_code, 1, 32, 'sha512').toString('hex');
+    const user_auth_hash = pbkdf2.pbkdf2Sync(identity.id, access_code, 1, 32, 'sha512').toString('hex');
     currently_authrorized_access_code = access_code;
     return request.post(`${api_base}/authorize/${user_auth_hash}/${access_code}`)
     .then(function(response){
@@ -41,7 +41,7 @@ module.exports = (function(){
 
   function deauthorize() {
     const access_code = currently_authrorized_access_code;
-    const user_auth_hash = pbkdf2.pbkdf2Sync(identity.id, identity.access_code, 1, 32, 'sha512').toString('hex');
+    const user_auth_hash = pbkdf2.pbkdf2Sync(identity.id, access_code, 1, 32, 'sha512').toString('hex');
     currently_authrorized_access_code = 'not-authorized';
     return request.post(`${api_base}/deauthorize/${user_auth_hash}/${access_code}`)
     .then(function(response){
