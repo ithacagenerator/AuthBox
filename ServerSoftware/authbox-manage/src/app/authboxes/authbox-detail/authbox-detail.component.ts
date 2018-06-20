@@ -118,7 +118,7 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   authorizedMembers() {
     if (this.members) {
       return this.members.filter(m =>
-        m.authorizedBoxNames.indexOf(this.authboxName) >= 0);
+        Array.isArray(m.authorizedBoxNames) && m.authorizedBoxNames.indexOf(this.authboxName) >= 0);
     }
     return [];
   }
