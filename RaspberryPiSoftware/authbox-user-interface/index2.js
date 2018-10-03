@@ -164,7 +164,9 @@ promiseDoWhilst(() => {
   .then(() => {
     if(loggedin) {
       // unconditionally reflect the time until expiry
-      const message = `FOR ${loginExpires.diff(moment(), 'seconds')} SECONDS`;
+      let expiryTime = loginExpires.diff(moment(), 'seconds');
+      expiryTime = Math.max(0, expiryTime);
+      const message = `FOR ${expiryTime} SECONDS`;
       return lcd.centerText(message, 1);
     }
   })
