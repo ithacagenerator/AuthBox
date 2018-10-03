@@ -134,7 +134,6 @@ db.getConfiguration()
 // initialize the LCD
 lcd.deauthorize();
 serial.begin();
-synchronizeConfigWithServer();
 
 // keep checking for timeout and/or logout when logged in
 promiseDoWhilst(() => {
