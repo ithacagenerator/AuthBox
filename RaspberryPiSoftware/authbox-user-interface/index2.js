@@ -102,14 +102,16 @@ function handleLogin() {
   // check the database and see if the passcode is valid
   return db.isAuthorized(passcode)
   .then(function(isAuthorized) {
+    const _tempPasscode = passcode;
     passcode = '';
     if(isAuthorized) {
       console.log(`Login Attempt Succeeded`);
       loginExpires = moment();
       loginExpires.add(configuration.idle_timeout_ms, 'ms');
       loggedin = true;
+      
       return Promise.all([
-        api.authorize(passcode),
+        api.authorize(_tempPasscode),
         lcd.setBacklightColor('green'),
         serial.authorize() 
       ]);
