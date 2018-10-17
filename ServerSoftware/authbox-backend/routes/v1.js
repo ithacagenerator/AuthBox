@@ -191,7 +191,7 @@ router.get('/members/:secret?', (req, res, next) => {
   }
     
   findDocuments('Members', {deleted: {$exists: false}}, {
-    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, registration: 0 }
   })
   .then((members) =>{
     res.json(members);
@@ -210,7 +210,7 @@ router.get('/member/:name/:secret?', (req, res, next) => {
   }
   const name = req.params.name;
   findDocuments('Members', {deleted: {$exists: false}, name}, {
-    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, registration: 0 }
   })
   .then((members) => {
     if (!members || (members.length !== 1)) {
