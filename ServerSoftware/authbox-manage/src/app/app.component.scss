@@ -33,3 +33,14 @@ nav {
   width: 100%;
   height: 100%;
 }
+
+@media screen and (max-width: 34em) {
+  .password-form-field {
+    width: 30%;
+  }
+  
+  .logged-in-status[_ngcontent-c0] {
+    position: relative;
+    left: -58px;
+  }
+}
