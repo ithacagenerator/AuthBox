@@ -20,7 +20,7 @@
   
       <ng-container matColumnDef="email">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
-        <mat-cell *matCellDef="let row"> {{row.email}} </mat-cell>
+        <mat-cell *matCellDef="let row" [class.not_validated]="!row.validated"> {{row.email}} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="authorizedBoxNames">
