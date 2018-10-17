@@ -191,10 +191,14 @@ router.get('/members/:secret?', (req, res, next) => {
   }
     
   findDocuments('Members', {deleted: {$exists: false}}, {
-    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, registration: 0, paypal: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, paypal: 0 }
   })
   .then((members) =>{
-    res.json(members);
+    res.json(members.map(v => {
+      v.registration_complete = v.registration && v.registration_complete;
+      delete v.registration;
+      return v;
+    }));
   })
   .catch((err) => {
     console.error(err);
@@ -210,7 +214,7 @@ router.get('/member/:name/:secret?', (req, res, next) => {
   }
   const name = req.params.name;
   findDocuments('Members', {deleted: {$exists: false}, name}, {
-    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, registration: 0, paypal: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, paypal: 0 }
   })
   .then((members) => {
     if (!members || (members.length !== 1)) {
@@ -226,6 +230,8 @@ router.get('/member/:name/:secret?', (req, res, next) => {
       //   member.authorizedBoxes = member.authorizedBoxes.map(b => authboxMap[b]);
       //   return member;
       // });      
+      members[0].registration_complete = members[0].registration && members[0].registration_complete;
+      delete members[0].registration;
       return members[0];
     }
   })
