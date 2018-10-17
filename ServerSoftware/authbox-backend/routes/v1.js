@@ -195,7 +195,7 @@ router.get('/members/:secret?', (req, res, next) => {
   })
   .then((members) =>{
     res.json(members.map(v => {
-      v.registration_complete = v.registration && v.registration.registration_complete;
+      v.registration_complete = v.registration && v.registration.registrationComplete;
       delete v.registration;
       return v;
     }));
@@ -230,7 +230,7 @@ router.get('/member/:name/:secret?', (req, res, next) => {
       //   member.authorizedBoxes = member.authorizedBoxes.map(b => authboxMap[b]);
       //   return member;
       // });      
-      members[0].registration_complete = members[0].registration && members[0].registration.registration_complete;
+      members[0].registration_complete = members[0].registration && members[0].registration.registrationComplete;
       delete members[0].registration;
       return members[0];
     }
