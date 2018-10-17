@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject, ViewChild, AfterViewInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 // This will just be a modal dialogue for adding a new Authbox member
@@ -7,8 +7,10 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   templateUrl: './authbox-add-member.component.html',
   styleUrls: ['./authbox-add-member.component.scss']
 })
-export class AuthboxAddMemberComponent {
+export class AuthboxAddMemberComponent implements AfterViewInit {
   @ViewChild('members') members;
+
+  selectedMembers = [];
 
   constructor(
     public dialogRef: MatDialogRef<AuthboxAddMemberComponent>,
@@ -18,10 +20,13 @@ export class AuthboxAddMemberComponent {
     this.dialogRef.close();
   }
 
-  selectedMembers() {
-    if (this.members) {
-      return this.members.selectedOptions.selected.map(item => item.value);
-    }
-    return [];
+  updateSelectedMembers() {
+    this.selectedMembers = this.members.selectedOptions.selected.map(item => item.value);
+  }
+
+  ngAfterViewInit() {
+    Promise.resolve().then(() => {
+      this.updateSelectedMembers();
+    });
   }
 }

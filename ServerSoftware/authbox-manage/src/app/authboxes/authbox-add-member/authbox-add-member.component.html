@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>Add Authorized Members</h1>
 <div mat-dialog-content>
-  <mat-selection-list #members>
+  <mat-selection-list #members (selectionChange)="updateSelectedMembers()">
     <mat-list-option *ngFor="let member of data?.members"
       [value]="member?.name"
       [selected]="member?.authorizedBoxNames.indexOf(data?.name) >= 0">
@@ -11,6 +11,6 @@
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>
   <button mat-button
-    [mat-dialog-close]="selectedMembers()"
+    [mat-dialog-close]="selectedMembers"
     cdkFocusInitial>Save</button>
 </div>
