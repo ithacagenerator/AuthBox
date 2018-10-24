@@ -13,13 +13,34 @@ if(help) {
   console.log(`
 
   Possible Arguments:
-    
-    --start, --s, --begin, --b   starting date in ISO-8601 format YYYY-MM-DDTHH:mm:ssZZ
-    --end, --e, --finish, --f    ending date in ISO-8601 format YYYY-MM-DDTHH:mm:ssZZ
+    --start, --s, --begin, --b   (optional) starting date in ISO-8601 format YYYY-MM-DDTHH:mm:ssZZ
+    --end, --e, --finish, --f    (optional) ending date in ISO-8601 format YYYY-MM-DDTHH:mm:ssZZ
     --input, --i, --csv, --c     input csv filename, defaults to authbox-history.csv
   `);
 
   process.exit(0);
+}
+
+let startMoment;
+if(start) {
+  startMoment = moment(start);
+  if(!startMoment.isValid()) {
+    startMoment = null;
+    console.warn(`Supplied start date ${start} is not a valid ISO8601 format, ignoring it`);
+  } else {
+    console.log(`Filtering data before ${startMoment.format()}`);
+  }
+}
+
+let endMoment;
+if(end) {
+  endMoment = moment(end);
+  if(!endMoment.isValid()) {
+    endMoment = null;
+    console.warn(`Supplied end date ${end} is not a valid ISO8601 format, ignoring it`);
+  } else {
+    console.log(`Filtering data after ${endMoment.format()}`);
+  }
 }
 
 let rawData;
@@ -45,10 +66,21 @@ parsedData = parsedData.map(v => {
   if(v.authorized && v.deauthorized) {
     v.authorized = moment(v.authorized);
     v.deauthorized = moment(v.deauthorized);
-    return v;
+    if(!v.authorized.isValid() || !v.deauthorized.isValid()) {
+      v = null;
+    }
+    else if(startMoment && v.deauthorized.isBefore(startMoment)) {
+      v = null;
+    }
+    else if(endMoment && v.authorized.isAfter(endMoment)) {
+      v = null;
+    }
   } else {
-    return null;
+    // ignore data if it doesn't include both start and end dates
+    v = null;
   }
+
+  return v;
 })
 .filter(v => !!v)
 .map(v => {
