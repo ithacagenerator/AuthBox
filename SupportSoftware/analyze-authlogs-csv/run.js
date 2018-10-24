@@ -1,10 +1,12 @@
 //jshint esversion: 6
 const argv = require('minimist')(process.argv.slice(2));
 const parse = require('csv-parse/lib/sync');
+const stringify = require('csv-stringify/lib/sync');
 const moment = require('moment');
 const fs = require('fs');
 
 const inputFilename = argv.input || argv.i || argv.c || argv.csv || 'authbox-history.csv';
+const outputFilename = argv.output || argv.o;
 const start = argv.start || argv.s || argv.begin || argv.b;
 const end = argv.end || argv.e || argv.finish || argv.f;
 const help = argv.help || argv.h;
@@ -13,9 +15,11 @@ if(help) {
   console.log(`
 
   Possible Arguments:
+    --input, --i, --csv, --c     input csv filename, defaults to authbox-history.csv
     --start, --s, --begin, --b   (optional) starting date in ISO-8601 format YYYY-MM-DDTHH:mm:ssZZ
     --end, --e, --finish, --f    (optional) ending date in ISO-8601 format YYYY-MM-DDTHH:mm:ssZZ
-    --input, --i, --csv, --c     input csv filename, defaults to authbox-history.csv
+    --output, --o                (optional) output filename
+    --json, --j                  (optional) supply flag to output json file (in addition to csv file) 
   `);
 
   process.exit(0);
@@ -85,10 +89,21 @@ parsedData = parsedData.map(v => {
 .filter(v => !!v)
 .map(v => {
   // calculate time differences
-  v.sessionTime = v.deauthorized.diff(v.authorized, 'seconds');
+  v.minutes = +((v.deauthorized.diff(v.authorized, 'seconds') / 60).toFixed(2));
   // calculate day of week
   v.weekday = v.authorized.format('dddd');
+
+  v.authorized = v.authorized.format();
+  v.deauthorized = v.deauthorized.format();
+
   return v;
 });
 
 console.log(JSON.stringify(parsedData, null, 2));
+
+if(outputFilename) {
+  fs.writeFileSync(outputFilename, stringify(parsedData, {header: true}), 'utf8');
+  if(argv.json) {
+    fs.writeFileSync(outputFilename + '.json', JSON.stringify(parsedData, null, 2));
+  }
+}
