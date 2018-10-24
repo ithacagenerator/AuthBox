@@ -92,7 +92,7 @@ parsedData = parsedData.map(v => {
   v.minutes = +((v.deauthorized.diff(v.authorized, 'seconds') / 60).toFixed(2));
   // calculate day of week
   v.weekday = v.authorized.format('dddd');
-
+  v.month = v.authorized.format('MMMM');
   v.authorized = v.authorized.format();
   v.deauthorized = v.deauthorized.format();
 
