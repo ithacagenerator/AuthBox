@@ -18,7 +18,7 @@ router.get('/amiloggedin/:secret', function(req, res, next) {
       res.json({status: "ok"});
     } else {
       res.status(401).json({error: "not logged in"});
-    }    
+    }
 });
 
 // Members is a collection, each Member is an object like:
@@ -27,7 +27,7 @@ var findMemberAndBox = (auth_hash, access_code) => {
   // first see if there's a user in the database that matches the user_code
   return findDocuments('Members', {'access_codes.code': access_code})
   .then((members) => {
-    if(members.length === 1){      
+    if(members.length === 1){
       members[0].access_code = access_code; // collapse to the code that was used
       return {
         member: members[0],
@@ -40,10 +40,10 @@ var findMemberAndBox = (auth_hash, access_code) => {
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authboxes/PASSWORD
 router.get('/authboxes/:secret?', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
-    
+
   findDocuments('AuthBoxes', {deleted: {$exists: false}}, {
     projection: { _id: 0, id: 0, access_codes: 0 }
   })
@@ -58,15 +58,15 @@ router.get('/authboxes/:secret?', (req, res, next) => {
 
 
 // cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "BOX-NAME", "id": "BOX-ID", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/authboxes/create/PASSWORD
-// 
+//
 // :secret is the apriori secret known to administrators
-// POST body is a JSON structure representing a new authbox, 
+// POST body is a JSON structure representing a new authbox,
 //           which should include an id, name, access_code, and (optional) idle_timeout_ms field
 //           date created and last modified fields will be added automatically
 //
 router.post('/authboxes/create/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
 
@@ -78,9 +78,9 @@ router.post('/authboxes/create/:secret', (req, res, next) => {
     }
   });
   if(missingFields.length){
-    res.status(422).json({error: 
+    res.status(422).json({error:
       `Missing ${missingFields.length} fields: ${JSON.stringify(missingFields)}`});
-    return;    
+    return;
   }
 
   let now = moment().format();
@@ -89,9 +89,9 @@ router.post('/authboxes/create/:secret', (req, res, next) => {
 
   insertDocument('AuthBoxes', obj)
   .then((insertResult) => {
-    if(!insertResult.insertedId){          
+    if(!insertResult.insertedId){
       throw new Error('no document inserted');
-    }    
+    }
   })
   .then(() =>{
     res.json({status: 'ok'});
@@ -103,15 +103,15 @@ router.post('/authboxes/create/:secret', (req, res, next) => {
 });
 
 // cURL: curl -X PUT -H "Content-Type: application/json" -d '{"name": "BOX-NAME", "id": "BOX-ID", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/authbox/PASSWORD
-// 
+//
 // :secret is the apriori secret known to administrators
-// PUT body is a JSON structure representing a the udpates to make, 
+// PUT body is a JSON structure representing a the udpates to make,
 //           which should include an id (optional), name, access_code (optional), and idle_timeout_ms (optional) field
 //           date last modified fields will be added automatically
 //
 router.put('/authbox/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
 
@@ -123,18 +123,18 @@ router.put('/authbox/:secret', (req, res, next) => {
   });
 
   if(!obj.name){
-    res.status(422).json({error: 'Name not provided.'});    
-    return;    
+    res.status(422).json({error: 'Name not provided.'});
+    return;
   }
 
-  let now = moment().format();  
+  let now = moment().format();
   obj.updated = now;
 
   updateDocument('AuthBoxes', { name: obj.name }, obj)
   .then((updateResult) => {
-    if(!updateResult.matchedCount){          
+    if(!updateResult.matchedCount){
       throw new Error('no document updated');
-    }    
+    }
   })
   .then(() =>{
     res.json({status: 'ok'});
@@ -146,32 +146,32 @@ router.put('/authbox/:secret', (req, res, next) => {
 });
 
 // cURL: curl -X DELETE -H "Content-Type: application/json" -d '{"name": "BOX-NAME"}' https://ithacagenerator.org/authbox/v1/authbox/PASSWORD
-// 
+//
 // :secret is the apriori secret known to administrators
-// DELETE body is a JSON structure representing a the udpates to make, 
+// DELETE body is a JSON structure representing a the udpates to make,
 //           which should include a name
 //
 router.delete('/authbox/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
 
   const obj = req.body;
   if(!obj.name){
-    res.status(422).json({error: 'Name not provided.'});    
-    return;    
+    res.status(422).json({error: 'Name not provided.'});
+    return;
   }
 
-  let now = moment().format();  
+  let now = moment().format();
   obj.updated = now;
   obj.deleted = true;
 
   updateDocument('AuthBoxes', { name: obj.name }, obj)
   .then((updateResult) => {
-    if(!updateResult.matchedCount){        
+    if(!updateResult.matchedCount){
       throw new Error('no document deleted');
-    }    
+    }
   })
   .then(() =>{
     res.json({status: 'ok'});
@@ -186,10 +186,10 @@ router.delete('/authbox/:secret', (req, res, next) => {
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/members/PASSWORD
 router.get('/members/:secret?', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
-    
+
   findDocuments('Members', {deleted: {$exists: false}}, {
     projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, paypal: 0 }
   })
@@ -209,7 +209,7 @@ router.get('/members/:secret?', (req, res, next) => {
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/member/NAME/PASSWORD
 router.get('/member/:name/:secret?', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
   const name = req.params.name;
@@ -218,18 +218,18 @@ router.get('/member/:name/:secret?', (req, res, next) => {
   })
   .then((members) => {
     if (!members || (members.length !== 1)) {
-      throw new Error(`Could not find member name '${name}'`);      
-    } else { 
+      throw new Error(`Could not find member name '${name}'`);
+    } else {
       // return findDocuments('AuthBoxes', {})
       // .then((allAuthBoxes) => {
       //   const authboxMap = allAuthBoxes.reduce((o, v) => {
       //     o[v.id] = v.name;
       //     return o;
-      //   }, {});      
+      //   }, {});
       //   const member = members[0];
       //   member.authorizedBoxes = member.authorizedBoxes.map(b => authboxMap[b]);
       //   return member;
-      // });      
+      // });
       members[0].registration_complete = members[0].registration && members[0].registration.registrationComplete;
       delete members[0].registration;
       return members[0];
@@ -243,16 +243,16 @@ router.get('/member/:name/:secret?', (req, res, next) => {
     res.status(422).json({error: err.message});
   });
 });
- 
+
 router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
 
   // message body should contain an array of member names
   if (!Array.isArray(req.body)) {
-    res.status(422).json({error: 'body must be an array of member names'});    
+    res.status(422).json({error: 'body must be an array of member names'});
     return;
   }
 
@@ -261,7 +261,7 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   let authboxName = req.params.authboxName;
   findDocuments("AuthBoxes", {name: authboxName})
   .then((authbox) => {
-    authbox = Array.isArray(authbox) && (authbox.length === 1) ? authbox[0] : {}; 
+    authbox = Array.isArray(authbox) && (authbox.length === 1) ? authbox[0] : {};
     if(!authbox || !authbox.id){
       throw new Error(`Could not find authbox named "${authboxName}"`);
     } else {
@@ -270,10 +270,10 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   })
   .then(() => {
     //then remove the authbox from all the members authorized lists
-    return updateDocument('Members', {}, // applies to all Members documents 
+    return updateDocument('Members', {}, // applies to all Members documents
       {
         $pull: { // removes values from arrays
-          authorizedBoxNames: authboxName, 
+          authorizedBoxNames: authboxName,
           authorizedBoxes: authboxId
         }
       },
@@ -283,14 +283,14 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   .then((updateResult) => {
     // then add the authbox to the authorized member lists
     return updateDocument('Members', {name: {$in: req.body}}, // only authorized members
-      { 
+      {
         $addToSet: {
-          authorizedBoxNames: authboxName, 
+          authorizedBoxNames: authboxName,
           authorizedBoxes: authboxId
         }
-      }, 
+      },
       {updateType: 'complex', updateMany: true}
-    );    
+    );
   })
   .then((updateResult) =>{
     res.json({status: 'ok'});
@@ -302,9 +302,9 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
 });
 
 // cURL: curl -X POST -H "Content-Type: application/json" -d '{"name": "MEMBER-NAME", "email": "MEMBER-EMAIL", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/members/create/PASSWORD
-// 
+//
 // :secret is the apriori secret known to administrators
-// POST body is a JSON structure representing a new authbox, 
+// POST body is a JSON structure representing a new authbox,
 //           which should include an email, name, and access_code field
 //           date created and last modified fields will be added automatically
 //
@@ -312,14 +312,14 @@ router.post('/members/create/:secret', (req, res, next) => {
   waitUntil(100, Infinity, function condition(){
     return !members_modification_in_progress;
   }, function done(){
-    members_modification_in_progress = true;  
+    members_modification_in_progress = true;
 
     if(req.params.secret !== secret){
-      res.status(401).json({error: 'secret is incorrect'});    
+      res.status(401).json({error: 'secret is incorrect'});
       members_modification_in_progress = false;
       return;
     }
-  
+
     let missingFields = [];
     let obj = req.body;
     ['name', 'email', 'access_code', 'access_method'].forEach(key => {
@@ -328,24 +328,24 @@ router.post('/members/create/:secret', (req, res, next) => {
       }
     });
     if(missingFields.length){
-      res.status(422).json({error: 
+      res.status(422).json({error:
         `Missing ${missingFields.length} fields: ${JSON.stringify(missingFields)}`});
       members_modification_in_progress = false;
-      return;    
+      return;
     }
-  
+
     let now = moment().format();
     obj.created = now;
     obj.updated = now;
-  
+
     obj.authorizedBoxes = [];
     obj.authorizedBoxNames = [];
-  
+
     obj.access_codes = [{
       method: obj.access_method,
       code: obj.access_code
     }];
-  
+
     delete obj.access_method;
     delete obj.access_code;
 
@@ -355,14 +355,14 @@ router.post('/members/create/:secret', (req, res, next) => {
       if(members.length > 0){
         throw new Error('proposed access code is not unique');
       }
-    })    
+    })
     .then(() => {
       return insertDocument('Members', obj);
-    })    
+    })
     .then((insertResult) => {
-      if(!insertResult.insertedId){          
+      if(!insertResult.insertedId){
         throw new Error('no document inserted');
-      }    
+      }
     })
     .then(() =>{
       members_modification_in_progress = false;
@@ -372,14 +372,14 @@ router.post('/members/create/:secret', (req, res, next) => {
       console.error(err);
       members_modification_in_progress = false;
       res.status(422).json({error: err.message});
-    });    
+    });
   });
 });
 
 // cURL: curl -X PUT -H "Content-Type: application/json" -d '{"name": "MEMBER-NAME", "email": "MEMBER-EMAIL", "access_code": "12345"}' https://ithacagenerator.org/authbox/v1/member/PASSWORD
-// 
+//
 // :secret is the apriori secret known to administrators
-// PUT body is a JSON structure representing a the udpates to make, 
+// PUT body is a JSON structure representing a the udpates to make,
 //           which should include an email (optional), name, and access_code (optional) field
 //           date last modified fields will be added automatically
 //
@@ -389,36 +389,50 @@ router.put('/member/:secret', (req, res, next) => {
   }, function done(){
     members_modification_in_progress = true;
     if(req.params.secret !== secret){
-      res.status(401).json({error: 'secret is incorrect'});    
+      res.status(401).json({error: 'secret is incorrect'});
       members_modification_in_progress = false;
       return;
     }
-  
+
     let obj = { };
     ['name', 'email', 'authorizedBoxNames'].forEach(key => {
       if (req.body[key]) {
         obj[key] = req.body[key];
       }
     });
-  
+
     if(!obj.name){
-      res.status(422).json({error: 'Name not provided.'});    
+      res.status(422).json({error: 'Name not provided.'});
       members_modification_in_progress = false;
-      return;    
+      return;
     }
-  
-    let now = moment().format();  
+
+    let now = moment().format();
     obj.updated = now;
-  
-    updateDocument('Members', { name: obj.name }, obj)
+
+    let query = { name: obj.name }
+    findDocuments('Members', query)
+    .then((members) => {
+      if(!Array.isArray(members) || (members.length !== 1)) {
+        query = { email: obj.email };
+        return findDocuments('Members', query);
+      }
+      return members;
+    })
+    .then((members) => {
+      if(!Array.isArray(members) || (members.length !== 1)) {
+        return { };
+      }
+      return updateDocument('Members', query, obj);
+    })
     .then((updateResult) => {
-      if(!updateResult.matchedCount){          
+      if(!updateResult.matchedCount){
         throw new Error('no document updated');
-      }    
+      }
     })
     .then(() => {
       // if an access code and access method was provided
-      // need to read the member object and update their 
+      // need to read the member object and update their
       // access codes array to include this object
       let access_code = req.body.access_code;
       let access_method = req.body.access_method;
@@ -436,7 +450,7 @@ router.put('/member/:secret', (req, res, next) => {
         })
         .then((members) => {
           if(members && members.length){
-            return members[0].access_codes; 
+            return members[0].access_codes;
           } else {
             throw new Error(`Could not find member name '${obj.name}'`);
           }
@@ -455,9 +469,9 @@ router.put('/member/:secret', (req, res, next) => {
           return updateDocument('Members', {name: obj.name}, {access_codes});
         })
         .then((updateResult) => {
-          if(!updateResult.matchedCount){          
+          if(!updateResult.matchedCount){
             throw new Error('no document updated [access codes update]');
-          }    
+          }
         });
       }
     })
@@ -469,29 +483,29 @@ router.put('/member/:secret', (req, res, next) => {
       members_modification_in_progress = false;
       console.error(err);
       res.status(422).json({error: err.message});
-    });    
+    });
   });
 });
 
 // cURL: curl -X DELETE -H "Content-Type: application/json" -d '{"name": "MEMBER-NAME"}' https://ithacagenerator.org/authbox/v1/member/PASSWORD
-// 
+//
 // :secret is the apriori secret known to administrators
-// DELETE body is a JSON structure representing a the udpates to make, 
+// DELETE body is a JSON structure representing a the udpates to make,
 //           which should include a name
 //
 router.delete('/member/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
 
   const obj = req.body;
   if(!obj.name){
-    res.status(422).json({error: 'Name not provided.'});    
-    return;    
+    res.status(422).json({error: 'Name not provided.'});
+    return;
   }
 
-  let now = moment().format();  
+  let now = moment().format();
   obj.updated = now;
   obj.deleted = true;
   obj.welcomeEmailSent = false;
@@ -499,9 +513,9 @@ router.delete('/member/:secret', (req, res, next) => {
 
   updateDocument('Members', { name: obj.name }, obj)
   .then((updateResult) => {
-    if(!updateResult.matchedCount){        
+    if(!updateResult.matchedCount){
       throw new Error('no document deleted');
-    }    
+    }
   })
   .then(() =>{
     res.json({status: 'ok'});
@@ -514,13 +528,13 @@ router.delete('/member/:secret', (req, res, next) => {
 
 router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
 
   // message body should contain an array of member names
   if (!Array.isArray(req.body)) {
-    res.status(422).json({error: 'body must be an array of member names'});    
+    res.status(422).json({error: 'body must be an array of member names'});
     return;
   }
 
@@ -529,7 +543,7 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   let authboxName = req.params.authboxName;
   findDocuments("AuthBoxes", {name: authboxName})
   .then((authbox) => {
-    authbox = Array.isArray(authbox) && (authbox.length === 1) ? authbox[0] : {}; 
+    authbox = Array.isArray(authbox) && (authbox.length === 1) ? authbox[0] : {};
     if(!authbox || !authbox.id){
       throw new Error(`Could not find authbox named "${authboxName}"`);
     } else {
@@ -538,10 +552,10 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   })
   .then(() => {
     //then remove the authbox from all the members authorized lists
-    return updateDocument('Members', {}, // applies to all Members documents 
+    return updateDocument('Members', {}, // applies to all Members documents
       {
         $pull: { // removes values from arrays
-          authorizedBoxNames: authboxName, 
+          authorizedBoxNames: authboxName,
           authorizedBoxes: authboxId
         }
       },
@@ -551,14 +565,14 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
   .then((updateResult) => {
     // then add the authbox to the authorized member lists
     return updateDocument('Members', {name: {$in: req.body}}, // only authorized members
-      { 
+      {
         $addToSet: {
-          authorizedBoxNames: authboxName, 
+          authorizedBoxNames: authboxName,
           authorizedBoxes: authboxId
         }
-      }, 
+      },
       {updateType: 'complex', updateMany: true}
-    );    
+    );
   })
   .then((updateResult) =>{
     res.json({status: 'ok'});
@@ -571,19 +585,19 @@ router.put('/bulk/authorize-members/:authboxName/:secret', (req, res, next) => {
 
 router.put('/bulk/authorize-boxes/:memberName/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
 
   // message body should contain an array of authbox names
   if (!Array.isArray(req.body)) {
-    res.status(422).json({error: 'body must be an array of authbox names'});    
+    res.status(422).json({error: 'body must be an array of authbox names'});
     return;
   }
 
-  // get the authbox ids that go with the requested names  
+  // get the authbox ids that go with the requested names
   let memberName = req.params.memberName;
-  const authorizedBoxNames = req.body;  
+  const authorizedBoxNames = req.body;
   findDocuments("AuthBoxes", {
     name: {$in: authorizedBoxNames}
   })
@@ -591,7 +605,7 @@ router.put('/bulk/authorize-boxes/:memberName/:secret', (req, res, next) => {
     const authboxMap = allAuthBoxes.reduce((o, v) => { // create a reverse lookup
       o[v.name] = v.id;
       return o;
-    }, {});               
+    }, {});
     const authorizedBoxes = authorizedBoxNames.map(b => authboxMap[b]);
     return updateDocument('Members', {name: memberName}, // applies to one member
       { authorizedBoxes, authorizedBoxNames }
@@ -607,9 +621,9 @@ router.put('/bulk/authorize-boxes/:memberName/:secret', (req, res, next) => {
 });
 
 // cURL: curl -X POST https://ithacagenerator.org/authbox/v1/authorize/CALCULATED-AUTH-HASH-HERE/ACCESS-CODE-HERE
-// 
+//
 // :auth_hash    is the result of mixing the user access code with the box id using a pbkdf2 hash
-// :access_code  is the access code entered by a user, uniquely identifies a user 
+// :access_code  is the access code entered by a user, uniquely identifies a user
 //
 //               because access_codes have a unique key in the database
 //               together, auth_hash and access_code uniquely identify a box (without revealing the box id)
@@ -624,14 +638,14 @@ router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
     }
   })
   .then((result) => {
-    // determine the boxName that goes with the box id 
+    // determine the boxName that goes with the box id
     // so we can augment the box usage record
     return findDocuments('AuthBoxes', {id: result.box_id})
     .then((boxes) => {
       const box = boxes ? boxes[0] : {};
       result.box_name = box.name;
       return result;
-    });    
+    });
   })
   .then((result) => {
     authorizedMemberName = result.member.name;
@@ -642,13 +656,13 @@ router.post('/authorize/:auth_hash/:access_code', (req, res, next) => {
       authorized: moment().format()
     })
     .then((insertResult) => {
-      if(!insertResult.insertedId){          
+      if(!insertResult.insertedId){
         throw new Error('no document inserted');
       }
     })
     .then(() => {
       return result;
-    });    
+    });
   })
   .then((result) => { // result has result.member.name and result.box_id
     return updateDocument('AuthBoxes', { id: result.box_id }, {
@@ -676,11 +690,11 @@ router.post('/deauthorize/:auth_hash/:access_code', (req, res, next) => {
           { box_id: result.box_id },
           { deauthorized: { $exists: false } }
         ]
-      }, {                        
+      }, {
         deauthorized: moment().format()
       })
       .then((updateResult) => {
-        if(updateResult.upsertedId){          
+        if(updateResult.upsertedId){
           console.error('document created, when, rather, one should have been modified');
         }
         if(updateResult.modifiedCount !== 1){
@@ -714,10 +728,10 @@ router.post('/deauthorize/:auth_hash/:access_code', (req, res, next) => {
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authmap/CALCULATED-AUTH-HASH-HERE
 router.get('/authmap/:auth_hash', (req, res, next) => {
   findDocuments('AuthBoxes', {})
-  .then((boxes) => {    
+  .then((boxes) => {
     return boxes.find(box => {
       const box_auth_hash = pbkdf2.pbkdf2Sync(box.id, box.access_code, 1, 32, 'sha512').toString('hex');
-      return box_auth_hash === req.params.auth_hash;      
+      return box_auth_hash === req.params.auth_hash;
     });
   })
   .then((box) => {
@@ -725,15 +739,15 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
       throw new Error('box not authorized to get authmap');
     }
     return box;
-  })  
-  .then((box) => {    
+  })
+  .then((box) => {
     return findDocuments('Members', { authorizedBoxes: { $elemMatch: { $eq: box.id } } })
     .then((members) => {
       return { members, box };
     });
   })
-  .then((members_and_box) => {    
-    // send back an array of valid authorization codes for the requested box    
+  .then((members_and_box) => {
+    // send back an array of valid authorization codes for the requested box
     res.json({
       codes: members_and_box.members
         .map(m => m.access_codes)                                   // an array of arrays of objects {code: '', method: ''}
@@ -753,10 +767,10 @@ router.get('/authmap/:auth_hash', (req, res, next) => {
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authboxes/history/AUTHBOX_NAME/PASSWORD?sort=SORT&order=ORDER&page=PAGE
 router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
-  
+
   const csv = req.query.csv === 'true';
   const all = req.query.all === 'true';
 
@@ -795,7 +809,7 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
     const options = {
       projection: { _id: 0, box_id: 0 },
       sort: _sort,
-      includeCount: true      
+      includeCount: true
     };
     if(!all){
       options.skip = page * nPerPage;
@@ -804,7 +818,7 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
 
     return findDocuments('BoxUsage', _condition, options);
   })
-  .then((boxUsages) => {    
+  .then((boxUsages) => {
     if(csv){
       return new Promise((resolve, reject) => {
         stringify(boxUsages.items, {header: true}, function(err, output){
@@ -814,28 +828,28 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
             res.type('text/csv').send(output);
             resolve();
           }
-        });          
+        });
       });
-    } else {    
+    } else {
       res.json(boxUsages);
     }
   })
   .catch((err) => {
     console.error(err);
     res.status(422).json({error: err.message});
-  });  
+  });
 });
 
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authboxes/history/AUTHBOX_NAME/PASSWORD?sort=SORT&order=ORDER&page=PAGE
 router.get('/members/history/:memberName/:secret', (req, res, next) => {
   if(req.params.secret !== secret){
-    res.status(401).json({error: 'secret is incorrect'});    
+    res.status(401).json({error: 'secret is incorrect'});
     return;
   }
 
   const csv = req.query.csv === 'true';
   const all = req.query.all === 'true';
-  
+
   if(req.query.sort === 'undefined') { delete req.query.sort; }
   if(req.query.order === 'undefined') { delete req.query.order; }
   if(req.query.page === 'undefined') { delete req.query.page; }
@@ -871,14 +885,14 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
     const options = {
       projection: { _id: 0, member: 0, box_id: 0 },
       sort: _sort,
-      includeCount: true   
+      includeCount: true
     };
     if(!all){
       options.skip = page * nPerPage;
       options.limit = nPerPage;
     }
 
-    return findDocuments('BoxUsage', _condition, options);  
+    return findDocuments('BoxUsage', _condition, options);
   })
   .then((boxUsages) => {
     if(csv){
@@ -890,7 +904,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
             res.type('text/csv').send(output);
             resolve();
           }
-        });          
+        });
       });
     } else {
       res.json(boxUsages);
@@ -899,7 +913,7 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
   .catch((err) => {
     console.error(err);
     res.status(422).json({error: err.message});
-  });  
+  });
 });
 
 var decipherAuthBoxId = (member, auth_hash) => {
@@ -956,8 +970,8 @@ var findDocuments = function(colxn, condition, options = {}) {
             console.log("Applying limit", limit);
             cursor = cursor.limit(limit);
           }
-          
-          cursor.count(false, {}, (err, cnt) => {          
+
+          cursor.count(false, {}, (err, cnt) => {
             if(err) {
               reject(err);
               client.close();
@@ -990,7 +1004,7 @@ var findDocuments = function(colxn, condition, options = {}) {
     });
   });
 };
-   
+
 var updateDocument = function(colxn, condition, update, options = {}){
 
   let opts = Object.assign({}, {upsert: false}, options);
@@ -1062,7 +1076,7 @@ var insertDocument = function(colxn, document){
         });
       }
     });
-  });    
+  });
 };
 
 var deleteDocument = function(colxn, condition, options = {}){
@@ -1098,6 +1112,6 @@ var deleteDocument = function(colxn, condition, options = {}){
     }
   });
 };
-  
+
 
 module.exports = router;
