@@ -93,7 +93,7 @@ export class MembersComponent implements AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      if (result && result.name) {
+      if (result && (result.name || result.email)) {
         if (!result.id) { delete result.id; }
         if (!result.access_code) { delete result.access_code; }
 
