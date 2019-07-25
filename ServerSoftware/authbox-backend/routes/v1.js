@@ -500,8 +500,8 @@ router.delete('/member/:secret', (req, res, next) => {
   }
 
   const obj = req.body;
-  if(!obj.name){
-    res.status(422).json({error: 'Name not provided.'});
+  if(!obj.name && !obj.email){
+    res.status(422).json({error: 'Neither name nor email provided.'});
     return;
   }
 
@@ -511,7 +511,21 @@ router.delete('/member/:secret', (req, res, next) => {
   obj.welcomeEmailSent = false;
   obj.access_codes = []; // wipe out the user's access codes
 
-  updateDocument('Members', { name: obj.name }, obj)
+  let query = { name: obj.name }
+  findDocuments('Members', query)
+  .then((members) => {
+    if(!Array.isArray(members) || (members.length !== 1)) {
+      query = { email: obj.email };
+      return findDocuments('Members', query);
+    }
+    return members;
+  })
+  .then((members) => {
+    if(!Array.isArray(members) || (members.length !== 1)) {
+      return { };
+    }
+    updateDocument('Members', query, obj);
+  })
   .then((updateResult) => {
     if(!updateResult.matchedCount){
       throw new Error('no document deleted');
