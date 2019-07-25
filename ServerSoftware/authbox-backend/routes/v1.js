@@ -418,7 +418,7 @@ router.put('/member/:secret', (req, res, next) => {
     let now = moment().format();
     obj.updated = now;
 
-    let query = { name: obj.name }
+    let query = { name: obj.name };
     findDocuments('Members', query)
     .then((members) => {
       if(!Array.isArray(members) || (members.length !== 1)) {
@@ -519,7 +519,7 @@ router.delete('/member/:secret', (req, res, next) => {
   obj.welcomeEmailSent = false;
   obj.access_codes = []; // wipe out the user's access codes
 
-  let query = { name: obj.name }
+  let query = { name: obj.name };
   findDocuments('Members', query)
   .then((members) => {
     if(!Array.isArray(members) || (members.length !== 1)) {
