@@ -131,6 +131,7 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.memberName) {
       this.apiSrvc.getMember(this.memberName)
       .then((member) => {
+        this.memberName = member.name || this.memberName;
         this.memberObj = member;
       });
     }

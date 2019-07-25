@@ -217,7 +217,15 @@ router.get('/member/:name/:secret?', (req, res, next) => {
     projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, paypal: 0 }
   })
   .then((members) => {
-    if (!members || (members.length !== 1)) {
+    if (!Array.isArray(members) || (members.length !== 1)) {
+      return findDocuments('Members', {deleted: {$exists: false}, email: name}, {
+        projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, paypal: 0 }
+      });
+    }
+    return members;
+  })
+  .then((members) => {
+    if (!Array.isArray(members) || (members.length !== 1)) {
       throw new Error(`Could not find member name '${name}'`);
     } else {
       // return findDocuments('AuthBoxes', {})
@@ -874,8 +882,13 @@ router.get('/members/history/:memberName/:secret', (req, res, next) => {
   const nPerPage = 30;
 
   const memberName = req.params.memberName;
-  // first determine the box id that goes with the box name
   findDocuments('Members', {name: memberName})
+  .then((members) => {
+    if (!Array.isArray(members) || (members.length !== 1)){
+      return findDocuments('Members', {email: memberName});
+    }
+    return members;
+  })
   .then((members) => {
     if (!members || (members.length !== 1)) {
       throw new Error(`Couldn't find Member named ${memberName}`);

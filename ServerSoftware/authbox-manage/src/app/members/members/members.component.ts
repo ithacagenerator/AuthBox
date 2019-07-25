@@ -98,7 +98,7 @@ export class MembersComponent implements AfterViewInit, OnDestroy {
         if (!result.access_code) { delete result.access_code; }
 
         if (result.detail) {
-          this.router.navigate([`/member/${result.name}`]);
+          this.router.navigate([`/member/${result.name || result.email}`]);
         } else if (result.delete) {
           delete result.delete;
           this.apiSrvc.deleteMember(result)
