@@ -532,7 +532,7 @@ router.delete('/member/:secret', (req, res, next) => {
     if(!Array.isArray(members) || (members.length !== 1)) {
       return { };
     }
-    updateDocument('Members', query, obj);
+    return updateDocument('Members', query, obj);
   })
   .then((updateResult) => {
     if(!updateResult.matchedCount){
