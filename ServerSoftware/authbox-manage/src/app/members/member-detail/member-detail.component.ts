@@ -58,8 +58,8 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!loggedin) {
         this.authboxes = null;
       }
-      this.refreshAuthboxes();
       this.refreshMember();
+      this.refreshAuthboxes();
     });
   }
 
@@ -118,7 +118,7 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refreshAuthboxes() {
-    this.apiSrvc.getAuthBoxes()
+    return this.apiSrvc.getAuthBoxes()
     .then((boxes) => {
       this.authboxes = boxes;
     })
@@ -129,12 +129,13 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   refreshMember() {
     if (this.memberName) {
-      this.apiSrvc.getMember(this.memberName)
+      return this.apiSrvc.getMember(this.memberName)
       .then((member) => {
-        this.memberName = member.name || this.memberName;
+        this.memberName = member.name || ;
         this.memberObj = member;
       });
     }
+    return Promise.resolve();
   }
 
   addAuthorizedBox() {
@@ -154,8 +155,8 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           this.snackBar.openFromComponent(SuccessStatusSnackComponent, {
             duration: 1000,
           });
-          this.refreshAuthboxes();
           this.refreshMember();
+          this.refreshAuthboxes();
         })
         .catch((err) => {
           console.error(err);
