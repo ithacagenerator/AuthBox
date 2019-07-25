@@ -401,8 +401,8 @@ router.put('/member/:secret', (req, res, next) => {
       }
     });
 
-    if(!obj.name){
-      res.status(422).json({error: 'Name not provided.'});
+    if(!obj.name && !obj.email){
+      res.status(422).json({error: 'Neither name nor email provided.'});
       members_modification_in_progress = false;
       return;
     }
