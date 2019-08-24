@@ -35,6 +35,8 @@ void enableCounter(void);
 void disableCounter(void);
 
 int LOCKOUT_PIN = 13; // Relay control output
+int LOCKOUT_PIN_ACTIVE = 0;
+int LOCKOUT_PIN_INACTIVE = 1 - LOCKOUT_PIN_ACTIVE;
 int BUZZER_HIGH_PIN = 10;
 int BUZZER_LOW_PIN = 9;
 boolean buzzer_enabled = false;
@@ -267,12 +269,12 @@ void handleCommands(char c){
 
 void handleAuthorizeCommand(void){    
     Serial.println("authorize");
-    digitalWrite(LOCKOUT_PIN, HIGH);
+    digitalWrite(LOCKOUT_PIN, LOCKOUT_PIN_ACTIVE);
 }
 
 void handleLockoutCommand(void){    
     Serial.println("lockout");    
-    digitalWrite(LOCKOUT_PIN, LOW);
+    digitalWrite(LOCKOUT_PIN, LOCKOUT_PIN_INACTIVE);
 }
 
 void handleBuzzerOnCommand(void){
@@ -314,5 +316,3 @@ void enableCounter(){
 void disableCounter(){
   TCCR1B &= ~_BV(CS11);
 }
-
-
