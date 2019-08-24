@@ -35,8 +35,12 @@ void enableCounter(void);
 void disableCounter(void);
 
 int LOCKOUT_PIN = 13; // Relay control output
-int LOCKOUT_PIN_ACTIVE = 0;
+
+// THESE NEED CONFIGURED BASED ON RELAY HARDWARE
+int LOCKOUT_PIN_ACTIVE = 1;
 int LOCKOUT_PIN_INACTIVE = 1 - LOCKOUT_PIN_ACTIVE;
+int INACTIVE_IS_HIGHZ = 1; // means drive Z instead when INACTIVE
+
 int BUZZER_HIGH_PIN = 10;
 int BUZZER_LOW_PIN = 9;
 boolean buzzer_enabled = false;
@@ -45,8 +49,10 @@ uint32_t previousBuzzerMillis = 0;
 const int32_t buzzerInterval = 500; // sets the buzzer beeping frequency
 
 void setup(){
-  pinMode(LOCKOUT_PIN, OUTPUT);
+  handleLockoutCommand();
   Serial.begin(9600);
+  // Serial.println("Hello RfidAuth");
+
   attachInterrupt(0, ISRreceiveData0, FALLING );  //data0/tx is connected to pin 2, which results in INT 0
   attachInterrupt(1, ISRreceiveData1, FALLING );  //data1/rx is connected to pin 3, which results in INT 1
   
@@ -269,12 +275,18 @@ void handleCommands(char c){
 
 void handleAuthorizeCommand(void){    
     Serial.println("authorize");
+    pinMode(LOCKOUT_PIN, OUTPUT);
     digitalWrite(LOCKOUT_PIN, LOCKOUT_PIN_ACTIVE);
 }
 
 void handleLockoutCommand(void){    
-    Serial.println("lockout");    
-    digitalWrite(LOCKOUT_PIN, LOCKOUT_PIN_INACTIVE);
+    Serial.println("lockout");   
+    if (INACTIVE_IS_HIGHZ) { 
+      pinMode(LOCKOUT_PIN, INPUT);
+    } else {
+      pinMode(LOCKOUT_PIN, OUTPUT);
+      digitalWrite(LOCKOUT_PIN, LOCKOUT_PIN_INACTIVE);
+    }
 }
 
 void handleBuzzerOnCommand(void){
