@@ -13,25 +13,27 @@ standoff_outer_diameter=6;
 outlines=true;
 outline_width = 1;
 
-// this is the coordinates of the hole in the corner of the raspberry pi nearest the header pins
+// these are the coordinates of the hole in the corner of the raspberry pi nearest the header pins
 raspberrypi_llx = 10;
 raspberrypi_lly = 10;
 raspberrypi_rot = 0;
 
-// this is the coordinates of the hole in the corner of the d-30 power supply
+// these are the coordinates of the hole in the corner of the d-30 power supply
 psu_llx = -100;
 psu_lly = -100;
 psu_rot = 0;
 
-// this is the coordinates of the center hole in the corner of the rfid reader
+// these are the coordinates of the hole in the corner of the rfid reader
 rfid_llx = 100;
 rfid_lly = 0;
 rfid_rot = 0;
 
+// these are thecoordinates of the hole in the corner of the arduino
+arduino_llx = -100;
+arduino_lly = 20;
+arduino_rot = 0;
+
 module mynutcatch(nut_type="M2.5", hole_type="M3") {
-    echo(nut_type);
-    echo(hole_type);
-    echo("-----");
     translate([0,0,epsilon]) nutcatch_parallel(name=nut_type);       
     translate([0,0,20]) hole_through(name=hole_type);
 }
@@ -73,7 +75,7 @@ module myoutline(_width, _height, _corner_radius=3, _corner_hole_offset=3.5) {
     }    
 }
 
-/////// RASPBERRY PI MOUNT ////////
+/////// RASPBERRY PI ////////
 module raspberrypi_mount(positive_shape = true) {
     
     raspberrypi_mount_width =  58;
@@ -159,6 +161,33 @@ module rfid_mount(positive_shape = true) {
     }
 }
 
+/////// ARDUINO ////////
+module arduino_mount(positive_shape = true) {
+    arduino_mount_width =  50.8;
+    arduino_mount_length = 15.2 + 27.9;    
+    llx = 0;
+    lly = 0;
+    urx = llx + arduino_mount_width;
+    ury = lly + arduino_mount_length;
+    if (positive_shape) {
+        translate([llx, lly+4.7, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3");
+        translate([llx, ury-15.2, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3");
+        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3");
+        translate([urx, ury, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3");     
+        
+        if (outlines) {
+            arduino_width = 68.6+6.2;
+            arduino_length = 53.3;
+            translate([0, -3.3/2, 0]) myoutline(_width=arduino_width, _length=arduino_length);
+        }
+    } else {
+        translate([llx, lly+4.7, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");
+        translate([llx, ury-15.2, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");
+        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");
+        translate([urx, ury, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");    
+    }
+}
+
 intersection() {
     difference() {                
         union() {
@@ -166,10 +195,12 @@ intersection() {
             translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape=true);
             translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=true);
             translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=true);
+            translate([arduino_llx,arduino_lly,0]) rotate([0,0,arduino_rot]) arduino_mount(positive_shape=true);
         }        
         
         translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape = false); 
         translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=false);
         translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=false);
+        translate([arduino_llx,arduino_lly,0]) rotate([0,0,arduino_rot]) arduino_mount(positive_shape=false);
     }
 }
