@@ -24,8 +24,8 @@ psu_lly = -100;
 psu_rot = 0;
 
 // these are the coordinates of the hole in the corner of the rfid reader
-rfid_llx = 100;
-rfid_lly = 0;
+rfid_llx = 110;
+rfid_lly = 20;
 rfid_rot = 0;
 
 // these are thecoordinates of the hole in the corner of the arduino
@@ -35,9 +35,18 @@ arduino_rot = 0;
 
 // these are thecoordinates of the hole in the corner of the arduino
 relay_llx = 50;
-relay_lly = -50;
+relay_lly = -20;
 relay_rot = 0;
 
+// these are thecoordinates of the hole in the corner of the terminal block #1
+tb1_llx = 50;
+tb1_lly = -100;
+tb1_rot = 0;
+
+// these are thecoordinates of the hole in the corner of the terminal block #2
+tb2_llx = 50;
+tb2_lly = -50;
+tb2_rot = 0;
 
 module mynutcatch(nut_type="M2.5", hole_type="M3") {
     translate([0,0,epsilon]) nutcatch_parallel(name=nut_type);       
@@ -63,7 +72,7 @@ module mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="
 module myoutline(_width, _height, _corner_radius=3, _corner_hole_offset=3.5) {
     _outline_offsetx = _width/2 - _corner_hole_offset;
     _outline_offsety = _length/2 - _corner_hole_offset;
-    translate([_outline_offsetx, _outline_offsety, -(height+standoff_height)]) {        
+    #translate([_outline_offsetx, _outline_offsety, -(height+standoff_height)]) {        
       difference() {
           hull() {
                translate([-_width/2 + _corner_radius, -_length/2 + _corner_radius, 0]) cylinder(h=1, r=_corner_radius);
@@ -211,7 +220,7 @@ module relay_mount(positive_shape = true) {
         if (outlines) {
             relay_width = 52;
             relay_length = 25;
-            #translate([0,0,0]) myoutline(_width=relay_width, _length=relay_length);
+            translate([0,0,0]) myoutline(_width=relay_width, _length=relay_length);
         }
     } else {
         translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");
@@ -220,6 +229,28 @@ module relay_mount(positive_shape = true) {
         translate([urx, ury, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");    
     }
 }
+
+/////// TERMINAL BLOCK ////////
+module tb_mount(positive_shape = true) {
+    tb_mount_width =  83;    
+    x = 0;    
+    x2 = x + tb_mount_width;    
+    if (positive_shape) {
+        translate([x, 0, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3", nostandoff=true);
+        translate([x2, 0, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3", nostandoff=true);   
+        
+        if (outlines) {
+            tb_width = 94;
+            tb_length = 42.5;
+            delta_x = tb_mount_width-tb_width;
+            translate([-2,-15,0]) myoutline(_width=tb_width, _length=tb_length);
+        }
+    } else {
+        translate([x, 0, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3", nostandoff=true);
+        translate([x2, 0, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3", nostandoff=true);     
+    }
+}
+
 
 intersection() {
     difference() {                
@@ -230,6 +261,8 @@ intersection() {
             translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=true);
             translate([arduino_llx,arduino_lly,0]) rotate([0,0,arduino_rot]) arduino_mount(positive_shape=true);
             translate([relay_llx,relay_lly,0]) rotate([0,0,relay_rot]) relay_mount(positive_shape=true);
+            translate([tb1_llx,tb1_lly,0]) rotate([0,0,tb1_rot]) tb_mount(positive_shape=true);
+            translate([tb2_llx,tb2_lly,0]) rotate([0,0,tb2_rot]) tb_mount(positive_shape=true);            
         }        
         
         translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape = false); 
@@ -237,5 +270,7 @@ intersection() {
         translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=false);
         translate([arduino_llx,arduino_lly,0]) rotate([0,0,arduino_rot]) arduino_mount(positive_shape=false);
         translate([relay_llx,relay_lly,0]) rotate([0,0,relay_rot]) relay_mount(positive_shape=false);
+        translate([tb1_llx,tb1_lly,0]) rotate([0,0,tb1_rot]) tb_mount(positive_shape=false);
+        translate([tb2_llx,tb2_lly,0]) rotate([0,0,tb2_rot]) tb_mount(positive_shape=false);        
     }
 }
