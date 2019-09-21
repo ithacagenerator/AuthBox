@@ -23,6 +23,11 @@ psu_llx = -100;
 psu_lly = -100;
 psu_rot = 0;
 
+// this is the coordinates of the center hole in the corner of the rfid reader
+rfid_llx = 100;
+rfid_lly = 0;
+rfid_rot = 0;
+
 module mynutcatch(nut_type="M2.5", hole_type="M3") {
     echo(nut_type);
     echo(hole_type);
@@ -129,15 +134,42 @@ module psu_mount(positive_shape = true) {
     }
 }
 
+/////// SEEED RFID READER////////
+module rfid_mount(positive_shape = true) {
+    rfid_mount_width =  19;
+    rfid_mount_length = 30.5;    
+    llx = 0;
+    lly = 0;
+    urx = llx + rfid_mount_width;
+    ury = lly + rfid_mount_length;
+    if (positive_shape) {
+        translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M3");
+        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M3");
+        translate([(urx+llx)/2, ury, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M3");
+        
+        if (outlines) {
+            rfid_width = 24.5;
+            rfid_length = 43.5;
+            translate([0, rfid_mount_width-rfid_width, 0]) myoutline(_width=rfid_width, _length=rfid_length);
+        }
+    } else {
+        translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M3");
+        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M3");
+        translate([(urx+llx)/2, ury, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M3");
+    }
+}
+
 intersection() {
     difference() {                
         union() {
             translate([0, 0, -height/2]) cube([width, length, height], center=true); // this is the substrate "floor"
             translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape=true);
             translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=true);
+            translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=true);
         }        
         
         translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape = false); 
         translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=false);
+        translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=false);
     }
 }
