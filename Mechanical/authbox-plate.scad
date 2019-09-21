@@ -33,6 +33,12 @@ arduino_llx = -100;
 arduino_lly = 20;
 arduino_rot = 0;
 
+// these are thecoordinates of the hole in the corner of the arduino
+relay_llx = 50;
+relay_lly = -50;
+relay_rot = 0;
+
+
 module mynutcatch(nut_type="M2.5", hole_type="M3") {
     translate([0,0,epsilon]) nutcatch_parallel(name=nut_type);       
     translate([0,0,20]) hole_through(name=hole_type);
@@ -188,6 +194,33 @@ module arduino_mount(positive_shape = true) {
     }
 }
 
+/////// RELAY ////////
+module relay_mount(positive_shape = true) {
+    relay_mount_width =  45.5;
+    relay_mount_length = 19;    
+    llx = 0;
+    lly = 0;
+    urx = llx + relay_mount_width;
+    ury = lly + relay_mount_length;
+    if (positive_shape) {
+        translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3");
+        translate([llx, ury, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3");
+        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3");
+        translate([urx, ury, 0]) mynutcatch_and_standoff(positive_shape=true,nut_type="M3");     
+        
+        if (outlines) {
+            relay_width = 52;
+            relay_length = 25;
+            #translate([0,0,0]) myoutline(_width=relay_width, _length=relay_length);
+        }
+    } else {
+        translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");
+        translate([llx, ury, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");
+        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");
+        translate([urx, ury, 0]) mynutcatch_and_standoff(positive_shape=false,nut_type="M3");    
+    }
+}
+
 intersection() {
     difference() {                
         union() {
@@ -196,11 +229,13 @@ intersection() {
             translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=true);
             translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=true);
             translate([arduino_llx,arduino_lly,0]) rotate([0,0,arduino_rot]) arduino_mount(positive_shape=true);
+            translate([relay_llx,relay_lly,0]) rotate([0,0,relay_rot]) relay_mount(positive_shape=true);
         }        
         
         translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape = false); 
         translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=false);
         translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=false);
         translate([arduino_llx,arduino_lly,0]) rotate([0,0,arduino_rot]) arduino_mount(positive_shape=false);
+        translate([relay_llx,relay_lly,0]) rotate([0,0,relay_rot]) relay_mount(positive_shape=false);
     }
 }
