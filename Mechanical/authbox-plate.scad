@@ -167,7 +167,7 @@ module rfid_mount(positive_shape = true) {
         if (outlines) {
             rfid_width = 24.5;
             rfid_length = 43.5;
-            translate([0, rfid_mount_width-rfid_width, 0]) myoutline(_width=rfid_width, _length=rfid_length);
+            translate([1, -6, 0]) myoutline(_width=rfid_width, _length=rfid_length);
         }
     } else {
         translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M3");
