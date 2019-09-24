@@ -3,50 +3,51 @@ include <cyl_head_bolt.scad>
 $fn = 64;
 epsilon=0.1;
 height = 6;
-width = 600;
-length = 600;
+width = 320;
+length = 140;
+padding = 25.4/4; // a quarter inch of pading
 screw_length = 9;
 standoff_height=screw_length - height;
 standoff_inner_diameter=3;
 standoff_outer_diameter=6;
 
-outlines=true;
+outlines=false;
 outline_width = 1;
 
 // these are the coordinates of the hole in the corner of the raspberry pi nearest the header pins
-raspberrypi_llx = 10;
-raspberrypi_lly = 10;
+raspberrypi_llx = -70; 
+raspberrypi_lly = -60.5;
 raspberrypi_rot = 0;
 
 // these are the coordinates of the hole in the corner of the d-30 power supply
-psu_llx = -100;
-psu_lly = -100;
-psu_rot = 0;
+psu_llx = -290;
+psu_lly = 122.5/2;
+psu_rot = 270;
 
 // these are the coordinates of the hole in the corner of the rfid reader
-rfid_llx = 110;
-rfid_lly = 20;
-rfid_rot = 0;
+rfid_llx = -85;
+rfid_lly = -3;
+rfid_rot = 90;
 
 // these are thecoordinates of the hole in the corner of the arduino
-arduino_llx = -100;
-arduino_lly = 20;
+arduino_llx = -65;
+arduino_lly = 16.25;
 arduino_rot = 0;
 
 // these are thecoordinates of the hole in the corner of the arduino
-relay_llx = 50;
-relay_lly = -20;
+relay_llx = -182;
+relay_lly = -8.5;
 relay_rot = 0;
 
 // these are thecoordinates of the hole in the corner of the terminal block #1
-tb1_llx = 50;
-tb1_lly = -100;
+tb1_llx = -175;
+tb1_lly = 40.5;
 tb1_rot = 0;
 
 // these are thecoordinates of the hole in the corner of the terminal block #2
-tb2_llx = 50;
-tb2_lly = -50;
-tb2_rot = 0;
+tb2_llx = -92;
+tb2_lly = -40;
+tb2_rot = 180;
 
 module mynutcatch(nut_type="M2.5", hole_type="M3") {
     translate([0,0,epsilon]) nutcatch_parallel(name=nut_type);       
@@ -255,7 +256,7 @@ module tb_mount(positive_shape = true) {
 intersection() {
     difference() {                
         union() {
-            translate([0, 0, -height/2]) cube([width, length, height], center=true); // this is the substrate "floor"
+            translate([-141.5, 0, -height/2]) cube([width, length, height], center=true); // this is the substrate "floor"
             translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape=true);
             translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=true);
             translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=true);
