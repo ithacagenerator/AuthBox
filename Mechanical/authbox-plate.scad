@@ -3,8 +3,8 @@ include <cyl_head_bolt.scad>
 $fn = 64;
 epsilon=0.1;
 height = 6;
-width = 320;
-length = 140;
+width = 325;
+length = 150;
 padding = 25.4/4; // a quarter inch of pading
 screw_length = 9;
 standoff_height=screw_length - height;
@@ -34,7 +34,7 @@ arduino_llx = -65;
 arduino_lly = 16.25;
 arduino_rot = 0;
 
-// these are thecoordinates of the hole in the corner of the arduino
+// these are thecoordinates of the hole in the corner of the relay
 relay_llx = -182;
 relay_lly = -8.5;
 relay_rot = 0;
@@ -128,14 +128,18 @@ module psu_mount(positive_shape = true) {
     lly = 0;
     urx = llx + psu_mount_width;
     ury = lly + psu_mount_length;
+    
+    interior_hole_y1 = 85+7-31;
+    interior_hole_y2 = interior_hole_y1-33;
+    
     if (positive_shape) {
         translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=true, nut_type="M3");
         translate([llx, ury, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=true, nut_type="M3");
         translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=true, nut_type="M3");
         translate([urx, ury, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=true, nut_type="M3");
         
-        translate([llx+73.5, lly-31, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=true, nut_type="M3");
-        translate([llx + 73.5, lly+64, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=true, nut_type="M3");
+        translate([llx+73.5, lly+interior_hole_y1, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=true, nut_type="M3");
+        translate([llx+73.5, lly+interior_hole_y2, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=true, nut_type="M3");
         
         if (outlines) {
             psu_width = 129;
@@ -147,8 +151,8 @@ module psu_mount(positive_shape = true) {
         translate([llx, ury, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
         translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
         translate([urx, ury, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
-        translate([llx + 73.5, lly+31, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
-        translate([llx + 73.5, lly+64, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([llx+73.5, lly+interior_hole_y1, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([llx+73.5, lly+interior_hole_y2, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
     }
 }
 
@@ -161,9 +165,9 @@ module rfid_mount(positive_shape = true) {
     urx = llx + rfid_mount_width;
     ury = lly + rfid_mount_length;
     if (positive_shape) {
-        translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M3");
-        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M3");
-        translate([(urx+llx)/2, ury, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M3");
+        //translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M2.5");
+        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M2.5");
+        translate([(urx+llx)/2, ury, 0]) mynutcatch_and_standoff(positive_shape=true, nostandoff=false, nut_type="M2.5");
         
         if (outlines) {
             rfid_width = 24.5;
@@ -171,16 +175,16 @@ module rfid_mount(positive_shape = true) {
             translate([1, -6, 0]) myoutline(_width=rfid_width, _length=rfid_length);
         }
     } else {
-        translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M3");
-        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M3");
-        translate([(urx+llx)/2, ury, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M3");
+        //translate([llx, lly, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M2.5");
+        translate([urx, lly, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M2.5");
+        translate([(urx+llx)/2, ury, 0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=false, nut_type="M2.5");
     }
 }
 
 /////// ARDUINO ////////
 module arduino_mount(positive_shape = true) {
     arduino_mount_width =  50.8;
-    arduino_mount_length = 15.2 + 27.9;    
+    arduino_mount_length = 15.2 + 27.9 + 5.1;    
     llx = 0;
     lly = 0;
     urx = llx + arduino_mount_width;
@@ -233,7 +237,7 @@ module relay_mount(positive_shape = true) {
 
 /////// TERMINAL BLOCK ////////
 module tb_mount(positive_shape = true) {
-    tb_mount_width =  83;    
+    tb_mount_width =  82;    
     x = 0;    
     x2 = x + tb_mount_width;    
     if (positive_shape) {
@@ -252,11 +256,18 @@ module tb_mount(positive_shape = true) {
     }
 }
 
-
+x_left = -width+24;
+x_right = 12;
+y_top = 69;
+y_bottom = -69;
+y_midpoint=(y_top + y_bottom) / 2;
+x_midpoint=(x_left+x_right)/2;
+x_leftq_midpoint=(x_midpoint+x_left)/2;
+x_rightq_midpoint=(x_midpoint+x_right)/2;
 intersection() {
     difference() {                
         union() {
-            translate([-141.5, 0, -height/2]) cube([width, length, height], center=true); // this is the substrate "floor"
+            translate([-144.5, 0, -height/2]) cube([width, length, height], center=true); // this is the substrate "floor"
             translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape=true);
             translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=true);
             translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=true);
@@ -267,11 +278,27 @@ intersection() {
         }        
         
         translate([raspberrypi_llx,raspberrypi_lly, 0]) rotate([0,0,raspberrypi_rot]) raspberrypi_mount(positive_shape = false); 
-        translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=false);
+        #translate([psu_llx,psu_lly,0]) rotate([0,0,psu_rot]) psu_mount(positive_shape=false);
         translate([rfid_llx,rfid_lly,0]) rotate([0,0,rfid_rot]) rfid_mount(positive_shape=false);
         translate([arduino_llx,arduino_lly,0]) rotate([0,0,arduino_rot]) arduino_mount(positive_shape=false);
         translate([relay_llx,relay_lly,0]) rotate([0,0,relay_rot]) relay_mount(positive_shape=false);
         translate([tb1_llx,tb1_lly,0]) rotate([0,0,tb1_rot]) tb_mount(positive_shape=false);
         translate([tb2_llx,tb2_lly,0]) rotate([0,0,tb2_rot]) tb_mount(positive_shape=false);        
+        
+
+        translate([x_left,y_bottom,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([x_left,y_top,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([x_right,y_bottom,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([x_right,y_top,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        
+        translate([x_midpoint,y_bottom,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([x_midpoint,y_top,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([x_leftq_midpoint,y_bottom,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([x_leftq_midpoint,y_top,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([x_rightq_midpoint,y_bottom,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");
+        translate([x_rightq_midpoint,y_top,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");        
+        
+        translate([x_left,y_midpoint,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");        
+        translate([x_right,y_midpoint,0]) mynutcatch_and_standoff(positive_shape=false, nostandoff=true, nut_type="M3");        
     }
 }
