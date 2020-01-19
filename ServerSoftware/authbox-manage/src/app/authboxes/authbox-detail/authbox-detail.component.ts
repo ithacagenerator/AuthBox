@@ -7,18 +7,9 @@ import { SuccessStatusSnackComponent } from '../../utilities/snackbars/success-s
 import { ErrorStatusSnackComponent } from '../../utilities/snackbars/error-snackbar/error-snackbar.component';
 import { AuthboxAddMemberComponent } from '../authbox-add-member/authbox-add-member.component';
 
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { from } from 'rxjs/observable/from';
-import { merge } from 'rxjs/observable/merge';
-import { of as observableOf } from 'rxjs/observable/of';
-import { catchError } from 'rxjs/operators/catchError';
-import { map } from 'rxjs/operators/map';
-import { startWith } from 'rxjs/operators/startWith';
-import { switchMap } from 'rxjs/operators/switchMap';
-import 'rxjs/add/operator/switchMap';
-
-import { saveAs } from 'file-saver/FileSaver';
+import { Observable, Subscription, from, of, merge } from 'rxjs';
+import { map, startWith, switchMap, catchError } from 'rxjs/operators';
+import { saveAs } from 'file-saver';
 
 /*
   This class should display:
@@ -35,8 +26,8 @@ import { saveAs } from 'file-saver/FileSaver';
 })
 export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   private authbox$: Observable<any>;
   private authboxSub: Subscription;
@@ -51,7 +42,7 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   isLoadingResults = true;
 
   observer;
-  filterUpdate$ = Observable.create((obs) => this.observer = obs);
+  filterUpdate$ = new Observable((obs) => this.observer = obs);
 
   constructor(
     private route: ActivatedRoute,
@@ -71,10 +62,11 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnInit() {
     this.authbox$ = this.route.paramMap
-      .switchMap((params: ParamMap) => {
-        return from([params.get('id')]);
-      });
-
+      .pipe(
+        switchMap((params: ParamMap) => {
+          return from([params.get('id')]);
+        })
+      );
     this.authboxSub = this.authbox$.subscribe((id) => {
       this.authboxName = id;
     });
@@ -82,28 +74,29 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
     merge(this.filterUpdate$, this.sort.sortChange, this.paginator.page)
-      .pipe(
-        startWith({}),
-        switchMap(() => {
-          this.isLoadingResults = true;
-          return this.apiSrvc.getAuthorizationHistory(this.authboxName,
-            this.sort.active, this.sort.direction, this.dataSource.filter,
-            this.paginator.pageIndex);
-        }),
-        map((data) => {
-          // Flip flag to show that loading has finished.
-          this.isLoadingResults = false;
-          this.resultsLength = data.total_count;
-          return data.items;
-        }),
-        catchError((err) => {
-          console.log(err);
-          this.isLoadingResults = false;
-          return observableOf([]);
-        })
-      ).subscribe((data) => {
-        this.dataSource.data = data;
-      });
+    .pipe(
+      startWith({}),
+      switchMap(() => {
+        this.isLoadingResults = true;
+        return this.apiSrvc.getAuthorizationHistory(this.authboxName,
+          this.sort.active, this.sort.direction, this.dataSource.filter,
+          this.paginator.pageIndex);
+      }),
+      map((data: any) => {
+        // Flip flag to show that loading has finished.
+        this.isLoadingResults = false;
+        this.resultsLength = data.total_count;
+        return data.items;
+      }),
+      catchError((err) => {
+        console.log(err);
+        this.isLoadingResults = false;
+        return of([]);
+      })
+    )
+    .subscribe((data) => {
+      this.dataSource.data = data;
+    });
   }
 
   ngAfterViewInit() {

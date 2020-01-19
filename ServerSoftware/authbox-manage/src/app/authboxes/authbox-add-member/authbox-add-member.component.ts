@@ -8,7 +8,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./authbox-add-member.component.scss']
 })
 export class AuthboxAddMemberComponent implements AfterViewInit {
-  @ViewChild('members') members;
+  @ViewChild('members', {static: true}) members;
 
   selectedMembers = [];
 

@@ -7,7 +7,7 @@ import { ApiService } from '../../api.service';
 import { MatTableDataSource, MatSort, MatSnackBar } from '@angular/material';
 import { SuccessStatusSnackComponent } from '../../utilities/snackbars/success-snackbar/success-snackbar.component';
 import { ErrorStatusSnackComponent } from '../../utilities/snackbars/error-snackbar/error-snackbar.component';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-auth-boxes',
@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs/Subscription';
   styleUrls: ['./authboxes.component.scss']
 })
 export class AuthBoxesComponent implements AfterViewInit, OnDestroy {
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
   displayedColumns = [
     'name', 'created', 'updated',
     'lastAuthorizedAt', 'lastAuthorizedBy',

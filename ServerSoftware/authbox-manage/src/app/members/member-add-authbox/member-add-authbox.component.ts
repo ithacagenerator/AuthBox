@@ -8,7 +8,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./member-add-authbox.component.scss']
 })
 export class MemberAddAuthboxComponent {
-  @ViewChild('authboxes') authboxes;
+  @ViewChild('authboxes', {static: true}) authboxes;
 
   constructor(
     public dialogRef: MatDialogRef<MemberAddAuthboxComponent>,

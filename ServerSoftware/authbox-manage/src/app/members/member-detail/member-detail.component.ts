@@ -7,18 +7,10 @@ import { SuccessStatusSnackComponent } from '../../utilities/snackbars/success-s
 import { ErrorStatusSnackComponent } from '../../utilities/snackbars/error-snackbar/error-snackbar.component';
 import { MemberAddAuthboxComponent } from '../member-add-authbox/member-add-authbox.component';
 
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { from } from 'rxjs/observable/from';
-import { merge } from 'rxjs/observable/merge';
-import { of as observableOf } from 'rxjs/observable/of';
-import { catchError } from 'rxjs/operators/catchError';
-import { map } from 'rxjs/operators/map';
-import { startWith } from 'rxjs/operators/startWith';
-import { switchMap } from 'rxjs/operators/switchMap';
-import 'rxjs/add/operator/switchMap';
+import { Observable, Subscription, from, merge, of } from 'rxjs';
+import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 
-import { saveAs } from 'file-saver/FileSaver';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-member-detail',
@@ -27,8 +19,8 @@ import { saveAs } from 'file-saver/FileSaver';
 })
 export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   private member$: Observable<any>;
   private memberSub: Subscription;
@@ -65,9 +57,11 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.member$ = this.route.paramMap
-      .switchMap((params: ParamMap) => {
-        return from([params.get('id')]);
-      });
+      .pipe(
+        switchMap((params: ParamMap) => {
+          return from([params.get('id')]);
+        })
+      );
 
     this.memberSub = this.member$.subscribe((name) => {
       this.memberName = name;
@@ -94,7 +88,7 @@ export class MemberDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         catchError((err) => {
           console.log(err);
           this.isLoadingResults = false;
-          return observableOf([]);
+          return of([]);
         })
       ).subscribe((data) => {
         this.dataSource.data = data;
