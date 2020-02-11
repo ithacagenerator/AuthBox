@@ -1,4 +1,4 @@
-/* jshint esversion:6 */
+/* jshint esversion: 8 */
 
 var express = require('express');
 var router = express.Router();
@@ -860,6 +860,57 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
     console.error(err);
     res.status(422).json({error: err.message});
   });
+});
+
+router.get('/members/active/:secret', async (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});
+    return;
+  }
+
+  // interrogate the Members collection for members whose last
+  // PayPal subscription entry is of txn_type === 'payment'
+  // and whose last IPN doesn't indicate subscr_eot
+  // or who has the benefactor flag
+  try {
+    let activeMembers = await findDocuments('Members', {
+      $or: [
+        {'paypal.txn_type': 'subscr_payment'},
+        {lifetimeMember: true}
+      ]
+    });
+    activeMembers = activeMembers || [];
+    res.json(
+      activeMembers
+      .filter(member => {
+        if (member.lifetimeMember) {
+          return true;
+        }
+
+        if(!member.paypal) {
+          return false;
+        }
+
+        const lastIPN = member.paypal.slice(-1)[0];
+        if(!lastIPN) {
+          return false;
+        }
+
+        return (lastIPN.txn_type !== 'subscr_eot');
+      })
+      .map(member => {
+        const name = member.name || 'Unknown Name';
+        const lastIPN = member.paypal.slice(-1)[0];
+        const registration = member.registration || {};
+        const firstname = registration.firstname || lastIPN.first_name || 'Unkown Firstname';
+        const lastname = registration.lastname || lastIPN.last_name || 'Unkown Lastname';
+        return { name, firstname, lastname };
+      })
+    );
+  } catch (e) {
+    console.error(e.message || e, e.stack);
+    res.status(500).json({error: e.message || 'Unknown error'});
+  }
 });
 
 // cURL: curl -X GET https://ithacagenerator.org/authbox/v1/authboxes/history/AUTHBOX_NAME/PASSWORD?sort=SORT&order=ORDER&page=PAGE
