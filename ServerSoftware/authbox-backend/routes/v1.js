@@ -983,7 +983,7 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
         period: from.format('YYYY-MM'),
         members: namifiedMembers
       });
-      results.members = new Set(...results.members, ...namifiedMembers.map(v => v.name));
+      results.members = new Set([...results.members, ...namifiedMembers.map(v => v.name)]);
       from.add(1, 'month');
     }
 
