@@ -24,14 +24,14 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../authbox-manage/dist')));
+app.use(express.static(path.join(__dirname, '../authbox-manage/dist/authbox')));
 
-console.log(path.join(__dirname, '../authbox-manage/dist'));
+console.log(path.join(__dirname, '../authbox-manage/dist/authbox'));
 
 app.use('/', index);
 app.use('/v1', v1);
 
-app.get('*', function(req, res, next) { res.sendFile(path.join(__dirname, '../authbox-manage/dist/index.html')); });
+app.get('*', function(req, res, next) { res.sendFile(path.join(__dirname, '../authbox-manage/dist/authbox/index.html')); });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
