@@ -862,6 +862,37 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   });
 });
 
+function namifyMember(member) {
+  let name = member.name || 'Unknown Name';
+  const lastIPN = ((member.paypal || [{}]).slice(-1)[0]) || {};
+  const registration = member.registration || {};
+  let firstname = registration.firstname || lastIPN.first_name || 'Unknown Firstname';
+  let lastname = registration.lastname || lastIPN.last_name || 'Unknown Lastname';
+  if ((firstname.length < 2) && lastIPN.first_name && (lastIPN.first_name.length > 2)) {
+    firstname = lastIPN.first_name;
+  }
+
+  if ((lastname.length < 2) && lastIPN.last_name && (lastIPN.last_name.length > 2)) {
+    lastname = lastIPN.last_name;
+  }
+
+  if (name.length < 5) {
+    name = 'Unknown Name';
+  }
+  if ((name === 'Unknown Name') && (firstname.indexOf('Unknown') < 0)) {
+    name = firstname;
+  }
+  if (lastname.indexOf('Unknown') < 0) {
+    if (name === 'Unknown Name') {
+      name = lastname;
+    } else if (name === firstname) {
+      name += ' ' + lastname;
+    }
+  }
+
+  return { name, firstname, lastname };
+}
+
 router.get('/members/active/:secret', async (req, res, next) => {
   if(req.params.secret !== secret){
     res.status(401).json({error: 'secret is incorrect'});
@@ -880,55 +911,63 @@ router.get('/members/active/:secret', async (req, res, next) => {
       ]
     });
     activeMembers = activeMembers || [];
+    activeMembers = activeMembers
+    .filter(member => {
+      if (member.lifetimeMember) {
+        return true;
+      }
+
+      if(!Array.isArray(member.paypal)) {
+        return false;
+      }
+
+      const lastIPN = member.paypal.slice(-1)[0];
+      if(!lastIPN) {
+        return false;
+      }
+
+      return (lastIPN.txn_type !== 'subscr_eot');
+    });
+
     res.json(
-      activeMembers
-      .filter(member => {
-        if (member.lifetimeMember) {
-          return true;
-        }
-
-        if(!Array.isArray(member.paypal)) {
-          return false;
-        }
-
-        const lastIPN = member.paypal.slice(-1)[0];
-        if(!lastIPN) {
-          return false;
-        }
-
-        return (lastIPN.txn_type !== 'subscr_eot');
-      })
-      .map(member => {
-        let name = member.name || 'Unknown Name';
-        const lastIPN = ((member.paypal || [{}]).slice(-1)[0]) || {};
-        const registration = member.registration || {};
-        let firstname = registration.firstname || lastIPN.first_name || 'Unknown Firstname';
-        let lastname = registration.lastname || lastIPN.last_name || 'Unknown Lastname';
-        if ((firstname.length < 2) && lastIPN.first_name && (lastIPN.first_name.length > 2)) {
-          firstname = lastIPN.first_name;
-        }
-
-        if ((lastname.length < 2) && lastIPN.last_name && (lastIPN.last_name.length > 2)) {
-          lastname = lastIPN.last_name;
-        }
-
-        if (name.length < 5) {
-          name = 'Unknown Name';
-        }
-        if ((name === 'Unknown Name') && (firstname.indexOf('Unknown') < 0)) {
-          name = firstname;
-        }
-        if (lastname.indexOf('Unknown') < 0) {
-          if (name === 'Unknown Name') {
-            name = lastname;
-          } else if (name === firstname) {
-            name += ' ' + lastname;
-          }
-        }
-
-        return { name, firstname, lastname };
-      })
+      activeMembers.map(namifyMember)
     );
+  } catch (e) {
+    console.error(e.message || e, e.stack);
+    res.status(500).json({error: e.message || 'Unknown error'});
+  }
+});
+
+router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
+  if(req.params.secret !== secret){
+    res.status(401).json({error: 'secret is incorrect'});
+    return;
+  }
+
+  const from = moment(req.params.from, 'MM-YYYY');
+  const to = moment(req.params.to, 'MM-YYYY');
+  if (!from.isValid()) {
+    res.status(422).json({error: `Failed to parse From date (${req.params.from}) using MM-YYYY`});
+    return;
+  }
+
+  if (!to.isValid()) {
+    res.status(422).json({error: `Failed to parse To date (${req.params.to}) using MM-YYYY`});
+    return;
+  }
+
+  if (from.isAfter(to)) {
+    res.status(422).json({error: `From date (${req.params.from}) is not after To date (${req.params.to})`});
+    return;
+  }
+
+  const results = [];
+  try {
+    while (from.isSameOrBefore(to)) {
+      const members =
+      from.add(1, month);
+    }
+    res.json(results);
   } catch (e) {
     console.error(e.message || e, e.stack);
     res.status(500).json({error: e.message || 'Unknown error'});
