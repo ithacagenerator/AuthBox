@@ -938,6 +938,8 @@ router.get('/members/active/:secret', async (req, res, next) => {
   }
 });
 
+// TODO: this currently doesn't account for lifetime members
+// TODO: this currently doesn't account for scholarship members
 router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
   if(req.params.secret !== secret){
     res.status(401).json({error: 'secret is incorrect'});
@@ -961,12 +963,31 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
     return;
   }
 
-  const results = [];
+  const results = {
+    data: [],
+    members: new Set()
+  };
   try {
     while (from.isSameOrBefore(to)) {
-      const members =
+      const paymentDateRegex = new RegExp(from.format('MMM') + '.*' + from.format('YYYY'));
+      const members = await findDocuments('Members', {
+        paypal: {
+          $elemMatch: {
+            txn_type: 'subscr_payment',
+            payment_date: { $regex: paymentDateRegex }
+          }
+        }
+      });
+      const namifiedMembers = members.map(namifyMember);
+      results.data.push({
+        period: from.format('YYYY-MM'),
+        members: namifiedMembers
+      });
+      results.members = new Set(...results.members, ...namifiedMembers.map(v => v.name));
       from.add(1, month);
     }
+
+    results.members = Array.from(results.members);
     res.json(results);
   } catch (e) {
     console.error(e.message || e, e.stack);
