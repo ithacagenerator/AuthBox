@@ -899,11 +899,30 @@ router.get('/members/active/:secret', async (req, res, next) => {
         return (lastIPN.txn_type !== 'subscr_eot');
       })
       .map(member => {
-        const name = member.name || 'Unknown Name';
+        let name = member.name || 'Unknown Name';
         const lastIPN = ((member.paypal || [{}]).slice(-1)[0]) || {};
         const registration = member.registration || {};
-        const firstname = registration.firstname || lastIPN.first_name || 'Unkown Firstname';
-        const lastname = registration.lastname || lastIPN.last_name || 'Unkown Lastname';
+        let firstname = registration.firstname || lastIPN.first_name || 'Unknown Firstname';
+        let lastname = registration.lastname || lastIPN.last_name || 'Unknown Lastname';
+        if ((firstname.length < 2) && lastIPN.first_name && (lastIPN.first_name.length > 2)) {
+          firstname = lastIPN.first_name;
+        }
+
+        if ((lastname.length < 2) && lastIPN.last_name && (lastIPN.last_name.length > 2)) {
+          lastname = lastIPN.last_name;
+        }
+
+        if (name === 'Unknown' && (firstname.indexOf('Unknown') < 0)) {
+          name = firstname;
+        }
+        if (lastname.indexOf('Unknown') < 0) {
+          if (name === 'Unknown') {
+            name = lastname;
+          } else if (name === firstname) {
+            name += ' ' + lastname;
+          }
+        }
+
         return { name, firstname, lastname };
       })
     );
