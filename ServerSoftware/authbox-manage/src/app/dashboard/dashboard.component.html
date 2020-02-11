@@ -9,4 +9,10 @@
       {{ memberStatus(member, period) }}
     </td>
   </tr>
+  <tr>
+    <th> Totals: </th>
+    <td *ngFor="let period of periods">
+      {{ data[period]?.members?.length }}
+    </td>
+  </tr>
 </table>
