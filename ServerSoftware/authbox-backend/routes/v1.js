@@ -900,7 +900,7 @@ router.get('/members/active/:secret', async (req, res, next) => {
       })
       .map(member => {
         const name = member.name || 'Unknown Name';
-        const lastIPN = member.paypal.slice(-1)[0];
+        const lastIPN = ((member.paypal || [{}]).slice(-1)[0]) || {};
         const registration = member.registration || {};
         const firstname = registration.firstname || lastIPN.first_name || 'Unkown Firstname';
         const lastname = registration.lastname || lastIPN.last_name || 'Unkown Lastname';
