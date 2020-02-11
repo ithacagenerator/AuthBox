@@ -946,15 +946,15 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
     return;
   }
 
-  const from = moment(req.params.from, 'MM-YYYY');
-  const to = moment(req.params.to, 'MM-YYYY');
+  const from = moment(req.params.from, 'YYYY-MM');
+  const to = moment(req.params.to, 'YYYY-MM');
   if (!from.isValid()) {
-    res.status(422).json({error: `Failed to parse From date (${req.params.from}) using MM-YYYY`});
+    res.status(422).json({error: `Failed to parse From date (${req.params.from}) using YYYY-MM`});
     return;
   }
 
   if (!to.isValid()) {
-    res.status(422).json({error: `Failed to parse To date (${req.params.to}) using MM-YYYY`});
+    res.status(422).json({error: `Failed to parse To date (${req.params.to}) using YYYY-MM`});
     return;
   }
 
