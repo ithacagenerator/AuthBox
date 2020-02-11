@@ -912,6 +912,9 @@ router.get('/members/active/:secret', async (req, res, next) => {
           lastname = lastIPN.last_name;
         }
 
+        if (name.length < 5) {
+          name = 'Unknown Name';
+        }
         if ((name === 'Unknown Name') && (firstname.indexOf('Unknown') < 0)) {
           name = firstname;
         }
