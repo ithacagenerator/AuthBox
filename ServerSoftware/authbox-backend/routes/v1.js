@@ -887,7 +887,7 @@ router.get('/members/active/:secret', async (req, res, next) => {
           return true;
         }
 
-        if(!member.paypal) {
+        if(!Array.isArray(member.paypal)) {
           return false;
         }
 
