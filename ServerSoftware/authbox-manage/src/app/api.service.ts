@@ -156,4 +156,16 @@ export class ApiService {
     }
     return this._http.get(apiUrl, options).toPromise<any>();
   }
+
+  public getActiveMembers() {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/members/active//${password}`;
+    return this._http.get(apiUrl).toPromise<any>();
+  }
+
+  public getHistoricMembership(from, to) {
+    const password = this._passwordService.getPassword();
+    const apiUrl = `${this.apiBase}/members/historic/${from}/${to}/${password}`;
+    return this._http.get(apiUrl).toPromise<any>();
+  }
 }
