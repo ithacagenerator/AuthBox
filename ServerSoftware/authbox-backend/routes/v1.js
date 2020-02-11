@@ -984,7 +984,7 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
         members: namifiedMembers
       });
       results.members = new Set(...results.members, ...namifiedMembers.map(v => v.name));
-      from.add(1, month);
+      from.add(1, 'month');
     }
 
     results.members = Array.from(results.members);
