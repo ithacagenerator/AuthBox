@@ -965,7 +965,8 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
 
   const results = {
     data: [],
-    members: new Set()
+    members: new Set(),
+    periods: []
   };
   try {
     while (from.isSameOrBefore(to)) {
@@ -988,6 +989,7 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
     }
 
     results.members = Array.from(results.members);
+    results.periods = results.data.map(v => v.period);
     res.json(results);
   } catch (e) {
     console.error(e.message || e, e.stack);
