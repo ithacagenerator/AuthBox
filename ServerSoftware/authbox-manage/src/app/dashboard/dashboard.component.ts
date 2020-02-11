@@ -53,7 +53,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log('hello');
     const p = this.data.find(v => v.period === period);
     if (p) {
-      const m = (p.members || []).find(v => v === member);
+      const m = (p.members || []).find(v => v.name === member);
       if (m) {
         return '✔️';
       }
