@@ -979,17 +979,20 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
           }
         }
       });
+
       const namifiedMembers = members.map(namifyMember);
+      const period = from.format('YYYY-MM');
       results.data.push({
-        period: from.format('YYYY-MM'),
+        period,
         members: namifiedMembers
       });
       results.members = new Set([...results.members, ...namifiedMembers.map(v => v.name)]);
+      results.periods.push(period);
+
       from.add(1, 'month');
     }
 
     results.members = Array.from(results.members);
-    results.periods = results.data.map(v => v.period);
     res.json(results);
   } catch (e) {
     console.error(e.message || e, e.stack);
