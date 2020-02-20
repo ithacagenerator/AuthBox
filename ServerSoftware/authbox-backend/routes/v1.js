@@ -1028,16 +1028,9 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
   let previousMembers = [];
   try {
     while (from.isSameOrBefore(to)) {
-      if (from.format('MM-YYYY') === moment().format('MM-YYYY')) {
-
-      }
-
       const paymentDateRegex = new RegExp(from.format('MMM') + '.*' + from.format('YYYY'));
-      const members = await findDocuments('Members', {
+      const query = {
         $or: [
-          {
-            name: {$in: previousMembers.map(v => v.name)}
-          },
           {
             paypal: {
               $elemMatch: {
@@ -1047,8 +1040,14 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
             }
           }
         ]
-      });
+      };
+      if (from.format('MM-YYYY') === moment().format('MM-YYYY')) {
+        query.$or.push(          {
+          name: {$in: previousMembers.map(v => v.name)}
+        });
+      }
 
+      const members = await findDocuments('Members', query);
       previousMembers = members;
 
       const period = from.format('YYYY-MM');
