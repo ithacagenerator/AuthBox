@@ -862,7 +862,14 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
   });
 });
 
-function namifyMember(member) {
+function namifyMember(period, member) {
+  const periodRegex = new RegExp(period.format('MMM') + '.*' + period.format('YYYY'));
+  period = moment(period);
+  const periodIsCurrent = period.format('MM-YYYY') === moment().format('MM-YYYY');
+
+  period.subtract(1, 'month');
+  const previousPeriodRegex = new RegExp(period.format('MMM') + '.*' + period.format('YYYY'));
+
   let name = member.name || 'Unknown Name';
   const lastIPN = ((member.paypal || [{}]).slice(-1)[0]) || {};
   const registration = member.registration || {};
@@ -890,7 +897,51 @@ function namifyMember(member) {
     }
   }
 
-  return { name, firstname, lastname };
+  // for the given period, determine if there was a payment, an eot, both, or neither
+  // in the case of neither, determine if there was a payment within the previous month
+  //   if their was a payment consider the membership 'terminal',
+  //   otherwise consider the membership 'dormant'
+  // if there was a payment only, consider the membership 'active'
+  // if there was an eot only, consider the membership 'terminal'
+  // if there was both an eot and a payment,
+  //   if the last thing in the period was a payment, consider the membership 'new'
+  //   otherwise consider the membership 'terminal'
+  const periodTransactions = member.paypal.filter(v => periodRegex.test(v.payment_date));
+  const periodHasPayments = !!periodTransactions.find(v => v.txn_type === 'subscr_payment');
+  const periodHasEots = !!periodTransactions.find(v => v.txn_type === 'subscr_eot');
+  let status = '';
+  if (!periodHasPayments && !periodHasEots) {
+    const previousPeriodTransactions = member.paypal.filter(v => previousPeriodRegex.test(v.payment_date));
+    if (previousPeriodTransactions.length > 0) {
+      lastTransactionInPreviousPeriod = previousPeriodTransactions.slice(-1)[0];
+      if (lastTransactionInPreviousPeriod.txn_type === 'payment') {
+        // terminal unless period is representative of the current calendar month / year
+        // in which case a bit more math is needed
+        status = 'terminal';
+        if (periodIsCurrent) {
+          // it's active if the payment is less than a month old
+          const lastPaymentMoment = moment(lastTransactionInPreviousPeriod.payment_date,
+            'HH:mm:ss MMM DD, YYYY zz');
+          const oneMonthAgo = moment();
+          oneMonthAgo.subtract(1, 'month');
+          if (oneMonthAgo.isSameOrBefore(lastPaymentMoment)) {
+            status = 'active';
+          }
+        }
+      }
+    } else {
+      status = 'dormant';
+    }
+  } else if (periodHasPayments && !periodHasEots) {
+    status = 'active';
+  } else if (periodHasEots && !periodHasPayments) {
+    status = 'terminal';
+  } else if (periodHasPayments && periodHasEots) {
+    status = periodTransactions.slice(-1)[0].txn_type === 'subscr_payment' ?
+      'new' : 'terminal';
+  }
+
+  return { name, firstname, lastname, status };
 }
 
 router.get('/members/active/:secret', async (req, res, next) => {
@@ -940,6 +991,10 @@ router.get('/members/active/:secret', async (req, res, next) => {
 
 // TODO: this currently doesn't account for lifetime members
 // TODO: this currently doesn't account for scholarship members
+//
+// How do you know if a member is active in a given month/year?
+// -- trivially if there is a subscr_payment for a member in a given month/year YES
+// -- but in order to determine which subscriptions truly ended in a given month
 router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
   if(req.params.secret !== secret){
     res.status(401).json({error: 'secret is incorrect'});
@@ -963,11 +1018,14 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
     return;
   }
 
-  const results = {
+  from.subtract(1, 'month'); // you have to consider the month before to get a complete list of members to evaluate
+
+  const payment_results = {
     data: [],
     members: new Set(),
     periods: []
   };
+
   try {
     while (from.isSameOrBefore(to)) {
       const paymentDateRegex = new RegExp(from.format('MMM') + '.*' + from.format('YYYY'));
@@ -980,20 +1038,24 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
         }
       });
 
-      const namifiedMembers = members.map(namifyMember);
       const period = from.format('YYYY-MM');
-      results.data.push({
+      const namifiedMembers = members.map(namifyMember.bind(null, from));
+      payment_results.data.push({
         period,
         members: namifiedMembers
       });
-      results.members = new Set([...results.members, ...namifiedMembers.map(v => v.name)]);
-      results.periods.push(period);
+      payment_results.members = new Set([...payment_results.members, ...namifiedMembers.map(v => v.name)]);
+      payment_results.periods.push(period);
 
       from.add(1, 'month');
     }
 
-    results.members = Array.from(results.members);
-    res.json(results);
+    // the first data set was just to collect members from the previous month
+    payment_results.members = Array.from(payment_results.members);
+    payment_results.periods = payment_results.periods.slice(1);
+    payment_results.data = payment_results.data.slice(1);
+
+    res.json(payment_results);
   } catch (e) {
     console.error(e.message || e, e.stack);
     res.status(500).json({error: e.message || 'Unknown error'});

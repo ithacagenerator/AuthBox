@@ -30,7 +30,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
             moment().format('YYYY-MM'));
 
           this.periods = data.periods;
-          this.members = data.members;
+          this.members = data.members.sort((a, b) => {
+            const aLast = a.split(' ').slice(-1)[0];
+            const bLast = b.split(' ').slice(-1)[0];
+            if (aLast < bLast) { return -1; }
+            if (aLast > bLast) { return +1; }
+            return 0;
+          });
           this.data = data.data;
         } catch (e) {
           console.error(e.message || e, e.stack);
