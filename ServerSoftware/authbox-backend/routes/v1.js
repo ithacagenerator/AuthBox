@@ -1064,7 +1064,13 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
     }
 
     // the first data set was just to collect members from the previous month
-    payment_results.members = Array.from(payment_results.members);
+    payment_results.members = Array.from(payment_results.members).sort((a, b) => {
+      const aSort = a.split(' ').slice(-1)[0];
+      const bSort = b.split(' ').slice(-1)[0];
+      if (aSort < bSort) return -1;
+      if (aSort > bSort) return +1;
+      return 0;
+    });
     payment_results.periods = payment_results.periods.slice(1);
     payment_results.data = payment_results.data.slice(1);
 
