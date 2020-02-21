@@ -4,9 +4,9 @@
     <th *ngFor="let period of periods"> {{ period }}</th>
   </tr>
   <tr *ngFor="let member of members">
-    <th> {{ member }} </th>
-    <td *ngFor="let period of periods">
-      {{ memberStatus(member, period) }}
+    <th class="member-name"> {{ member }} </th>
+    <td *ngFor="let period of periods" style="text-align: center;">
+      <span [ngClass]="checkMarkClass(member, period)">{{ memberStatus(member, period) }}</span>
     </td>
   </tr>
   <tr>

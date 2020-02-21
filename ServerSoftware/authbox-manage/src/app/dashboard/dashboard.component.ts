@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
 
@@ -56,7 +56,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   memberStatus(member, period) {
-    console.log('hello');
     const p = this.data.find(v => v.period === period);
     if (p) {
       const m = (p.members || []).find(v => v.name === member);
@@ -65,5 +64,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     }
     return ' ';
+  }
+
+  checkMarkClass(member, period) {
+    const p = this.data.find(v => v.period === period);
+    if (p) {
+      const m = (p.members || []).find(v => v.name === member);
+      if (m) {
+        return `checkmark-${m.status}`;
+      }
+    }
+    return '';
   }
 }
