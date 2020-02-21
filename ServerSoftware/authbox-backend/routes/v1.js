@@ -945,7 +945,7 @@ function namifyMember(period, member) {
   }
 
   if (name === 'John Hobart') {
-    console.log(JSON.stringify({name, periodHasPayments, periodHasEots, periodHasSignup}, null, 2));
+    console.log(JSON.stringify({name, paypal: member.paypal, periodHasPayments, periodHasEots, periodHasSignup}, null, 2));
   }
 
   return { name, firstname, lastname, status };
