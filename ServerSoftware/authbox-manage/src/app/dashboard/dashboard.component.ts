@@ -71,6 +71,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (p) {
       const m = (p.members || []).find(v => v.name === member);
       if (m) {
+        console.log(m.status);
         return `checkmark-${m.status}`;
       }
     }
