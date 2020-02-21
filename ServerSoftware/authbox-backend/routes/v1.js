@@ -906,7 +906,7 @@ function namifyMember(period, member) {
   // if there was both an eot and a payment,
   //   if the last thing in the period was a payment, consider the membership 'new'
   //   otherwise consider the membership 'terminal'
-  const periodTransactions = member.paypal.filter(v => periodRegex.test(v.payment_date));
+  const periodTransactions = member.paypal.filter(v => periodRegex.test(v.payment_date) || periodRegex.test(v.subscr_date) || periodRegex.test(v.eot_date));
   const periodHasPayments = !!periodTransactions.find(v => v.txn_type === 'subscr_payment');
   const periodHasEots = !!periodTransactions.find(v => v.txn_type === 'subscr_eot');
   const periodHasSignup = !!periodTransactions.find(v => v.txn_type === 'subscr_signup');
