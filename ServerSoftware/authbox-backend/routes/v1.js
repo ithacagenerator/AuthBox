@@ -909,6 +909,7 @@ function namifyMember(period, member) {
   const periodTransactions = member.paypal.filter(v => periodRegex.test(v.payment_date));
   const periodHasPayments = !!periodTransactions.find(v => v.txn_type === 'subscr_payment');
   const periodHasEots = !!periodTransactions.find(v => v.txn_type === 'subscr_eot');
+
   let status = '';
   if (!periodHasPayments && !periodHasEots) {
     const previousPeriodTransactions = member.paypal.filter(v => previousPeriodRegex.test(v.payment_date));
@@ -939,6 +940,10 @@ function namifyMember(period, member) {
   } else if (periodHasPayments && periodHasEots) {
     status = periodTransactions.slice(-1)[0].txn_type === 'subscr_payment' ?
       'new' : 'terminal';
+  }
+
+  if (name === 'Eli Kantrowitz') {
+    console.log(JSON.stringify({name, periodHasPayments, periodHasEots}, null, 2));
   }
 
   return { name, firstname, lastname, status };
