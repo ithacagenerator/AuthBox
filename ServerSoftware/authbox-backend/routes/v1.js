@@ -944,7 +944,7 @@ function namifyMember(period, member) {
       'new' : 'terminal';
   }
 
-  if (name === 'Jim Holahan') {
+  if (name === '') {
     console.log(JSON.stringify(member.paypal.map(v => {
       return {
         txn_type: v.txn_type,

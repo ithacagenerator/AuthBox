@@ -60,7 +60,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (p) {
       const m = (p.members || []).find(v => v.name === member);
       if (m) {
-        return '✔️';
+        return '✓';
       }
     }
     return ' ';
