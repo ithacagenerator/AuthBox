@@ -1094,11 +1094,11 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
         ]
       };
 
-      if (from.format('MM-YYYY') === moment().format('MM-YYYY')) {
-        query.$or.push(          {
-          name: {$in: previousMembers.map(v => v.name)}
-        });
-      }
+      // if (from.format('MM-YYYY') === moment().format('MM-YYYY')) {
+      query.$or.push(          {
+        name: {$in: previousMembers.map(v => v.name)}
+      });
+      // }
 
       const members = await findDocuments('Members', query);
       previousMembers = members;
@@ -1107,7 +1107,7 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
       const namifiedMembers = members.map(namifyMember.bind(null, from));
       payment_results.data.push({
         period,
-        members: namifiedMembers
+        members: namifiedMembers.filter(v => v.status !== 'dormant')
       });
       payment_results.members = new Set([...payment_results.members, ...namifiedMembers.map(v => v.name)]);
       payment_results.periods.push(period);
