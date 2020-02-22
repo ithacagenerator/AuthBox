@@ -908,7 +908,31 @@ function namifyMember(period, member) {
   //   otherwise consider the membership 'terminal'
   const periodTransactions = member.paypal.filter(v => periodRegex.test(v.payment_date) || periodRegex.test(v.subscr_date) || periodRegex.test(v.eot_date));
   const periodHasPayments = !!periodTransactions.find(v => v.txn_type === 'subscr_payment');
-  const periodHasEots = !!periodTransactions.find(v => v.txn_type === 'subscr_eot');
+  const reversePayments = member.paypal.filter(v => v.txn_type === 'subscr_payment').reverse();
+  const periodHasEots = !!member.paypal.find((v, idx, arr) => {
+    if (v.txn_type !== 'subscr_eot') {
+      return false;
+    }
+
+    // now that we know it's a subscr_eot, we can deduce the date that it happened
+    // by looking at the subscription id, then find the last payment with the same id
+    // and add one month to it
+    let eot_date = null;
+    const lastPayment = reversePayments.find(vv => vv.subscr_id === v.subscr_id);
+    if (lastPayment) {
+      eot_date = moment(lastPayment.payment_date,
+        'HH:mm:ss MMM DD, YYYY zz');
+      eot_date.add(1, 'month');
+      eot_date = eot_date.format('MMM YYYY');
+    }
+
+    if (eot_date && periodRegex.test(eot_date)) {
+      return true;
+    }
+
+    return false;
+  });
+
   const periodHasSignup = !!periodTransactions.find(v => v.txn_type === 'subscr_signup');
   let status = '';
   if (periodHasSignup && periodHasPayments) {
