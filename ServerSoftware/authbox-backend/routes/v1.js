@@ -1084,13 +1084,13 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
               }
             }
           },
-          {
-            paypal: {
-              $elemMatch: {
-                txn_type: 'subscr_eot',
-              }
-            }
-          }
+          // {
+          //   paypal: {
+          //     $elemMatch: {
+          //       txn_type: 'subscr_eot',
+          //     }
+          //   }
+          // }
         ]
       };
 
