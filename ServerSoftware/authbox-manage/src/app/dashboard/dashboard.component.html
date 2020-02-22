@@ -4,15 +4,15 @@
     <th *ngFor="let period of periods"> {{ period }}</th>
   </tr>
   <tr *ngFor="let member of members">
-    <th style="text-align: center; border-top: thin black solid; border-left:thin black solid" class="member-name"> {{ member }} </th>
+    <th style="text-align: left; border-top: thin black solid; border-left:thin black solid" class="member-name"> {{ member }} </th>
     <td *ngFor="let period of periods" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
       <span [ngClass]="checkMarkClass(member, period)">{{ memberStatus(member, period) }}</span>
     </td>
   </tr>
   <tr>
-    <th style="text-align: center; border-top: thin black solid; border-left:thin black solid"> Totals: </th>
-    <td *ngFor="let period of periods" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
-      {{ data[period]?.members?.length }}
+    <th style="text-align: left; border-top: thin black solid; border-left:thin black solid"> Totals: </th>
+    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
+      {{ data[i]?.members?.length }}
     </td>
   </tr>
 </table>
