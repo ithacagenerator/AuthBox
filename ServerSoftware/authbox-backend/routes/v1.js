@@ -910,7 +910,7 @@ function namifyMember(period, member) {
   const periodHasPayments = !!periodTransactions.find(v => v.txn_type === 'subscr_payment');
   const reversePayments = member.paypal.filter(v => v.txn_type === 'subscr_payment').reverse();
   const periodHasEots = !!member.paypal.find(v => {
-    if (v.txn_type !== 'subscr_eot') {
+    if (['subscr_eot', 'subscr_failed'].indexOf(v.txn_type) < 0) {
       return false;
     }
 
@@ -1084,6 +1084,14 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
               }
             }
           },
+          {
+            paypal: {
+              $elemMatch: {
+                txn_type: 'subscr_failed',
+                retry_at: { $regex: paymentDateRegex }
+              }
+            }
+          }
           // {
           //   paypal: {
           //     $elemMatch: {
