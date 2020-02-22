@@ -77,4 +77,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
     return '';
   }
+
+  newMembersCount(data, i) {
+    return data[i].members.filter(v => v.status === 'new').length;
+  }
+
+  activeMembersCount(data, i) {
+    return data[i].members.filter(v => v.status === 'active' || v.status === '').length;
+  }
+
+  terminalMembersCount(data, i) {
+    return data[i].members.filter(v => v.status === 'terminal').length;
+  }
 }

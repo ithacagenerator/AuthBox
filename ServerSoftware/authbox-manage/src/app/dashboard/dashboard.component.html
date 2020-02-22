@@ -10,9 +10,27 @@
     </td>
   </tr>
   <tr>
-    <th style="text-align: left; border-top: thin black solid; border-left:thin black solid"> Totals: </th>
-    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
+    <th style="text-align: left; border-top: medium black solid; border-left:thin black solid"> Totals: </th>
+    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: medium black solid; border-left:thin black solid">
       {{ data[i]?.members?.length }}
+    </td>
+  </tr>
+  <tr>
+    <th style="text-align: left; border-top: thin black solid; border-left:thin black solid"> New: </th>
+    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
+      {{ newMembersCount(data, i) }}
+    </td>
+  </tr>
+  <tr>
+    <th style="text-align: left; border-top: thin black solid; border-left:thin black solid"> Continuing: </th>
+    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
+      {{ activeMembersCount(data, i) }}
+    </td>
+  </tr>
+  <tr>
+    <th style="text-align: left; border-top: thin black solid; border-left:thin black solid"> Terminating: </th>
+    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
+      {{ terminalMembersCount(data, i) }}
     </td>
   </tr>
 </table>
