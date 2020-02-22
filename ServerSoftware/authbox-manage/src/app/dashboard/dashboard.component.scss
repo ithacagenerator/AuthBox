@@ -6,22 +6,22 @@
   color: green;
   font-weight: 900;
   font-size: 30px;
-}
-
-.checkmark-dormant {
-  color: gray;
-  font-weight: 900;
-  font-size: 30px;
+  position: relative;
+  top: 4px;
 }
 
 .checkmark-terminal {
   color: red;
   font-weight: 900;
   font-size: 30px;
+  position: relative;
+  top: 4px;
 }
 
 .checkmark-new {
   color: blue;
   font-weight: 900;
   font-size: 30px;
+  position: relative;
+  top: 4px;
 }
