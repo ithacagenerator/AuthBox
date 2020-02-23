@@ -9,31 +9,31 @@
   </tr>
   <tr *ngFor="let member of members">
     <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-top: thin black solid; border-left:thin black solid" class="member-name"> {{ member }} </th>
-    <td *ngFor="let period of periods" [style.border-left]="period === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid;">
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid;">
       <span [ngClass]="checkMarkClass(member, period)">{{ memberStatus(member, period) }}</span>
     </td>
   </tr>
   <tr>
     <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-top: medium black solid; border-left:thin black solid"> Totals: </th>
-    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: medium black solid; border-left:thin black solid">
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: medium black solid">
       {{ data[i]?.members?.length }}
     </td>
   </tr>
   <tr>
     <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-top: thin black solid; border-left:thin black solid"> New: </th>
-    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid;">
       {{ newMembersCount(data, i) }}
     </td>
   </tr>
   <tr>
     <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-top: thin black solid; border-left:thin black solid"> Continuing: </th>
-    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid;">
       {{ activeMembersCount(data, i) }}
     </td>
   </tr>
   <tr>
     <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-top: thin black solid; border-left:thin black solid"> Terminating: </th>
-    <td *ngFor="let period of periods; let i = index" style="text-align: center; border-top: thin black solid; border-left:thin black solid">
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid;">
       {{ terminalMembersCount(data, i) }}
     </td>
   </tr>
