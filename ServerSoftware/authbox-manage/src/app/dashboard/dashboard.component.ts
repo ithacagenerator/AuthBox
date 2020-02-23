@@ -170,7 +170,7 @@ export const MY_FORMATS = {
       <button mat-button
         [disabled]="!datesAreValid"
         [mat-dialog-close]="dates"
-        cdkFocusInitial>Save</button>
+        cdkFocusInitial>Fetch</button>
     </div>
   `,
     providers: [
