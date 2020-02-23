@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -18,7 +18,7 @@ import { AuthboxEditComponent } from './authboxes/authbox-edit/authbox-edit.comp
 import { AuthboxCreateComponent } from './authboxes/authbox-create/authbox-create.component';
 import { AuthboxDetailComponent } from './authboxes/authbox-detail/authbox-detail.component';
 import { AuthboxAddMemberComponent } from './authboxes/authbox-add-member/authbox-add-member.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { DashboardComponent, CalendarDialogComponent } from './dashboard/dashboard.component';
 import { SuccessStatusSnackComponent } from './utilities/snackbars/success-snackbar/success-snackbar.component';
 import { ErrorStatusSnackComponent } from './utilities/snackbars/error-snackbar/error-snackbar.component';
 
@@ -33,11 +33,14 @@ import {
   MatCheckboxModule,
   MatListModule,
   MatPaginatorModule,
-  MatSelectModule
+  MatSelectModule,
+  MatDatepickerModule,
+  MatNativeDateModule
 } from '@angular/material';
 import { MatSortModule } from '@angular/material/sort';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MomentDateModule } from '@angular/material-moment-adapter';
 
 @NgModule({
   declarations: [
@@ -52,6 +55,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AuthboxDetailComponent,
     AuthboxAddMemberComponent,
     DashboardComponent,
+    CalendarDialogComponent,
     SuccessStatusSnackComponent,
     ErrorStatusSnackComponent,
     MemberAddAuthboxComponent,
@@ -60,6 +64,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AppRoutingModule,
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
     MatButtonModule,
@@ -73,12 +78,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatCheckboxModule,
     MatListModule,
     MatPaginatorModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MomentDateModule
   ],
   providers: [
     ApiService,
     ManagementPasswordService,
-    UtilService
+    UtilService,
+    MatDatepickerModule
   ],
   bootstrap: [AppComponent],
   entryComponents: [
@@ -89,7 +98,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AuthboxAddMemberComponent,
     MemberCreateComponent,
     MemberEditComponent,
-    MemberAddAuthboxComponent
+    MemberAddAuthboxComponent,
+    CalendarDialogComponent
   ]
 })
 export class AppModule { }

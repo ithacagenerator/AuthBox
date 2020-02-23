@@ -1,7 +1,11 @@
 <table>
   <tr>
     <th>&nbsp;</th>
-    <th *ngFor="let period of periods" style="padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: center; border-top: thin black solid; border-left:thin black solid"> {{ period }}</th>
+    <th *ngFor="let year of years" [attr.colspan]="year.count" style="padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: center; border-top: thin black solid; border-left:thin black solid"> {{ year.year }}</th>
+  </tr>
+  <tr>
+    <th><button (click)="openCalendarDialog()">Change Dates</button></th>
+    <th *ngFor="let period of periodHeaders" style="padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: center; border-top: thin black solid; border-left:thin black solid"> {{ period }}</th>
   </tr>
   <tr *ngFor="let member of members">
     <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-top: thin black solid; border-left:thin black solid" class="member-name"> {{ member }} </th>

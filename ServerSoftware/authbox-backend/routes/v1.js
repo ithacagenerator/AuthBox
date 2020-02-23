@@ -978,8 +978,6 @@ function namifyMember(period, member) {
     console.log(JSON.stringify({name, periodHasPayments, periodHasEots, periodHasSignup}, null, 2));
   }
 
-
-
   return { name, firstname, lastname, status };
 }
 
