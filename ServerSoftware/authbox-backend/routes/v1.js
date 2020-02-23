@@ -918,7 +918,7 @@ function namifyMember(period, member) {
     // by looking at the subscription id, then find the last payment with the same id
     // and add one month to it
     let eot_date = null;
-    const lastPayment = reversePayments.find(vv => vv.subscr_id === v.subscr_id);
+    const lastPayment = reversePayments.find(vv => vv.subscr_id === (v.subscr_id || v.recurring_payment_id));
     if (lastPayment) {
       eot_date = moment(lastPayment.payment_date,
         'HH:mm:ss MMM DD, YYYY zz');
