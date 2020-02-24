@@ -44,8 +44,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       this.periods = data.periods;
       this.members = data.members.sort((a, b) => {
-        const aLast = a.split(' ').slice(-1)[0];
-        const bLast = b.split(' ').slice(-1)[0];
+        const aLast = a.split(' ').slice(-1)[0].toLowerCase();
+        const bLast = b.split(' ').slice(-1)[0].toLowerCase();
         if (aLast < bLast) { return -1; }
         if (aLast > bLast) { return +1; }
         return 0;
