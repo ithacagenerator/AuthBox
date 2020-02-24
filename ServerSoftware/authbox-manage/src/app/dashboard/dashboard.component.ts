@@ -125,7 +125,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(async (result) => {
       console.log('The dialog was closed', result);
-      await this.fetchHistoricalData(result.start, result.end);
+      if (result && result.start && result.end) {
+        await this.fetchHistoricalData(result.start, result.end);
+      }
     });
   }
 }
