@@ -29,3 +29,6 @@
 td, th {
   white-space: nowrap;
 }
+
+tr:nth-child(even) {background: #CCC}
+tr:nth-child(odd) {background: #FFF}
