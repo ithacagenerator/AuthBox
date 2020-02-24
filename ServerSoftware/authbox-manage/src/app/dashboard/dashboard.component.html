@@ -9,7 +9,7 @@
         Displaying {{ members.length }} Members
       </span>
     </th>
-    <th *ngFor="let period of periodHeaders" [style.border-left]="period === 'Jan' ? 'medium black solid' : 'thin black solid'" style="padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: center; border-top: thin black solid;"> {{ period }}</th>
+    <th *ngFor="let period of periodHeaders" [style.border-left]="period === 'Jan' ? 'medium black solid' : 'thin black solid'" style="font-family: Lucida Console, Courier, monospace; font-weight: boldest; padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: center; border-top: thin black solid;"> {{ period }}</th>
   </tr>
   <tr *ngFor="let member of members">
     <th style="padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: left; border-top: thin black solid; border-left:thin black solid" class="member-name"> {{ member }} </th>
