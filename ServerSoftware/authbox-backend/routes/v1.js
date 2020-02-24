@@ -1123,7 +1123,13 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
       const namifiedMembers = members.map(namifyMember.bind(null, from));
       payment_results.data.push({
         period,
-        members: namifiedMembers.filter(v => v.status !== 'dormant')
+        members: namifiedMembers.filter(v => v.status !== 'dormant').sort((a, b) => {
+          const aSort = a.split(' ').slice(-1)[0].toLowerCase();
+          const bSort = b.split(' ').slice(-1)[0].toLowerCase();
+          if (aSort < bSort) return -1;
+          if (aSort > bSort) return +1;
+          return 0;
+        })
       });
       payment_results.members = new Set([...payment_results.members, ...namifiedMembers.map(v => v.name)]);
       payment_results.periods.push(period);
