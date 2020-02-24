@@ -1123,13 +1123,7 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
       const namifiedMembers = members.map(namifyMember.bind(null, from));
       payment_results.data.push({
         period,
-        members: namifiedMembers.filter(v => v.status !== 'dormant').sort((a, b) => {
-          const aSort = a.split(' ').slice(-1)[0].toLowerCase();
-          const bSort = b.split(' ').slice(-1)[0].toLowerCase();
-          if (aSort < bSort) return -1;
-          if (aSort > bSort) return +1;
-          return 0;
-        })
+        members: namifiedMembers.filter(v => v.status !== 'dormant')
       });
       payment_results.members = new Set([...payment_results.members, ...namifiedMembers.map(v => v.name)]);
       payment_results.periods.push(period);
@@ -1139,8 +1133,8 @@ router.get('/members/historic/:from/:to/:secret', async (req, res, next) => {
 
     // the first data set was just to collect members from the previous month
     payment_results.members = Array.from(payment_results.members).sort((a, b) => {
-      const aSort = a.split(' ').slice(-1)[0];
-      const bSort = b.split(' ').slice(-1)[0];
+      const aSort = a.split(' ').slice(-1)[0].toLowerCase();
+      const bSort = b.split(' ').slice(-1)[0].toLowerCase();
       if (aSort < bSort) return -1;
       if (aSort > bSort) return +1;
       return 0;
