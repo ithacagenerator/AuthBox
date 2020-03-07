@@ -1005,12 +1005,22 @@ function namifyMember(period, member) {
     return false;
   });
 
+  let tier;
   if (allPayments.length > 0) {
     const membershipLevelBasis = allPayments.slice(-1)[0].payment_gross;
-    console.log(+membershipLevelBasis);
+    const knownTiers = {
+      35:    'standard',
+      20:    'basic',
+      75:    'extra',
+      56.25: 'extra-student',
+      10:    'basic-family-1',
+      26.25: 'standard-student',
+      15:    'basic-student'
+    };
+    tier = knownTiers[membershipLevelBasis];
   }
 
-  return { name, firstname, lastname, status };
+  return { name, firstname, lastname, status, tier };
 }
 
 router.get('/members/active/:secret', async (req, res, next) => {
