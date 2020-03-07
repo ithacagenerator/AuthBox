@@ -1007,15 +1007,15 @@ function namifyMember(period, member) {
 
   let tier;
   if (allPayments.length > 0) {
-    const membershipLevelBasis = allPayments.slice(-1)[0].payment_gross;
+    const membershipLevelBasis = allPayments.slice(-1)[0].payment_gross.toFixed(2);
     const knownTiers = {
-      35:    'standard',
-      20:    'basic',
-      75:    'extra',
-      56.25: 'extra-student',
-      10:    'basic-family-1',
-      26.25: 'standard-student',
-      15:    'basic-student'
+      '35.00': 'standard',
+      '20.00': 'basic',
+      '75.00': 'extra',
+      '56.25': 'extra-student',
+      '10.00': 'basic-family-1',
+      '26.25': 'standard-student',
+      '15.00': 'basic-student'
     };
     tier = knownTiers[membershipLevelBasis];
   }
