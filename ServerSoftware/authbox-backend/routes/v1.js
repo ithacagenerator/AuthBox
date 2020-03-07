@@ -993,10 +993,10 @@ function namifyMember(period, member) {
   const allPayments = member.paypal.filter(v => {
     if (!v._m && v.payment_date) {
       v._m = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY Z');
-      v._m.days(0).hours(0).minutes(0).seconds(0).milliseconds(0);
+      v._m.date(1).hours(0).minutes(0).seconds(0).milliseconds(0);
     }
     if (v._m) {
-      period.hours(0).minutes(0).seconds(0).milliseconds(0);
+      period.date(1).hours(0).minutes(0).seconds(0).milliseconds(0);
       if (v._m.isSameOrBefore(period)) {
         return true;
       }
