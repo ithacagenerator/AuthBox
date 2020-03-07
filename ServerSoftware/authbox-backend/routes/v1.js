@@ -903,6 +903,10 @@ function namifyMember(period, member) {
     }
   }
 
+  if (name === 'Unknown Name') {
+    console.warn('Indeterminate Name for ', member);
+  }
+
   if (!member.paypal) {
     console.warn(`Member "${member.email}" has no PayPal record`);
     return { name, firstname, lastname };
