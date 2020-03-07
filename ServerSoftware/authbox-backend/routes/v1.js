@@ -997,7 +997,7 @@ function namifyMember(period, member) {
   // do so by looking at the last payment record that is in or before this month
   _period.date(1).hours(0).minutes(0).seconds(0).milliseconds(0);
   const allPayments = member.paypal.filter(v => {
-    if (!v._m && v.payment_date) {
+    if (!v._m && v.payment_date && v.payment_gross && (+v.payment_gross > 0)) {
       v._m = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY Z');
       v._m.date(1).hours(0).minutes(0).seconds(0).milliseconds(0);
     }
