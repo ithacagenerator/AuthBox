@@ -978,6 +978,28 @@ function namifyMember(period, member) {
     console.log(JSON.stringify({name, periodHasPayments, periodHasEots, periodHasSignup}, null, 2));
   }
 
+  // Also decorate the member with their likely membership tier based on payment amount
+  // do so by looking at the last payment record that is in or before this month
+  const allPayments = member.paypal.filter(v => {
+    if (!v._m && v.payment_date) {
+      v._m = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY Z');
+      v._m.days(0).hours(0).minutes(0).seconds(0).milliseconds(0);
+    }
+    if (v.m) {
+      period.hours(0).minutes(0).seconds(0).milliseconds(0);
+      if (v._m.isSameOrBefore(period)) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+
+  if (allPayments.length > 0) {
+    const membershipLevelBasis = allPayments.slice(-1)[0].payment_gross;
+    console.log(+membershipLevelBasis);
+  }
+
   return { name, firstname, lastname, status };
 }
 
