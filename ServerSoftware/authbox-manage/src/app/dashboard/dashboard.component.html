@@ -47,7 +47,7 @@
       {{ countMembersByTier(data, i, tier) }}
     </td>
   </tr>
-  <tr>
+  <tr *ngIf="anyUnknownTiers(data)">
     <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid; border-top: thin black solid"> Unknown </th>
     <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid">
       {{ countMembersByUnknownTier(data, i) }}

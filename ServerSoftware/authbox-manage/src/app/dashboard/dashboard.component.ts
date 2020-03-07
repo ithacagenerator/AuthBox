@@ -139,6 +139,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return '';
   }
 
+  anyUnknownTiers(data) {
+    for (let i = 0 ; i < this.periods.length; i++) {
+      if (this.countMembersByUnknownTier(data, i) > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   openCalendarDialog(): void {
     const dialogRef = this.dialog.open(CalendarDialogComponent, {
       width: '350px',
