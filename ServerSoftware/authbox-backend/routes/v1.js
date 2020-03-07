@@ -996,8 +996,8 @@ function namifyMember(period, member) {
       v._m = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY Z');
       v._m.date(1).hours(0).minutes(0).seconds(0).milliseconds(0);
     }
-    console.warn(name, v._m ? v._m.format() : null, period.format(), _period.format());
     if (v._m) {
+      console.warn(name, v._m.format(), period.format(), _period.format());
       if (v._m.isSameOrBefore(_period)) {
         return true;
       }
