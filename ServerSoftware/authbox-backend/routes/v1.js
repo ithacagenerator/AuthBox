@@ -990,7 +990,8 @@ function namifyMember(period, member) {
 
   // Also decorate the member with their likely membership tier based on payment amount
   // do so by looking at the last payment record that is in or before this month
-  const _period = moment(period).date(1).hours(0).minutes(0).seconds(0).milliseconds(0);
+  const _period = moment(period);
+  _period.date(1).hours(0).minutes(0).seconds(0).milliseconds(0);
   const allPayments = member.paypal.filter(v => {
     if (!v._m && v.payment_date) {
       v._m = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY Z');
