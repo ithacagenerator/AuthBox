@@ -12,7 +12,10 @@
     <th *ngFor="let period of periodHeaders" [style.border-left]="period === 'Jan' ? 'medium black solid' : 'thin black solid'" style="font-family: Lucida Console, Courier, monospace; font-weight: boldest; padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: center; border-top: thin black solid;"> {{ period }}</th>
   </tr>
   <tr *ngFor="let member of members">
-    <th style="padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: left; border-top: thin black solid; border-left:thin black solid" class="member-name"> {{ member }} </th>
+    <th [attr.title]="tiers(data, member)"
+      style="padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: left; border-top: thin black solid; border-left:thin black solid" class="member-name">
+      {{ member }}
+    </th>
     <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid;">
       <span [ngClass]="checkMarkClass(member, period)">{{ memberStatus(member, period) }}</span>
     </td>

@@ -162,6 +162,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  tiers(data, member) {
+    const _tiers = [];
+    for (const datum of this.data) {
+      const m = datum.members.find(v => v.name === member);
+      if (m && m.tier) {
+        if (_tiers.slice(-1)[0] !== m.tier) {
+          _tiers.push(m.tier);
+        }
+      }
+    }
+    return `[${Array.from(_tiers).join(', ')}]`;
+  }
 }
 
 export const MY_FORMATS = {
