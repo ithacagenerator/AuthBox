@@ -903,6 +903,7 @@ function namifyMember(period, member) {
   }
 
   if (!member.paypal) {
+    console.warn(`Member ${name} has no PayPal record`);
     return { name, firstname, lastname };
   }
 
