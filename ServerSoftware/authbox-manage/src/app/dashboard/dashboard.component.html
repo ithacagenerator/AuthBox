@@ -41,4 +41,10 @@
       {{ terminalMembersCount(data, i) }}
     </td>
   </tr>
+  <tr *ngFor="let tier of knownTiers; let i = index">
+    <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid" [style.border-top]="i === 0 ? 'medium black solid' : 'thin black solid'"> {{ tier }} </th>
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid;">
+      {{ countMembersByTier(data, i, tier) }}
+    </td>
+  </tr>
 </table>

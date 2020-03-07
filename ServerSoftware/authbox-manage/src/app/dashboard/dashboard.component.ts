@@ -21,6 +21,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   members = [];
   data = [];
   years = [];
+  knownTiers = [
+    'basic',
+    'basic-student',
+    'standard',
+    'standard-student',
+    'extra',
+    'extra-student'
+  ];
 
   constructor(
     private apiSrvc: ApiService,
@@ -225,5 +233,9 @@ export class CalendarDialogComponent {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  countMembersByTier(data, i, tier) {
+    return data[i].members.filter(v => v.tier === tier).length;
   }
 }
