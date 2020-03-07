@@ -1007,7 +1007,7 @@ function namifyMember(period, member) {
 
   let tier;
   if (allPayments.length > 0) {
-    const membershipLevelBasis = allPayments.slice(-1)[0].payment_gross.toFixed(2);
+    const membershipLevelBasis = allPayments.slice(-1)[0].payment_gross;
     const knownTiers = {
       '35.00': 'standard',
       '20.00': 'basic',
