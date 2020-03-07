@@ -863,6 +863,11 @@ router.get('/authboxes/history/:authboxName/:secret', (req, res, next) => {
 });
 
 function namifyMember(period, member) {
+
+  if (!member) {
+    return {};
+  }
+
   const periodRegex = new RegExp(period.format('MMM') + '.*' + period.format('YYYY'));
   period = moment(period);
   const periodIsCurrent = period.format('MM-YYYY') === moment().format('MM-YYYY');
@@ -895,6 +900,10 @@ function namifyMember(period, member) {
     } else if (name === firstname) {
       name += ' ' + lastname;
     }
+  }
+
+  if (!member.paypal) {
+    return { name, firstname, lastname };
   }
 
   // for the given period, determine if there was a payment, an eot, both, or neither
@@ -980,26 +989,24 @@ function namifyMember(period, member) {
 
   // Also decorate the member with their likely membership tier based on payment amount
   // do so by looking at the last payment record that is in or before this month
-  if (member.paypal) {
-    const allPayments = member.paypal.filter(v => {
-      if (!v._m && v.payment_date) {
-        v._m = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY Z');
-        v._m.days(0).hours(0).minutes(0).seconds(0).milliseconds(0);
-      }
-      if (v.m) {
-        period.hours(0).minutes(0).seconds(0).milliseconds(0);
-        if (v._m.isSameOrBefore(period)) {
-          return true;
-        }
-      }
-
-      return false;
-    });
-
-    if (allPayments.length > 0) {
-      const membershipLevelBasis = allPayments.slice(-1)[0].payment_gross;
-      console.log(+membershipLevelBasis);
+  const allPayments = member.paypal.filter(v => {
+    if (!v._m && v.payment_date) {
+      v._m = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY Z');
+      v._m.days(0).hours(0).minutes(0).seconds(0).milliseconds(0);
     }
+    if (v.m) {
+      period.hours(0).minutes(0).seconds(0).milliseconds(0);
+      if (v._m.isSameOrBefore(period)) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+
+  if (allPayments.length > 0) {
+    const membershipLevelBasis = allPayments.slice(-1)[0].payment_gross;
+    console.log(+membershipLevelBasis);
   }
 
   return { name, firstname, lastname, status };
