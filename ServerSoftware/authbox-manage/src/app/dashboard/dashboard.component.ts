@@ -177,7 +177,7 @@ export const MY_FORMATS = {
         <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
         <mat-datepicker #fromPicker startView="year"
           (monthSelected)="chosenFromMonthHandler($event, fromPicker)"
-          (yearSelected)="chosenFromYearHandler($event, fromPicker)"
+          (yearSelected)="chosenFromYearHandler(fromPicker)"
         ></mat-datepicker>
       </mat-form-field>
       <mat-form-field>
@@ -186,7 +186,7 @@ export const MY_FORMATS = {
         <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
         <mat-datepicker #toPicker startView="year"
           (monthSelected)="chosenToMonthHandler($event, toPicker)"
-          (yearSelected)="chosenToYearHandler($event, toPicker)"
+          (yearSelected)="chosenToYearHandler($event)"
         ></mat-datepicker>
       </mat-form-field>
     </div>
