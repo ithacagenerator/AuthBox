@@ -998,7 +998,7 @@ function namifyMember(period, member) {
       v._m.date(1).hours(0).minutes(0).seconds(0).milliseconds(0);
     }
     if (v._m) {
-      console.warn(name, v._m.format(), period.format(), _period.format());
+      // console.warn(name, v._m.format(), period.format(), _period.format());
       if (v._m.isSameOrBefore(_period)) {
         return true;
       }
