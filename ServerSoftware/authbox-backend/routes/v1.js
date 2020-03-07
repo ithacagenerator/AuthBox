@@ -995,7 +995,7 @@ function namifyMember(period, member) {
       v._m = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY Z');
       v._m.days(0).hours(0).minutes(0).seconds(0).milliseconds(0);
     }
-    if (v.m) {
+    if (v._m) {
       period.hours(0).minutes(0).seconds(0).milliseconds(0);
       if (v._m.isSameOrBefore(period)) {
         return true;
