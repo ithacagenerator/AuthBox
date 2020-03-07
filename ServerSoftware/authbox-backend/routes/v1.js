@@ -1002,6 +1002,8 @@ function namifyMember(period, member) {
       }
     }
 
+    console.warn(name, v._m ? v._m.format() : null, period.format(), _period.format());
+
     return false;
   });
 
@@ -1023,7 +1025,7 @@ function namifyMember(period, member) {
   }
 
   if (!tier) {
-    console.warn(`did not determine tier for "${name}"`, membershipLevelBasis, allPayments);
+    console.warn(`did not determine tier for "${name}"`);
   }
 
   return { name, firstname, lastname, status, tier };
