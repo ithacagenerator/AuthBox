@@ -41,10 +41,16 @@
       {{ terminalMembersCount(data, i) }}
     </td>
   </tr>
-  <tr *ngFor="let tier of knownTiers; let i = index">
-    <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid" [style.border-top]="i === 0 ? 'medium black solid' : 'thin black solid'"> {{ tier }} </th>
-    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid;">
+  <tr *ngFor="let tier of knownTiers; let j = index">
+    <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid" [style.border-top]="j === 0 ? 'medium black solid' : 'thin black solid'"> {{ tier }} </th>
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" [style.border-top]="j === 0 ? 'medium black solid' : 'thin black solid'" style="text-align: center;">
       {{ countMembersByTier(data, i, tier) }}
+    </td>
+  </tr>
+  <tr>
+    <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid; border-top: thin black solid"> Unknown </th>
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid">
+      {{ countMembersByUnknownTier(data, i) }}
     </td>
   </tr>
 </table>

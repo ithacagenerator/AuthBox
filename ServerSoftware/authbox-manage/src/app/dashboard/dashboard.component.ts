@@ -124,6 +124,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return data[i].members.filter(v => v.status === 'terminal').length;
   }
 
+  countMembersByTier(data, i, tier) {
+    return data[i].members.filter(v => v.tier === tier).length;
+  }
+
+  countMembersByUnknownTier(data, i) {
+    if (Array.isArray(data) && data[i] && Array.isArray(data[i].members)) {
+      const totalMembers = data[i].members.length;
+      const totalTieredMembers = this.knownTiers.reduce((t, v) => {
+        return t + this.countMembersByTier(data, i, v);
+      }, 0);
+      return totalMembers - totalTieredMembers;
+    }
+    return '';
+  }
+
   openCalendarDialog(): void {
     const dialogRef = this.dialog.open(CalendarDialogComponent, {
       width: '350px',
@@ -233,9 +248,5 @@ export class CalendarDialogComponent {
 
   onNoClick(): void {
     this.dialogRef.close();
-  }
-
-  countMembersByTier(data, i, tier) {
-    return data[i].members.filter(v => v.tier === tier).length;
   }
 }

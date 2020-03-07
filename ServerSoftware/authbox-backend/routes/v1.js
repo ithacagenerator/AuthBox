@@ -1018,6 +1018,10 @@ function namifyMember(period, member) {
       '15.00': 'basic-student'
     };
     tier = knownTiers[membershipLevelBasis];
+
+    if (!tier) {
+      console.warn(`did not determine tier for "${name}"`, membershipLevelBasis, allPayments);
+    }
   }
 
   return { name, firstname, lastname, status, tier };
