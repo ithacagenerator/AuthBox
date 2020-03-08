@@ -1019,6 +1019,7 @@ function namifyMember(period, member) {
       '35.00': 'standard',
       '20.00': 'basic',
       '75.00': 'extra',
+      '37.50': 'extra', // technically, this is a family membership discount applied
       '56.25': 'extra-student',
       '10.00': 'basic', // technically, this is a family membership discount applied
       '26.25': 'standard-student',
