@@ -30,6 +30,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     'extra-student'
   ];
 
+  knownTiersRollups = ['basic', 'standard', 'extra'];
+
   constructor(
     private apiSrvc: ApiService,
     public dialog: MatDialog) {
@@ -137,6 +139,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return totalMembers - totalTieredMembers;
     }
     return '';
+  }
+
+  countMembersByTierRollup(data, i, tier) {
+    const regex = new RegExp(tier);
+    return data[i].members.filter(v => regex.test(v.tier)).length;
   }
 
   anyUnknownTiers(data) {

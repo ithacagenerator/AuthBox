@@ -1,4 +1,4 @@
-<table>
+<table cellpadding="0" cellspacing="0">
   <tr>
     <th><button (click)="openCalendarDialog()">Change Dates</button></th>
     <th *ngFor="let year of years" [attr.colspan]="year.count" style="padding-top: 4px; padding-left: 4px; padding-right: 4px; text-align: center; border-top: thin black solid; border-left:medium black solid"> {{ year.year }}</th>
@@ -54,6 +54,18 @@
     <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid; border-top: thin black solid"> Unknown </th>
     <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" style="text-align: center; border-top: thin black solid">
       {{ countMembersByUnknownTier(data, i) }}
+    </td>
+  </tr>
+  <tr *ngFor="let tier of knownTiersRollups; let j = index">
+    <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid" [style.border-top]="j === 0 ? 'medium black solid' : 'thin black solid'"> {{ tier }} rollup</th>
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" [style.border-top]="j === 0 ? 'medium black solid' : 'thin black solid'" style="text-align: center;">
+      {{ countMembersByTierRollup(data, i, tier) }}
+    </td>
+  </tr>
+  <tr>
+    <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid" [style.border-top]="'medium black solid'"> student rollup</th>
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" [style.border-top]="'medium black solid'" style="text-align: center;">
+      {{ countMembersByTierRollup(data, i, 'student') }}
     </td>
   </tr>
 </table>
