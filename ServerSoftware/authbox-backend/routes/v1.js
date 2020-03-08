@@ -907,9 +907,14 @@ function namifyMember(period, member) {
     console.warn('Indeterminate Name for ', member);
   }
 
+  let gender = 'unknown';
+  if (member.registration && member.registration.optional && member.registration.optional.gender) {
+    gender = member.registration.optional.gender;
+  }
+
   if (!member.paypal) {
     console.warn(`Member "${member.email}" has no PayPal record`);
-    return { name, firstname, lastname };
+    return { name, firstname, lastname, gender };
   }
 
   // for the given period, determine if there was a payment, an eot, both, or neither
@@ -1033,7 +1038,7 @@ function namifyMember(period, member) {
     console.warn(`did not determine tier for "${name}"`);
   }
 
-  return { name, firstname, lastname, status, tier };
+  return { name, firstname, lastname, status, tier, gender };
 }
 
 router.get('/members/active/:secret', async (req, res, next) => {
