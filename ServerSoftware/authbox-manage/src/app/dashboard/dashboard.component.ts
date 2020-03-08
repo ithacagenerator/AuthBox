@@ -31,7 +31,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ];
 
   knownTiersRollups = ['basic', 'standard', 'extra'];
-  knownGenders = ['male', 'female', 'unknown'];
+  knownGenders = ['male', 'female', 'other'];
 
   constructor(
     private apiSrvc: ApiService,

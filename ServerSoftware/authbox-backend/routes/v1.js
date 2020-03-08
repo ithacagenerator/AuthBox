@@ -907,7 +907,7 @@ function namifyMember(period, member) {
     console.warn('Indeterminate Name for ', member);
   }
 
-  let gender = 'unknown';
+  let gender = 'other';
   if (member.registration && member.registration.optional && member.registration.optional.gender) {
     gender = member.registration.optional.gender;
   }
