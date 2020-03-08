@@ -68,4 +68,10 @@
       {{ countMembersByTierRollup(data, i, 'student') }}
     </td>
   </tr>
+  <tr *ngFor="let gender of knownGenders; let j = index">
+    <th style="padding-top: 4px; padding-left: 4px; text-align: left; border-left:thin black solid" [style.border-top]="j === 0 ? 'medium black solid' : 'thin black solid'"> {{ gender }} </th>
+    <td *ngFor="let period of periods; let i = index" [style.border-left]="periodHeaders[i] === 'Jan' ? 'medium black solid' : 'thin black solid'" [style.border-top]="j === 0 ? 'medium black solid' : 'thin black solid'" style="text-align: center;">
+      {{ countMembersByGender(data, i, gender) }}
+    </td>
+  </tr>
 </table>

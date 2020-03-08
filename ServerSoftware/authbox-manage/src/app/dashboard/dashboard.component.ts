@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ];
 
   knownTiersRollups = ['basic', 'standard', 'extra'];
+  knownGenders = ['male', 'female', 'unknown'];
 
   constructor(
     private apiSrvc: ApiService,
@@ -153,6 +154,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     }
     return false;
+  }
+
+  countMembersByGender(data, i, gender) {
+    return data[i].members.filter(v => v.gender === gender).length;
   }
 
   openCalendarDialog(): void {
