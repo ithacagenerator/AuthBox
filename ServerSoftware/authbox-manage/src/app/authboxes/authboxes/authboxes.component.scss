@@ -16,8 +16,9 @@ mat-cell {
 
 .add-button {
   position: fixed;
-  bottom: 50px;  
+  bottom: 50px;
   left: 50px;
+  z-index: 99;
 }
 
 .table-wrapper {
