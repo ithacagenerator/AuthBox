@@ -1077,9 +1077,12 @@ router.get('/members/active/:secret', async (req, res, next) => {
       return (lastIPN.txn_type !== 'subscr_eot');
     });
 
-    res.json(
-      activeMembers.map(v => v.name)
-    );
+    res.json(activeMembers.map(v => {
+      return {
+        name: v.name,
+        authorizedBoxNamesi: v.authorizedBoxNames
+      }
+    }));
   } catch (e) {
     console.error(e.message || e, e.stack);
     res.status(500).json({error: e.message || 'Unknown error'});
