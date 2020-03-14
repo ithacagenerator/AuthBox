@@ -1078,7 +1078,7 @@ router.get('/members/active/:secret', async (req, res, next) => {
     });
 
     res.json(
-      activeMembers.map(namifyMember.bind(null, moment()))
+      activeMembers.map(v => v.name)
     );
   } catch (e) {
     console.error(e.message || e, e.stack);
