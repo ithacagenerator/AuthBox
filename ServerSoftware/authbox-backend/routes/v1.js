@@ -1080,7 +1080,7 @@ router.get('/members/active/:secret', async (req, res, next) => {
     res.json(activeMembers.map(v => {
       return {
         name: v.name,
-        authorizedBoxNamesi: v.authorizedBoxNames
+        authorizedBoxNames: v.authorizedBoxNames
       }
     }));
   } catch (e) {
