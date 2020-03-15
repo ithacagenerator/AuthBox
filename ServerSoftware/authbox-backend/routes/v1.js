@@ -987,7 +987,7 @@ function namifyMember(period, member) {
     const previousPeriodTransactions = member.paypal.filter(v => previousPeriodRegex.test(v.payment_date));
     if (previousPeriodTransactions.length > 0) {
       lastTransactionInPreviousPeriod = previousPeriodTransactions.slice(-1)[0];
-      if (lastTransactionInPreviousPeriod.txn_type === 'payment') {
+      if (lastTransactionInPreviousPeriod.txn_type === 'subscr_payment') {
         // terminal unless period is representative of the current calendar month / year
         // in which case a bit more math is needed
         status = 'terminal';
@@ -1003,9 +1003,9 @@ function namifyMember(period, member) {
           }
 
           // unless there is a cancellation that comes before the next expected payment...
-          const cancelationsInThisPeriod = member.paypal.filter(v => v.txn_type === 'subscr_cancel' && periodRegex.test(v.subscr_date));
-          if (cancelationsInThisPeriod.length > 0) {
-            const lastCancellationMoment = moment(cancelationsInThisPeriod.slice(-1)[0].subscr_date, 'HH:mm:ss MMM DD, YYYY zz');
+          const cancellationsInThisPeriod = member.paypal.filter(v => v.txn_type === 'subscr_cancel' && periodRegex.test(v.subscr_date));
+          if (cancellationsInThisPeriod.length > 0) {
+            const lastCancellationMoment = moment(cancellationsInThisPeriod.slice(-1)[0].subscr_date, 'HH:mm:ss MMM DD, YYYY zz');
             // if the cancellation happened before one month after the last payment
             // then the member is now in a terminating status for this month
             const nextPaymentDateMoment = moment(lastPaymentMoment);
