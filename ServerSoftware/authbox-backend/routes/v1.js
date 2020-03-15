@@ -984,7 +984,7 @@ function namifyMember(period, member) {
   if (periodHasSignup && periodHasPayments) {
     status = 'new';
   } else if (!periodHasPayments && !periodHasEots) {
-    const previousPeriodTransactions = member.paypal.filter(v => previousPeriodRegex.test(v.payment_date) || periodRegex.test(v.subscr_date) || previousPeriodRegex.test(v.subscr_date));
+    const previousPeriodTransactions = member.paypal.filter(v => previousPeriodRegex.test(v.payment_date));
     if (previousPeriodTransactions.length > 0) {
       lastTransactionInPreviousPeriod = previousPeriodTransactions.slice(-1)[0];
       if (lastTransactionInPreviousPeriod.txn_type === 'payment') {
@@ -992,6 +992,7 @@ function namifyMember(period, member) {
         // in which case a bit more math is needed
         status = 'terminal';
         if (periodIsCurrent) {
+
           // it's active if the payment is less than a month old
           const lastPaymentMoment = moment(lastTransactionInPreviousPeriod.payment_date,
             'HH:mm:ss MMM DD, YYYY zz');
@@ -999,6 +1000,19 @@ function namifyMember(period, member) {
           oneMonthAgo.subtract(1, 'month');
           if (oneMonthAgo.isSameOrBefore(lastPaymentMoment)) {
             status = 'active';
+          }
+
+          // unless there is a cancellation that comes before the next expected payment...
+          const cancelationsInThisPeriod = member.paypal.filter(v => v.txn_type === 'subscr_cancel' && periodRegex.test(v.subscr_date));
+          if (cancelationsInThisPeriod.length > 0) {
+            const lastCancellationMoment = moment(cancelationsInThisPeriod.slice(-1)[0].subscr_date, 'HH:mm:ss MMM DD, YYYY zz');
+            // if the cancellation happened before one month after the last payment
+            // then the member is now in a terminating status for this month
+            const nextPaymentDateMoment = moment(lastPaymentMoment);
+            nextPaymentDateMoment.add(1, 'month');
+            if (lastCancellationMoment.isBefore(nextPaymentDateMoment)) {
+              status = 'terminating';
+            }
           }
         }
       } else if (lastTransactionInPreviousPeriod.txn_type === 'subscr_cancel') {
@@ -1016,7 +1030,7 @@ function namifyMember(period, member) {
             return false;
           }
 
-          const paymentDate = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY ZZ');
+          const paymentDate = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY zz');
           if (moment().diff(paymentDate, 'months') < 1) {
             return true;
           }
