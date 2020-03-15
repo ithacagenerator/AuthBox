@@ -197,7 +197,7 @@ router.get('/members/:secret?', (req, res, next) => {
     res.json(members.map(v => {
       v.registration_complete = v.registration && v.registration.registrationComplete;
       const namified = namifyMember(moment(), v);
-      v.namified = { name: namified.name };
+      v.namified = { name: namified.name, status: namified.status };
       delete v.paypal;
       delete v.registration;
       return v;
