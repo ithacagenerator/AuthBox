@@ -984,7 +984,7 @@ function namifyMember(period, member) {
   if (periodHasSignup && periodHasPayments) {
     status = 'new';
   } else if (!periodHasPayments && !periodHasEots) {
-    const previousPeriodTransactions = member.paypal.filter(v => previousPeriodRegex.test(v.payment_date));
+    const previousPeriodTransactions = member.paypal.filter(v => previousPeriodRegex.test(v.payment_date) || previousPeriodRegex.test(v.subscr_date));
     if (previousPeriodTransactions.length > 0) {
       lastTransactionInPreviousPeriod = previousPeriodTransactions.slice(-1)[0];
       if (lastTransactionInPreviousPeriod.txn_type === 'payment') {
