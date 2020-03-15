@@ -23,13 +23,16 @@
         <mat-cell *matCellDef="let row"
         [class.new_member]="row?.namified?.status === 'new'"
         [class.terminal_member]="row?.namified?.status === 'terminal'"
+        [class.active_member]="row?.namified?.status === 'active'"
         [class.not_validated]="!row.validated"
         [class.registration_incomplete]="!row.registration_complete"> {{row.email}} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
-        <mat-cell *matCellDef="let row"> {{ row?.namified?.status }} </mat-cell>
+        <mat-header-cell *matHeaderCellDef mat-sort-header style="justify-content: center;position: relative;left: 10px;">
+          Status
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" style="justify-content: center;"> {{ row?.namified?.status }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="authorizedBoxNames">
