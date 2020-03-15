@@ -191,11 +191,14 @@ router.get('/members/:secret?', (req, res, next) => {
   }
 
   findDocuments('Members', {deleted: {$exists: false}}, {
-    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0, paypal: 0 }
+    projection: { _id: 0, access_codes: 0, authorizedBoxes: 0 }
   })
   .then((members) =>{
     res.json(members.map(v => {
       v.registration_complete = v.registration && v.registration.registrationComplete;
+      const namified = namifyMember(moment(), v);
+      v.namified = { name: namified.name };
+      delete v.paypal;
       delete v.registration;
       return v;
     }));
