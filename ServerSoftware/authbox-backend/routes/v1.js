@@ -1010,7 +1010,7 @@ function namifyMember(period, member) {
             // then the member is now in a terminating status for this month
             const nextPaymentDateMoment = moment(lastPaymentMoment);
             nextPaymentDateMoment.add(1, 'month');
-            if (lastCancellationMoment.isBefore(nextPaymentDateMoment)) {
+            if (lastCancellationMoment.isBefore(nextPaymentDateMoment) && lastCancellationMoment.isAfter(lastPaymentMoment)) {
               status = 'terminating';
             }
           }
