@@ -1011,7 +1011,7 @@ function namifyMember(period, member) {
             const nextPaymentDateMoment = moment(lastPaymentMoment);
             nextPaymentDateMoment.add(1, 'month');
             if (lastCancellationMoment.isBefore(nextPaymentDateMoment) && lastCancellationMoment.isAfter(lastPaymentMoment)) {
-              status = 'terminating';
+              status = 'terminal';
             }
           }
         }
