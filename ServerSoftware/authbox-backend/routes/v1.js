@@ -1077,7 +1077,7 @@ router.get('/members/active/:secret', async (req, res, next) => {
       return (lastIPN.txn_type !== 'subscr_eot');
     });
 
-    let res = activeMembers.map(v => {
+    let result = activeMembers.map(v => {
       const namified = namifyMember(moment(), v);
 
       return {
@@ -1087,7 +1087,7 @@ router.get('/members/active/:secret', async (req, res, next) => {
       };
     });
 
-    res.json(res);
+    res.json(result);
   } catch (e) {
     console.error(e.message || e, e.stack);
     res.status(500).json({error: e.message || 'Unknown error'});
