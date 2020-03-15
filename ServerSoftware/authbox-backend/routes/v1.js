@@ -1085,6 +1085,14 @@ router.get('/members/active/:secret', async (req, res, next) => {
         namified,
         authorizedBoxNames: v.authorizedBoxNames
       };
+    })
+    .sort((a, b) => {
+      const sortA = a.namified.name.split(' ').slice(-1)[0];
+      const sortB = b.namified.name.split(' ').slice(-1)[0];
+
+      if (sortA === sortB) return 0;
+      if (sortA < sortB) return -1;
+      return +1;
     });
 
     res.json(result);
