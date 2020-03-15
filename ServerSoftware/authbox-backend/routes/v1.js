@@ -207,11 +207,14 @@ router.get('/members/:secret?', (req, res, next) => {
       let sortB = b.namified.status;
 
       if (sortA !== sortB) {
+        if (sortA === 'new') return -1;
+        if (sortB === 'new') return +1;
+
+        if (sortA === 'terminal') return -1;
+        if (sortB === 'terminal') return +1;
+
         if (sortA === 'active') return -1;
         if (sortB === 'active') return +1;
-
-        if (sortA !== '') return -1;
-        if (sortB !== '') return +1;
       }
 
       sortA = a.namified.name.split(' ').slice(-1)[0];
