@@ -194,14 +194,34 @@ router.get('/members/:secret?', (req, res, next) => {
     projection: { _id: 0, access_codes: 0, authorizedBoxes: 0 }
   })
   .then((members) =>{
-    res.json(members.map(v => {
+    const result = members.map(v => {
       v.registration_complete = v.registration && v.registration.registrationComplete;
       const namified = namifyMember(moment(), v);
       v.namified = { name: namified.name, status: namified.status };
       delete v.paypal;
       delete v.registration;
       return v;
-    }));
+    })
+    .sort((a, b) => {
+      let sortA = a.namified.status;
+      let sortB = b.namified.status;
+
+      if (sortA !== sortB) {
+        if (sortA === 'active') return -1;
+        if (sortB === 'active') return +1;
+
+        if (sortA !== '') return -1;
+        if (sortB !== '') return +1;
+      }
+
+      sortA = a.namified.name.split(' ').slice(-1)[0];
+      sortB = b.namified.name.split(' ').slice(-1)[0];
+
+      if (sortA === sortB) return 0;
+      if (sortA < sortB) return -1;
+      return +1;
+    });
+    res.json(result);
   })
   .catch((err) => {
     console.error(err);
