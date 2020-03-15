@@ -999,6 +999,28 @@ function namifyMember(period, member) {
           }
         }
       }
+
+      if (!status) {
+        // if the person has made a payment within 30 days, they are active
+        const hasRecentPayment = member.paypal.find(v => {
+          if (v.txn_type !== 'subscr_payment') {
+            return false;
+          }
+
+          if (!v.payment_date) {
+            return false;
+          }
+
+          const paymentDate = moment(v.payment_date, 'HH:mm:ss MMM DD, YYYY ZZ');
+          if (moment().diff(paymentDate, 'months') < 1) {
+            return true;
+          }
+          return false;
+        });
+        if (hasRecentPayment) {
+          status = 'active';
+        }
+      }
     } else {
       status = 'dormant';
     }
