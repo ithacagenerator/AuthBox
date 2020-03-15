@@ -1,5 +1,5 @@
 <button mat-fab color="primary" (click)="newMember()" class="add-button">
-  <mat-icon aria-label="Create New">add</mat-icon>  
+  <mat-icon aria-label="Create New">add</mat-icon>
 </button>
 
 <div class="table-wrapper">
@@ -8,21 +8,28 @@
       <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
     </mat-form-field>
   </div>
-  
+
   <div class="table-container">
-  
+
     <mat-table [dataSource]="dataSource" matSort>
-  
+
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
-        <mat-cell *matCellDef="let row"> {{row.name}} </mat-cell>
+        <mat-cell *matCellDef="let row"> {{row?.namified?.name || row.name}} </mat-cell>
       </ng-container>
-  
+
       <ng-container matColumnDef="email">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
-        <mat-cell *matCellDef="let row" 
+        <mat-cell *matCellDef="let row"
+        [class.new_member]="row?.namified?.status === 'new'"
+        [class.terminal_member]="row?.namified?.status === 'terminal'"
         [class.not_validated]="!row.validated"
         [class.registration_incomplete]="!row.registration_complete"> {{row.email}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row?.namified?.status }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="authorizedBoxNames">
@@ -34,15 +41,15 @@
         <mat-header-cell *matHeaderCellDef mat-sort-header> Created Date </mat-header-cell>
         <mat-cell *matCellDef="let row"> {{row.created}} </mat-cell>
       </ng-container>
-      
+
       <ng-container matColumnDef="updated">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Updated Date </mat-header-cell>
         <mat-cell *matCellDef="let row"> {{row.updated}} </mat-cell>
-      </ng-container>      
+      </ng-container>
 
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="rowSelected(row)">
       </mat-row>
-    </mat-table>  
+    </mat-table>
   </div>
 </div>

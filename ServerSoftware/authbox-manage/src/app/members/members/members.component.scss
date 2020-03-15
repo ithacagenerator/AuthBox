@@ -31,5 +31,17 @@ mat-cell {
 }
 
 .not_validated {
+  color: rgb(195, 120, 0);
+}
+
+.new_member {
+  color: blue;
+}
+
+.terminal_member {
   color: red;
+}
+
+.active_member {
+  color: green;
 }
