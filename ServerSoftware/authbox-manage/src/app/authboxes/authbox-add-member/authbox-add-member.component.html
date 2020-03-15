@@ -4,7 +4,7 @@
     <mat-list-option *ngFor="let member of data?.members"
       [value]="member?.name"
       [selected]="member?.authorizedBoxNames.indexOf(data?.name) >= 0">
-      {{member?.name}}
+      {{member?.namified?.name || member.name}}
     </mat-list-option>
   </mat-selection-list>
 </div>
