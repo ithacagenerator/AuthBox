@@ -1001,6 +1001,8 @@ function namifyMember(period, member) {
             status = 'active';
           }
         }
+      } else if (lastTransactionInPreviousPeriod.txn_type === 'subscr_cancel') {
+        status = 'terminal';
       }
 
       if (!status) {
