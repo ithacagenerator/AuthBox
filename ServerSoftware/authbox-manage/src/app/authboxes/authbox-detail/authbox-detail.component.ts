@@ -117,7 +117,7 @@ export class AuthboxDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   refreshMembers() {
-    this.apiSrvc.getMembers()
+    this.apiSrvc.getActiveMembers()
     .then((members) => {
       this.members = members.map(v => {
         if (!Array.isArray(v.authorizedBoxNames)) {
