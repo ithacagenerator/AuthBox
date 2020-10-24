@@ -27,7 +27,7 @@ export class MemberAddAuthboxComponent {
 
   memberHasAccessto(authboxName) {
     if (this.data.member) {
-      return this.data.member.authorizedBoxNames.indexOf(authboxName) >= 0;
+      return (this.data.member.authorizedBoxNames || []).indexOf(authboxName) >= 0;
     } else {
       return false;
     }
