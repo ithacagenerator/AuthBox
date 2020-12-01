@@ -1038,6 +1038,8 @@ function namifyMember(period, member) {
         });
         if (hasRecentPayment) {
           status = 'active';
+        } else {
+          status = 'dormant';
         }
       }
     } else {
