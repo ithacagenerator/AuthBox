@@ -952,6 +952,9 @@ function namifyMember(period, member) {
   // if there was both an eot and a payment,
   //   if the last thing in the period was a payment, consider the membership 'new'
   //   otherwise consider the membership 'terminal'
+
+  const debugName = '---';
+
   const periodTransactions = member.paypal.filter(v => periodRegex.test(v.payment_date) || periodRegex.test(v.subscr_date) || periodRegex.test(v.eot_date));
   const periodHasPayments = !!periodTransactions.find(v => v.txn_type === 'subscr_payment');
   const reversePayments = member.paypal.filter(v => v.txn_type === 'subscr_payment').reverse();
@@ -960,16 +963,21 @@ function namifyMember(period, member) {
       return false;
     }
 
-    // now that we know it's a subscr_eot, we can deduce the date that it happened
+    // now that we know there is a subscr_eot, we can deduce the date that it happened
     // by looking at the subscription id, then find the last payment with the same id
     // and add one month to it
     let eot_date = null;
     const lastPayment = reversePayments.find(vv => vv.subscr_id === (v.subscr_id || v.recurring_payment_id));
     if (lastPayment) {
-      eot_date = moment(lastPayment.payment_date,
-        'HH:mm:ss MMM DD, YYYY zz');
-      eot_date.add(1, 'month');
-      eot_date = eot_date.format('MMM YYYY');
+      const lastPaymentIdx = member.paypal.findIndex(vv => vv === lastPayment);
+      const eotIdx = member.paypal.findIndex(vv => vv === v);
+      
+      if (eotIdx > lastPaymentIdx) {
+        eot_date = moment(lastPayment.payment_date,
+          'HH:mm:ss MMM DD, YYYY zz');
+        eot_date.add(1, 'month');
+        eot_date = eot_date.format('MMM YYYY');
+      }
     }
 
     if (eot_date && periodRegex.test(eot_date)) {
@@ -991,6 +999,9 @@ function namifyMember(period, member) {
         // terminal unless period is representative of the current calendar month / year
         // in which case a bit more math is needed
         status = 'terminal';
+        if (member.name.includes(debugName)) {
+          console.log('INITIALIZED to terminal');
+        }
         if (periodIsCurrent) {
 
           // it's active if the payment is less than a month old
@@ -1011,11 +1022,19 @@ function namifyMember(period, member) {
             const nextPaymentDateMoment = moment(lastPaymentMoment);
             nextPaymentDateMoment.add(1, 'month');
             if (lastCancellationMoment.isBefore(nextPaymentDateMoment) && lastCancellationMoment.isAfter(lastPaymentMoment)) {
+              if (member.name.includes(debugName)) {
+                console.log('CHANGED to terminal because of lastCancellationMoment after lastPaymentMoment');
+              }  
+              
               status = 'terminal';
             }
           }
         }
       } else if (lastTransactionInPreviousPeriod.txn_type === 'subscr_cancel') {
+        if (member.name.includes(debugName)) {
+          console.log('CHANGED TO terminal because last transaction is subscr_cancel');
+        }
+
         status = 'terminal';
       }
 
@@ -1048,10 +1067,19 @@ function namifyMember(period, member) {
   } else if (periodHasPayments && !periodHasEots) {
     status = 'active';
   } else if (periodHasEots && !periodHasPayments) {
+    if (member.name.includes(debugName)) {
+      console.log('CHANGED to terminal because perion has EOTs and no payments', JSON.stringify(periodTransactions, null, 2), periodRegex);
+    }
+
     status = 'terminal';
   } else if (periodHasPayments && periodHasEots) {
     status = periodTransactions.slice(-1)[0].txn_type === 'subscr_payment' ?
       'new' : 'terminal';
+
+    if (member.name.includes(debugName) && status === 'terminal') {
+      console.log('CHANGED to terminal because last period transaction is not subscr_payment');
+    }
+
   }
 
   if (name === '') {
