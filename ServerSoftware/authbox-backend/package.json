@@ -18,7 +18,7 @@
     "mongodb": "^3.0.2",
     "morgan": "~1.9.1",
     "pbkdf2": "^3.0.14",
-    "pug": "2.0.0-beta11",
+    "pug": "3.0.1",
     "serve-favicon": "~2.4.5",
     "wait-until": "0.0.2"
   }
