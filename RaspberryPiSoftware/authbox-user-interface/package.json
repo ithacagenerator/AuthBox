@@ -11,7 +11,7 @@
   "dependencies": {
     "adafruit-i2c-lcd": "^1.0.2",
     "homedir": "^0.6.0",
-    "moment": "^2.20.1",
+    "moment": "^2.29.4",
     "mongodb": "^3.0.2",
     "pbkdf2": "^3.0.14",
     "promise-do-whilst": "^1.0.1",
