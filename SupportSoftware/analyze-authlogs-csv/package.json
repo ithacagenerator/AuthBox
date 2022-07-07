@@ -7,7 +7,7 @@
     "csv-parse": "^4.4.6",
     "csv-stringify": "^4.3.1",
     "minimist": "^1.2.0",
-    "moment": "^2.22.2"
+    "moment": "^2.29.4"
   },
   "devDependencies": {},
   "scripts": {
